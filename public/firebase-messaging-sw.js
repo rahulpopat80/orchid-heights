@@ -99,6 +99,17 @@ function setupVisitorListener(wing, flatNo) {
           } else {
             notifiedIds.add(docId);
           }
+        } else if (change.type === 'removed') {
+          const docId = change.doc.id;
+          console.log(`[SW] Visitor ${docId} resolved elsewhere. Auto-dismissing notification.`);
+          // Get any active notification with this visitor's tag and close it
+          if (self.registration.getNotifications) {
+            self.registration.getNotifications({ tag: docId }).then(notifications => {
+              notifications.forEach(notification => notification.close());
+            }).catch(err => {
+              console.warn('[SW] Failed to auto-dismiss resolved notification:', err);
+            });
+          }
         }
       });
     }, err => {
@@ -237,20 +248,85 @@ self.addEventListener('message', (event) => {
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   
-  const visitorId = event.notification.data?.visitorId || event.notification.data?.id;
+  const visitorId = event.notification.data?.visitorId || event.notification.data?.id || event.notification.tag;
   const action = event.action;
 
   if (action === 'approve' || action === 'reject') {
     const status = action === 'approve' ? 'approved' : 'rejected';
-    
-    // Write directly to Firestore from the service worker background thread!
-    const updatePromise = db.collection('visitors').doc(visitorId).update({
-      status: status,
-      respondedAt: new Date().toISOString()
+    console.log(`[SW] Action clicked: ${action}. Target Visitor: ${visitorId}`);
+
+    if (!visitorId || visitorId === 'fcm_notif') {
+      console.warn('[SW] Mismatched or invalid visitorId tag, skipping database transaction.');
+      return;
+    }
+
+    const visitorRef = db.collection('visitors').doc(visitorId);
+    const notificationRef = db.collection('notifications').doc(visitorId);
+
+    const updatePromise = db.runTransaction((transaction) => {
+      return transaction.get(visitorRef).then((visitorDoc) => {
+        if (!visitorDoc.exists) {
+          throw new Error("Visitor document does not exist");
+        }
+
+        const visitorData = visitorDoc.data();
+        // Prevent double response if another device already responded
+        if (visitorData.status !== 'pending') {
+          console.log(`[SW] Visitor ${visitorId} already responded: ${visitorData.status}. Skipping.`);
+          return;
+        }
+
+        const respondedTime = new Date().toISOString();
+        const respondedBy = 'Resident (via Notification)';
+        const rejectReason = '';
+
+        const updatedVisitor = {
+          ...visitorData,
+          status: status,
+          respondedTime: respondedTime,
+          respondedBy: respondedBy,
+          rejectReason: rejectReason
+        };
+
+        transaction.set(visitorRef, updatedVisitor);
+        transaction.set(notificationRef, {
+          status: status,
+          respondedTime: respondedTime,
+          respondedBy: respondedBy,
+          rejectReason: rejectReason
+        }, { merge: true });
+
+        // Query society notifications matching this visitorId
+        return db.collection('society_notifications')
+          .where('metadata.visitorId', '==', visitorId)
+          .get()
+          .then((notifSnap) => {
+            notifSnap.forEach((docSnap) => {
+              const notifData = docSnap.data();
+              const newTitle = `🚪 Gate Visitor: ${visitorData.fullName} (${status.toUpperCase()})`;
+              const newMsg = status === 'approved'
+                ? `Visitor ${visitorData.fullName} (${visitorData.guestType}) was APPROVED for entry to Flat ${visitorData.wing}-${visitorData.flatNo} by ${respondedBy} for ${visitorData.reason}.`
+                : `Visitor ${visitorData.fullName} (${visitorData.guestType}) was REJECTED for entry to Flat ${visitorData.wing}-${visitorData.flatNo} by ${respondedBy}.${rejectReason ? ' Reason: ' + rejectReason : ''}`;
+              
+              transaction.set(db.collection('society_notifications').doc(docSnap.id), {
+                title: newTitle,
+                message: newMsg,
+                status: status,
+                metadata: {
+                  ...notifData.metadata,
+                  status: status,
+                  respondedTime: respondedTime,
+                  respondedBy: respondedBy,
+                  rejectReason: rejectReason
+                }
+              }, { merge: true });
+            });
+          });
+      });
     }).then(() => {
-      console.log(`[SW] Background successfully updated visitor ${visitorId} to status: ${status}`);
+      console.log(`[SW] Successfully transaction-updated visitor ${visitorId} to status: ${status}`);
     }).catch(err => {
-      console.error('[SW] Failed to update visitor status from background worker:', err);
+      console.error('[SW] Transaction failed to update visitor status:', err);
     });
 
     // Broadcast status change to any active browser client tabs

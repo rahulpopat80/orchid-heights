@@ -369,7 +369,18 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
           const currentDevices = ownerData.devices || [];
           const device = payload.device;
           if (device && device.deviceId) {
-            const isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
+            let isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
+            
+            // Match by fingerprint too to prevent duplicate blocks for same browser/IP
+            if (!isRegistered) {
+              isRegistered = currentDevices.some((d) => 
+                d.os === device.os && 
+                d.browser === device.browser && 
+                d.userAgent === device.userAgent && 
+                d.ipAddress === device.ipAddress
+              );
+            }
+
             if (!isRegistered && currentDevices.length >= 4) {
               return {
                 success: false,
@@ -739,7 +750,18 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
     if (ownerSnap.exists()) {
       const ownerData = ownerSnap.data() as FlatOwner;
       const currentDevices = ownerData.devices || [];
-      const existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
+      let existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
+      
+      // Fallback matching by fingerprint to avoid duplicate clutter on Incognito logins
+      if (existingIdx === -1) {
+        existingIdx = currentDevices.findIndex((d) => 
+          d.os === device.os && 
+          d.browser === device.browser && 
+          d.userAgent === device.userAgent && 
+          d.ipAddress === device.ipAddress
+        );
+      }
+
       if (existingIdx > -1) {
         currentDevices[existingIdx] = { ...currentDevices[existingIdx], ...device, lastLogin: new Date().toISOString() };
       } else {
@@ -862,6 +884,14 @@ export async function createComplaint(payload: any): Promise<Complaint> {
 
   try {
     await setDoc(doc(db, 'complaints', complaintId), newComplaint);
+    
+    // Notify about the new complaint
+    createSocietyNotification({
+      type: 'complaint',
+      title: `📝 New Complaint Filed`,
+      message: `Flat ${derivedFlatId} filed a complaint: "${title}"`
+    }).catch(err => console.warn('Failed to dispatch new complaint notification:', err));
+
     return newComplaint;
   } catch (error) {
     if (isQuotaError(error)) {

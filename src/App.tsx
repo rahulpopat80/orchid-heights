@@ -237,6 +237,40 @@ export default function App() {
     setActiveTab('directory');
   };
 
+  // Validate active device registration state (handles admin remote signout)
+  useEffect(() => {
+    if (session && (session.role === 'owner' || session.role === 'admin') && session.wing && session.flatNo) {
+      const validateDeviceSession = async () => {
+        try {
+          const flatKey = `${session.wing}_${session.flatNo}`;
+          const deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
+          
+          if (deviceId) {
+            const ownersList = await api.getOwners();
+            const myOwner = ownersList.find((o: any) => o.wing === session.wing && o.flatNo === session.flatNo);
+            
+            if (myOwner) {
+              const registeredDevices = myOwner.devices || [];
+              const isDeviceRegistered = registeredDevices.some((d: any) => d.deviceId === deviceId);
+              
+              if (!isDeviceRegistered) {
+                console.warn('[Session Security] This device has been signed out remotely by Admin.');
+                alert('🚫 This device has been signed out / removed from this flat by the administrator.');
+                handleLogout();
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('[Session Security] Failed to validate device registration:', err);
+        }
+      };
+      
+      // Delay validation slightly to not block page loading
+      const checkTimer = setTimeout(validateDeviceSession, 3000);
+      return () => clearTimeout(checkTimer);
+    }
+  }, [session, owners]);
+
   return (
     <Routes>
       <Route
