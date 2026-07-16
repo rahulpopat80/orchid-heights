@@ -52,23 +52,25 @@ function syncBackgroundListeners() {
 
 // Subscribe to real-time visitors for the specific flat in the background
 function setupVisitorListener(wing, flatNo) {
-  if (activeUnsubscribe) {
+  if (activeUnsubscribe && Array.isArray(activeUnsubscribe)) {
+    activeUnsubscribe.forEach(u => u());
+  } else if (activeUnsubscribe) {
     activeUnsubscribe();
   }
+  activeUnsubscribe = [];
 
   console.log(`[SW] Starting background visitor snapshot listener for flat ${wing}-${flatNo}`);
 
-  activeUnsubscribe = db.collection('visitors')
+  activeUnsubscribe.push(db.collection('visitors')
     .where('wing', '==', wing)
     .where('flatNo', '==', Number(flatNo))
-    .where('status', '==', 'waiting')
+    .where('status', '==', 'pending')
     .onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added') {
           const docId = change.doc.id;
           const visitor = change.doc.data();
 
-          // Ensure we don't alert for old records on initial snapshot load
           const isFresh = (Date.now() - (visitor.createdAt || Date.now())) < 60000;
 
           if (!notifiedIds.has(docId) && isFresh) {
@@ -84,25 +86,92 @@ function setupVisitorListener(wing, flatNo) {
               badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
               tag: docId,
               requireInteraction: true,
-              data: { 
-                visitorId: docId, 
-                wing, 
-                flatNo 
-              },
+              data: { visitorId: docId, wing, flatNo },
               actions: [
                 { action: 'approve', title: '✅ Approve' },
                 { action: 'reject', title: '❌ Reject' }
               ]
             });
           } else {
-            // Keep track of pre-existing documents loaded on snapshot initiation
             notifiedIds.add(docId);
           }
         }
       });
     }, err => {
       console.error('[SW] Firestore background snapshot listener error:', err);
-    });
+    }));
+
+  activeUnsubscribe.push(db.collection('announcements')
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const docId = change.doc.id;
+          const ann = change.doc.data();
+          const isFresh = (Date.now() - new Date(ann.timestamp || Date.now()).getTime()) < 60000;
+          
+          let shouldNotify = false;
+          if (ann.target === 'all') shouldNotify = true;
+          if (ann.target === 'wing' && ann.wing === wing) shouldNotify = true;
+          if (ann.target === 'flat' && ann.wing === wing && ann.flatNo === Number(flatNo)) shouldNotify = true;
+
+          if (shouldNotify && !notifiedIds.has(docId) && isFresh) {
+            notifiedIds.add(docId);
+            self.registration.showNotification(`📢 Notice: ${ann.sender || 'Admin'}`, {
+              body: ann.text,
+              icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+              tag: docId,
+              data: { url: '/?activeTab=resident' }
+            });
+          } else {
+            notifiedIds.add(docId);
+          }
+        }
+      });
+    }));
+
+  activeUnsubscribe.push(db.collection('financial_reports')
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const docId = change.doc.id;
+          const fin = change.doc.data();
+          const isFresh = (Date.now() - new Date(fin.date || fin.createdAt || Date.now()).getTime()) < 60000;
+          
+          if (!notifiedIds.has(docId) && isFresh) {
+            notifiedIds.add(docId);
+            self.registration.showNotification(`💰 Financial Ledger Update`, {
+              body: `New ${fin.type}: ${fin.title} - ₹${fin.amount}`,
+              icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+              tag: docId,
+              data: { url: '/?activeTab=resident' }
+            });
+          } else {
+            notifiedIds.add(docId);
+          }
+        }
+      });
+    }));
+
+  activeUnsubscribe.push(db.collection('complaints')
+    .where('wing', '==', wing)
+    .where('flatNo', '==', Number(flatNo))
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'modified') {
+          const docId = change.doc.id;
+          const comp = change.doc.data();
+          if (comp.status === 'resolved' && !notifiedIds.has(docId + '-resolved')) {
+            notifiedIds.add(docId + '-resolved');
+            self.registration.showNotification(`✅ Complaint Resolved`, {
+              body: `Your complaint "${comp.title}" has been marked as resolved!`,
+              icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+              tag: docId,
+              data: { url: '/?activeTab=resident' }
+            });
+          }
+        }
+      });
+    }));
 }
 
 // FCM standard background messages support

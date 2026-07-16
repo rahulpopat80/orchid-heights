@@ -1201,15 +1201,15 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   </span>
                 </button>
 
-                {/* Notification bell with badge */}
+                {/* Premium Notification bell with badge */}
                 <button
                   onClick={() => setIsNotificationsOpen(true)}
-                  className="relative p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition cursor-pointer shadow-sm border border-white/10 backdrop-blur-md"
+                  className="relative flex items-center justify-center p-3.5 bg-gradient-to-tr from-indigo-600/90 to-purple-600/90 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl transition-all duration-300 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/30 backdrop-blur-xl group hover:scale-105 active:scale-95"
                   title="Open Notifications Panel"
                 >
-                  <Bell className="w-4.5 h-4.5" />
+                  <Bell className="w-5 h-5 group-hover:animate-bounce" />
                   {(societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length + activeSosAlerts.length) > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-[#7C3AED] text-white text-[8px] font-black rounded-full flex items-center justify-center shadow animate-bounce">
+                    <span className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-slate-800 shadow-[0_0_15px_rgba(225,29,72,0.6)] animate-pulse">
                       {societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length + activeSosAlerts.length}
                     </span>
                   )}
