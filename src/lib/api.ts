@@ -38,7 +38,8 @@ import {
   getFlatPasswords,
   createSocietyNotification,
   subscribeToSocietyNotifications,
-  deployFirestoreRulesAutonomously
+  deployFirestoreRulesAutonomously,
+  subscribeToOwners
 } from './firebase';
 
 export async function detectServerEnvironment(): Promise<boolean> {
@@ -271,5 +272,12 @@ export const api = {
     onUpdate: (notifications: any[]) => void
   ) => {
     return subscribeToSocietyNotifications(wing, flatNo, onUpdate);
+  },
+
+  subscribeOwners: (
+    onUpdate: (owners: FlatOwner[]) => void,
+    onError?: (error: Error) => void
+  ) => {
+    return subscribeToOwners(onUpdate, onError);
   }
 };

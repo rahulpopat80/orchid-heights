@@ -431,7 +431,33 @@ export async function getAllOwners(): Promise<FlatOwner[]> {
     handleFirestoreError(error, OperationType.LIST, 'owners');
   }
 }
-
+export function subscribeToOwners(onUpdate: (owners: FlatOwner[]) => void, onError?: (error: Error) => void) {
+  if (isQuotaExceeded) return () => {};
+  try {
+    const unsubscribe = rawOnSnapshot(
+      rawCollection(db, 'owners'),
+      (snapshot) => {
+        const list: FlatOwner[] = [];
+        snapshot.forEach((docSnap) => {
+          list.push(docSnap.data() as FlatOwner);
+        });
+        list.sort((a, b) => a.wing !== b.wing ? a.wing.localeCompare(b.wing) : a.flatNo - b.flatNo);
+        onUpdate(list);
+      },
+      (error) => {
+        if (isQuotaError(error)) {
+          markQuotaExceeded();
+        }
+        if (onError) onError(error);
+      }
+    );
+    return unsubscribe;
+  } catch (error: any) {
+    console.error('Failed to subscribe to owners:', error);
+    if (onError) onError(error);
+    return () => {};
+  }
+}
 export async function updateOwnerDetails(wing: string, flatNo: number, payload: any): Promise<{ success: boolean; owner?: FlatOwner; message?: string }> {
   if (isQuotaExceeded) return fallback.updateOwnerDetailsLocal(wing, flatNo, payload);
   const id = `${wing}-${flatNo}`;
@@ -1089,7 +1115,7 @@ async function triggerFCMPushForSocietyNotification(payload: {
       // Deliver to each token
       for (const token of allTokens) {
         try {
-          await fetch(
+          const response = await fetch(
             `https://fcm.googleapis.com/v1/projects/${firebaseConfig.projectId}/messages:send`,
             {
               method: "POST",
@@ -1117,8 +1143,23 @@ async function triggerFCMPushForSocietyNotification(payload: {
               })
             }
           );
-        } catch (deliveryErr) {
+
+          if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`FCM Server returned status ${response.status}: ${errText}`);
+          }
+          console.log(`[FCM Trigger] Notification successfully broadcast-sent to token ${token.substring(0, 8)}...`);
+        } catch (deliveryErr: any) {
           console.warn('[FCM Trigger] Failed delivery to token:', token, deliveryErr);
+          try {
+            await addDoc(collection(db, 'fcm_errors'), {
+              timestamp: new Date().toISOString(),
+              token: token.substring(0, 15) + '...',
+              error: deliveryErr.message || String(deliveryErr),
+              context: 'broadcast_push',
+              title: payload.title
+            });
+          } catch (logErr) {}
         }
       }
     }
@@ -1568,12 +1609,20 @@ export async function sendFCMPushToFlat(
 
         if (!response.ok) {
           const errText = await response.text();
-          console.warn(`[FCM] Delivery failed for token ${token.substring(0, 8)}...: ${errText}`);
-        } else {
-          console.log(`[FCM] Notification successfully sent to token ${token.substring(0, 8)}...`);
+          throw new Error(`FCM Server returned status ${response.status}: ${errText}`);
         }
-      } catch (postErr) {
+        console.log(`[FCM] Notification successfully sent to token ${token.substring(0, 8)}...`);
+      } catch (postErr: any) {
         console.warn(`[FCM] Individual token delivery failed for ${token.substring(0, 8)}...`, postErr);
+        try {
+          await addDoc(collection(db, 'fcm_errors'), {
+            timestamp: new Date().toISOString(),
+            token: token.substring(0, 15) + '...',
+            error: postErr.message || String(postErr),
+            context: 'flat_push',
+            title: notification.title
+          });
+        } catch (logErr) {}
       }
     }
   } catch (err) {

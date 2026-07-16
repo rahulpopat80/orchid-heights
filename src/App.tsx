@@ -57,21 +57,49 @@ export default function App() {
     }
   };
 
-  // Fetch owners directory when app boots or session loads
+  // Fetch owners directory when app boots or session loads, and subscribe in real-time
   useEffect(() => {
     loadOwners();
+    
+    const unsubscribe = api.subscribeOwners((data) => {
+      if (Array.isArray(data)) {
+        setOwners(data);
+      }
+    }, (err) => {
+      console.warn('Real-time owners subscription failed, using manual reload fallback:', err);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Register service worker and request Notification permission on startup
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then((reg) => {
+      const currentProjectId = firebaseConfig.projectId;
+      const cachedProject = localStorage.getItem('orchid_sw_project_id');
+
+      if (cachedProject !== currentProjectId) {
+        console.log('[SW Migration] Migrating service worker to new project:', currentProjectId);
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (let reg of registrations) {
+            reg.unregister();
+            console.log('[SW Migration] Unregistered old SW scope:', reg.scope);
+          }
+          // Register fresh service worker
+          navigator.serviceWorker.register('/firebase-messaging-sw.js').then((newReg) => {
+            console.log('[SW Migration] Registered new SW scope:', newReg.scope);
+            localStorage.setItem('orchid_sw_project_id', currentProjectId);
+          });
+        });
+      } else {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js').then((reg) => {
           console.log('Orchid Heights service worker registered:', reg.scope);
-        })
-        .catch((err) => {
+          // Check for service worker updates immediately
+          reg.update();
+        }).catch((err) => {
           console.error('Orchid Heights service worker registration failed:', err);
         });
+      }
     }
 
     if ('Notification' in window && Notification.permission === 'default') {

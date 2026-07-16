@@ -586,14 +586,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
     try {
       await addDoc(collection(db, 'gym_theatre_logs'), payload);
-      
-      // Dispatch society notification for gym check-in
-      api.createSocietyNotification({
-        type: 'movie_schedule',
-        title: `🏋️ Gym/Theatre Check-in: Flat ${flatId}`,
-        message: `Flat ${flatId} checked into the ${amenity} at ${new Date().toLocaleTimeString('en-IN')}.`
-      }).catch(err => console.warn('Failed to dispatch checkin notification:', err));
-
       setGymTheatreSuccess(`Checked in to ${amenity} successfully!`);
     } catch (err: any) {
       setGymTheatreError(err.message || 'Check-in failed.');
