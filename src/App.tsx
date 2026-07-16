@@ -15,6 +15,7 @@ import Directory from './components/Directory';
 import AdminPage from './components/AdminPage';
 import { api, detectServerEnvironment } from './lib/api';
 import { registerFCMToken, subscribeToForegroundMessages } from './lib/firebase';
+import firebaseConfig from '../firebase-applet-config.json';
 
 export default function App() {
   // Session details stored in localStorage for persistent logins
