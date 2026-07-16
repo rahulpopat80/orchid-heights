@@ -21,7 +21,7 @@ import {
   orderBy as rawOrderBy,
   arrayUnion as rawArrayUnion
 } from 'firebase/firestore';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, deleteToken, onMessage } from 'firebase/messaging';
 import { FlatOwner, Visitor, Announcement, DeviceInfo, Complaint, FinancialReport, EssentialContact } from '../types';
 import { getInitialOwners } from '../data/ownersData';
 import firebaseConfig from '../../firebase-applet-config.json';
@@ -988,6 +988,12 @@ export async function createSocietyNotification(payload: {
   const newNotif = { id, type: payload.type, title: payload.title, message: payload.message, wing: payload.wing || '', flatNo: payload.flatNo || 0, timestamp: new Date().toISOString(), metadata: payload.metadata || {} };
   try {
     await setDoc(doc(db, 'society_notifications', id), newNotif);
+    
+    // Dispatch FCM push notification asynchronously in the background so it doesn't block the write
+    triggerFCMPushForSocietyNotification(payload).catch(err => {
+      console.warn('[FCM Trigger] Background notification dispatch failed:', err);
+    });
+
     return true;
   } catch (error) {
     if (isQuotaError(error)) {
@@ -996,6 +1002,98 @@ export async function createSocietyNotification(payload: {
     }
     console.error('Failed to create society notification:', error);
     return false;
+  }
+}
+
+// Background worker to push FCM messages to one or all owners based on target scope
+async function triggerFCMPushForSocietyNotification(payload: {
+  type: 'notice' | 'financial' | 'complaint' | 'visitor' | 'amenity_request' | 'movie_schedule';
+  title: string; message: string; wing?: string; flatNo?: number;
+}): Promise<void> {
+  const wing = payload.wing || '';
+  const flatNo = payload.flatNo || 0;
+
+  try {
+    if (wing && flatNo > 0) {
+      console.log(`[FCM Trigger] Direct push to flat: ${wing}-${flatNo}`);
+      await sendFCMPushToFlat(wing, flatNo, {
+        title: payload.title,
+        body: payload.message,
+        data: { type: payload.type }
+      });
+    } else {
+      console.log(`[FCM Trigger] Broadcast push. Wing: ${wing || 'All'}`);
+      let queryRef;
+      if (wing) {
+        queryRef = rawQuery(rawCollection(db, 'owners'), rawWhere('wing', '==', wing.toUpperCase()));
+      } else {
+        queryRef = rawCollection(db, 'owners');
+      }
+
+      const snap = await rawGetDocs(queryRef);
+      const allTokens: string[] = [];
+      snap.forEach((docSnap) => {
+        const ownerData = docSnap.data() as FlatOwner;
+        const tokens: string[] = (ownerData as any).fcmTokens || [];
+        tokens.forEach(t => {
+          if (t && !allTokens.includes(t)) {
+            allTokens.push(t);
+          }
+        });
+      });
+
+      if (allTokens.length === 0) {
+        console.log('[FCM Trigger] No tokens registered for broadcast scope, skipping push.');
+        return;
+      }
+
+      console.log(`[FCM Trigger] Dispatching broadcast push to ${allTokens.length} devices...`);
+      const serviceAccount = getHardcodedServiceAccount();
+      if (!serviceAccount.client_email || !serviceAccount.private_key) return;
+
+      const accessToken = await getGoogleAccessToken(
+        serviceAccount.client_email,
+        serviceAccount.private_key
+      );
+
+      // Deliver to each token
+      for (const token of allTokens) {
+        try {
+          await fetch(
+            `https://fcm.googleapis.com/v1/projects/${firebaseConfig.projectId}/messages:send`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`
+              },
+              body: JSON.stringify({
+                message: {
+                  token: token,
+                  notification: {
+                    title: payload.title,
+                    body: payload.message
+                  },
+                  webpush: {
+                    notification: {
+                      icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png"
+                    },
+                    fcm_options: {
+                      link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
+                    }
+                  },
+                  data: { type: payload.type }
+                }
+              })
+            }
+          );
+        } catch (deliveryErr) {
+          console.warn('[FCM Trigger] Failed delivery to token:', token, deliveryErr);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[FCM Trigger] Background push execution failed:', err);
   }
 }
 
@@ -1198,11 +1296,34 @@ export async function registerFCMToken(wing: string, flatNo: number): Promise<st
     return null;
   }
   try {
-    // Wait for service worker to be ready
+    const currentProjectId = firebaseConfig.projectId;
+    const cachedProject = localStorage.getItem('orchid_fcm_project_id');
+
+    // Force deletion of old token if project migrated to ensure we get a token for the new project
+    if (cachedProject !== currentProjectId) {
+      console.log('[FCM] Project migrated. Deleting old cached FCM token...');
+      try {
+        await deleteToken(messaging);
+      } catch (delErr) {
+        console.warn('Could not delete old FCM token:', delErr);
+      }
+      localStorage.removeItem(`orchid_fcm_token_${wing}_${flatNo}`);
+      localStorage.setItem('orchid_fcm_project_id', currentProjectId);
+    }
+
+    let swReg: ServiceWorkerRegistration | undefined = undefined;
     if ('serviceWorker' in navigator) {
+      // Register or retrieve the active service worker registration
+      swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
       await navigator.serviceWorker.ready;
     }
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+
+    // Explicitly link VAPID key and our custom Service Worker registration
+    const token = await getToken(messaging, { 
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: swReg 
+    });
+
     if (token) {
       const id = `${wing}-${flatNo}`;
       const ownerRef = doc(db, 'owners', id);

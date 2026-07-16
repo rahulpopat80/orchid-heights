@@ -192,18 +192,24 @@ messaging.onBackgroundMessage((payload) => {
   const title = payload.notification?.title || '🚪 New Visitor Request';
   const body = payload.notification?.body || 'A visitor is waiting at the gate for approval!';
   const icon = payload.notification?.image || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png';
+  const type = payload.data?.type || 'visitor';
   
-  self.registration.showNotification(title, {
+  const options = {
     body,
     icon,
     badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
     data: payload.data || {},
-    requireInteraction: true,
-    actions: [
+    requireInteraction: type === 'visitor'
+  };
+
+  if (type === 'visitor') {
+    options.actions = [
       { action: 'approve', title: '✅ Approve' },
       { action: 'reject', title: '❌ Reject' }
-    ]
-  });
+    ];
+  }
+
+  self.registration.showNotification(title, options);
 });
 
 // Sync listeners on startup and registration events
