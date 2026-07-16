@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Check if user is logged in
+    function isOwner() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user has Admin or Security role
+    function isAdminOrSecurity() {
+      return request.auth != null && 
+        (
+          firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'security'
+        );
+    }
+    
+    // Visitor photos folder
+    match /visitor_photos/{photoId} {
+      allow read: if isOwner();
+      allow write: if isAdminOrSecurity();
+      allow delete: if request.auth != null && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

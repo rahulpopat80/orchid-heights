@@ -1,0 +1,15 @@
+{
+  "name": "orchid-heights",
+  "version": "1.0.0",
+  "description": "Orchid Heights gate and resident management web portal with real-time multi-tab and Firebase sync.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "serve": "http-server -p 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vite": "^5.1.0",
+    "http-server": "^14.1.1"
+  }
+}

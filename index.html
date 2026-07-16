@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orchid Heights - gate & Resident Management Portal</title>
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Firebase Compat Client SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+  
+  <!-- SheetJS Excel Parser Library -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- Firebase Disconnected Warning Wizard -->
+  <div id="firebase-warning-banner" class="config-banner" style="display: none; background: var(--warning-bg); border-bottom: 1px solid var(--warning-border); border-radius: 0; padding: 12px 24px; font-size:13.5px; color: var(--warning); z-index: 10000; position: sticky; top: 0;">
+    <div style="display:flex; align-items:center; gap:8px; max-width: 1200px; margin: 0 auto; width:100%;">
+      <span class="material-icons" style="font-size:20px;">warning</span>
+      <span>
+        <strong>Firebase Disconnected:</strong> Running in local sandbox mode. Sign in as Admin (Wing B, Flat 1104, password <strong>9898180810</strong>) and paste your configuration keys in settings to activate FireStore, Storage & Push notifications.
+      </span>
+    </div>
+  </div>
+
+  <!-- Realtime App Notification Overlay -->
+  <div id="notification-banner-container" class="notification-banner-container"></div>
+
+  <!-- Audio Chime Waveform Indicator -->
+  <div id="sound-indicator" class="sound-indicator">
+    <div class="sound-bar" style="animation: sound-bounce 0.6s infinite alternate;"></div>
+    <div class="sound-bar" style="animation: sound-bounce 0.6s infinite alternate; animation-delay: 0.15s;"></div>
+    <div class="sound-bar" style="animation: sound-bounce 0.6s infinite alternate; animation-delay: 0.3s;"></div>
+    <span>Sound alert triggered!</span>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- NAVBAR (FOR ADMINISTRATIVE VIEWS) -->
+    <header class="app-navbar" style="border-radius: var(--radius-lg); margin-bottom: 24px;">
+      <div class="brand">
+        <div class="brand-icon">🏢</div>
+        <div class="brand-text">
+          <h1 style="font-size: 16px; margin: 0; color: white;">Orchid Heights</h1>
+          <span style="font-size: 9px; letter-spacing: 1px;">Resident Gate System</span>
+        </div>
+      </div>
+      
+      <div class="nav-user-info" id="nav-info-block" style="display: none;">
+        <span class="user-badge nav-user-label" style="font-size:11.5px;">Loading User Profile...</span>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- ==================== 1. LOGIN PORTALS ==================== -->
+    <main id="auth-view" class="auth-wrapper">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Orchid Heights App</h2>
+          <p>Select your login portal below to sign in</p>
+        </div>
+        
+        <div class="auth-tabs">
+          <div id="auth-tab-res" class="auth-tab active" onclick="toggleLoginTabs('resident')">Resident Portal</div>
+          <div id="auth-tab-sec" class="auth-tab" onclick="toggleLoginTabs('security')">Gate Security</div>
+        </div>
+
+        <!-- Resident Login Form -->
+        <form id="res-login-form" onsubmit="handleResidentLogin(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="res-wing">Select Wing</label>
+              <select id="res-wing" required>
+                <option value="A">Wing A</option>
+                <option value="B">Wing B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="res-flat">Flat Number</label>
+              <select id="res-flat" required>
+                <!-- Filled dynamically by JS -->
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="res-password">Portal Password</label>
+            <input type="password" id="res-password" class="form-control" placeholder="••••••••" required>
+            <span style="font-size: 11px; color: var(--text-light); display: block; margin-top: 5px;">Common Default: <strong>admin@123</strong><br>Super Admin: Wing B-1104, Password: <strong>9898180810</strong></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In As Resident</button>
+        </form>
+
+        <!-- Security Login Form -->
+        <form id="sec-login-form" onsubmit="handleSecurityLogin(event)" style="display: none;">
+          <div class="form-group">
+            <label for="sec-username">Security ID</label>
+            <input type="text" id="sec-username" class="form-control" placeholder="admin" required>
+          </div>
+          <div class="form-group">
+            <label for="sec-password">Security Password</label>
+            <input type="password" id="sec-password" class="form-control" placeholder="••••••••" required>
+            <span style="font-size: 11px; color: var(--text-light); display: block; margin-top: 5px;">Gate Account: <strong>admin</strong> / <strong>admin@123</strong></span>
+          </div>
+          <button type="submit" class="btn btn-secondary btn-block">Sign In As Guard</button>
+        </form>
+      </div>
+    </main>
+
+    <!-- ==================== 2. SECURITY GUARD PORTAL ==================== -->
+    <main id="security-view" style="display: none;">
+      <div class="grid-2">
+        
+        <!-- Left Column: Visitor Form -->
+        <div class="glass-card">
+          <div class="glass-card-title">
+            <span class="material-icons" style="color: var(--primary-color);">person_add</span>
+            Visitor Entry Registration
+          </div>
+          
+          <form id="visitor-entry-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="visitor-name">Visitor Full Name *</label>
+                <input type="text" id="visitor-name" class="form-control" placeholder="Ramesh Kumar" required>
+              </div>
+              <div class="form-group">
+                <label for="visitor-phone">Mobile Number *</label>
+                <input type="tel" id="visitor-phone" class="form-control" placeholder="9876543210" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="visitor-type">Guest Type *</label>
+                <select id="visitor-type" required>
+                  <option value="delivery">📦 Delivery Partner</option>
+                  <option value="guest">👥 Personal Guest</option>
+                  <option value="electrician">⚡ Electrician / Plumber</option>
+                  <option value="milkman">🥛 Milkman / Vendor</option>
+                  <option value="courier">✉️ Courier Agent</option>
+                  <option value="other">🛠️ Maintenance worker</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="visitor-count">Number of Visitors *</label>
+                <input type="number" id="visitor-count" class="form-control" value="1" min="1" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="visitor-wing">Target Wing *</label>
+                <select id="visitor-wing" required>
+                  <option value="A">Wing A</option>
+                  <option value="B">Wing B</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="visitor-flat">Target Flat *</label>
+                <select id="visitor-flat" required>
+                  <!-- Preloaded -->
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="background: #f1f5f9; padding: 10px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <span id="visitor-owner-name" style="font-size:12.5px; font-weight: 500; color: var(--primary-color);">Select target flat...</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="visitor-reason">Reason for Visit *</label>
+                <input type="text" id="visitor-reason" class="form-control" placeholder="Amazon parcel, social visit" required>
+              </div>
+              <div class="form-group">
+                <label for="visitor-email">Email (Optional)</label>
+                <input type="email" id="visitor-email" class="form-control" placeholder="guest@gmail.com">
+              </div>
+            </div>
+
+            <!-- Photo Snapshot capture -->
+            <div class="form-group">
+              <label>Take Visitor Photo *</label>
+              <div class="camera-box" id="camera-box">
+                <video id="camera-stream" class="camera-stream" autoplay playsinline style="display: none;"></video>
+                <div class="camera-overlay"></div>
+                <div id="camera-placeholder" class="camera-placeholder">
+                  <span class="material-icons" style="font-size:40px;">photo_camera</span>
+                  <p style="font-size:12px; margin-top:4px;">Webcam not started yet</p>
+                  <button type="button" class="btn btn-secondary" style="margin-top:6px; padding:4px 10px; font-size:11px;" onclick="startWebcam()">Enable Camera</button>
+                </div>
+              </div>
+              
+              <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <button type="button" class="btn btn-primary" style="flex:1; padding:6px 12px; font-size:11.5px;" onclick="captureSnapshot()">📷 Capture Photo</button>
+                <label class="btn" style="flex:1; padding:6px 12px; font-size:11.5px; background:#f1f5f9; border:1px solid #cbd5e1; text-align:center; cursor:pointer;">
+                  📤 Upload Image
+                  <input type="file" id="visitor-photo-file" accept="image/*" style="display: none;">
+                </label>
+              </div>
+
+              <label style="font-size: 11px;">Or select preset avatar:</label>
+              <div class="avatar-selector">
+                <div class="avatar-option selected" data-avatar="delivery">
+                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23cbd5e1'/><path d='M50 25 L75 42 L75 68 L50 85 L25 68 L25 42 Z' fill='%23475569'/><path d='M50 25 L75 42 L50 58 L25 42 Z' fill='%2394a3b8'/><path d='M50 58 L50 85' stroke='%2394a3b8' stroke-width='2'/><circle cx='50' cy='20' r='6' fill='%231e293b'/></svg>" alt="Delivery">
+                  <span class="avatar-label">Delivery</span>
+                </div>
+                <div class="avatar-option" data-avatar="guest">
+                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23eff6ff'/><circle cx='50' cy='40' r='18' fill='%231d4ed8'/><path d='M22 75 C 22 55, 78 55, 78 75 Z' fill='%231d4ed8'/><circle cx='50' cy='38' r='4' fill='%23ffffff'/></svg>" alt="Guest">
+                  <span class="avatar-label">Guest</span>
+                </div>
+                <div class="avatar-option" data-avatar="electrician">
+                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23fef3c7'/><path d='M25 80 L75 80 L70 45 L30 45 Z' fill='%23d97706'/><circle cx='50' cy='35' r='12' fill='%231e293b'/><path d='M50 15 L50 25 M43 18 L57 22' stroke='%23d97706' stroke-width='4'/></svg>" alt="Electrician">
+                  <span class="avatar-label">Electrician</span>
+                </div>
+                <div class="avatar-option" data-avatar="milkman">
+                  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23f0fdf4'/><rect x='35' y='45' width='30' height='35' rx='3' fill='%2316a34a'/><path d='M40 45 L40 32 C40 28, 60 28, 60 32 L60 45' fill='none' stroke='%2386efac' stroke-width='4'/><circle cx='50' cy='20' r='7' fill='%2316a34a'/></svg>" alt="Milkman">
+                  <span class="avatar-label">Milkman</span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">🚀 Send visitor Request</button>
+          </form>
+        </div>
+
+        <!-- Right Column: Recent logs status -->
+        <div>
+          <div class="glass-card">
+            <div class="glass-card-title">
+              <span class="material-icons" style="color: var(--warning);">watch_later</span>
+              Gate Visitor Log (Real-time updates)
+            </div>
+            <div class="request-list" id="guard-requests-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Search residents directory -->
+      <div class="glass-card">
+        <div class="glass-card-title">
+          <span class="material-icons" style="color: var(--primary-color);">contact_mail</span>
+          Residents Contact Directory (View-Only)
+        </div>
+        <div class="search-box">
+          <span class="material-icons search-icon">search</span>
+          <input type="text" id="guard-directory-search" class="form-control" placeholder="Search by flat, owner name, Gujarati name, vehicle plate or mobile...">
+        </div>
+        <div class="table-wrapper">
+          <table id="guard-directory-table">
+            <thead>
+              <tr>
+                <th>Flat</th>
+                <th>Owner Name</th>
+                <th>Contact</th>
+                <th>Vehicles</th>
+                <th>Sub-Members</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Prefilled -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== 3. RESIDENT PORTAL VIEW (SCREENSHOT LAYOUT) ==================== -->
+    <main id="resident-view" style="display: none;">
+      
+      <!-- Mock Smartphone shell for premium representation -->
+      <div style="max-width:480px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 28px; overflow:hidden; box-shadow: var(--shadow-lg);">
+        
+        <!-- Header Banner matching mockup exactly -->
+        <div style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 24px 20px 16px 20px; color: white; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; position:relative;">
+          
+          <!-- Top Row -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <span style="font-weight:700; font-size:15px; letter-spacing:0.5px; font-family: inherit;">SOCIETY APP</span>
+            <div style="display:flex; gap:12px; align-items:center;">
+              <span class="material-icons" style="font-size:18px; cursor:pointer;" onclick="alert('Emergency Alert broadcasted to security!')">sms_failed</span>
+              <span class="material-icons" style="font-size:18px; position:relative; cursor:pointer;" onclick="switchCommunityTab('visitors')">
+                notifications
+                <span style="position:absolute; top:-4px; right:-4px; background:#ef4444; border:1px solid white; border-radius:50%; width:7px; height:7px;"></span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Profile Row -->
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom: 24px;">
+            <div style="width: 58px; height: 58px; border-radius: 50%; overflow:hidden; border: 2px solid rgba(255,255,255,0.4); background:#fff;">
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%231e3a8a'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='32'>👤</text></svg>" style="width:100%; height:100%; object-fit:cover;" alt="User">
+            </div>
+            <div>
+              <h2 id="mock-resident-name" style="font-size:16px; font-weight:700; color:white; margin-bottom:2px;">Raghuvir Sourabh</h2>
+              <span id="mock-resident-flat" style="font-size:12px; color: rgba(255,255,255,0.8); display:block;">A-404 | Genesis Apartments</span>
+            </div>
+          </div>
+
+          <!-- Tabs row -->
+          <div style="display:flex; border-bottom:1px solid rgba(255,255,255,0.15);">
+            <div id="mock-tab-community" class="dashboard-tab active" style="flex:1; text-align:center; padding:10px; color:white; border-bottom-width:2px; font-size:13px; font-weight:600; cursor:pointer;" onclick="switchMockAppTab('community')">Community</div>
+            <div id="mock-tab-personal" class="dashboard-tab" style="flex:1; text-align:center; padding:10px; color:rgba(255,255,255,0.7); border-bottom-width:2px; font-size:13px; font-weight:600; cursor:pointer;" onclick="switchMockAppTab('personal')">Personal</div>
+          </div>
+        </div>
+
+        <!-- Body Area -->
+        <div style="padding: 20px; background: #f8fafc; min-height: 480px;">
+          
+          <!-- COMMUNITY VIEW: GRID OF 6 CARDS -->
+          <div id="mock-section-community">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom: 20px;">
+              
+              <!-- Card 1: Visitors -->
+              <div id="mock-card-visitors" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('visitors')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">door_sensor</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">Visitors</span>
+              </div>
+              
+              <!-- Card 2: MOM -->
+              <div id="mock-card-mom" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('mom')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">groups</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">MOM</span>
+              </div>
+
+              <!-- Card 3: Help Desk -->
+              <div id="mock-card-helpdesk" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('helpdesk')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">contact_support</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">Help desk</span>
+              </div>
+
+              <!-- Card 4: Directory -->
+              <div id="mock-card-directory" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('directory')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">storefront</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">Resident Directory</span>
+              </div>
+
+              <!-- Card 5: Staff -->
+              <div id="mock-card-staff" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('staff')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">dry_cleaning</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">Staff</span>
+              </div>
+
+              <!-- Card 6: Amenities -->
+              <div id="mock-card-amenities" class="mock-community-card" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; text-align:center; cursor:pointer; box-shadow:var(--shadow-sm); transition:var(--transition-fast);" onclick="switchCommunityTab('amenities')">
+                <span class="material-icons" style="font-size:28px; color:#2563eb; margin-bottom:6px;">pool</span>
+                <span style="display:block; font-size:12.5px; font-weight:600; color:var(--text-main);">Amenities</span>
+              </div>
+            </div>
+            
+            <!-- Dynamic Sub-Panel details wrapper -->
+            <div id="community-tab-content" style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; box-shadow:var(--shadow-sm);">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- PERSONAL VIEW: PROFILE & SETTINGS -->
+          <div id="mock-section-personal" style="display:none;">
+            <!-- Register vehicles -->
+            <div style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; box-shadow:var(--shadow-sm); margin-bottom:16px;">
+              <strong style="font-size:14px; color:var(--text-main); display:block; margin-bottom:12px;">🚗 Register flat Vehicle</strong>
+              <form onsubmit="addVehicle(event)" style="display:flex; gap:8px;">
+                <select id="vehicle-type" style="width:100px; padding:6px;">
+                  <option value="two">🏍️ 2W</option>
+                  <option value="four">🚗 4W</option>
+                </select>
+                <input type="text" id="vehicle-plate" class="form-control" style="padding:6px; font-size:12px;" placeholder="GJ-03-AB-1234" required>
+                <button type="submit" class="btn btn-primary" style="padding:6px 12px; font-size:12px;">Add</button>
+              </form>
+              <div class="table-wrapper" style="margin-top:12px;">
+                <table>
+                  <thead>
+                    <tr><th>Type</th><th>Plate</th><th></th></tr>
+                  </thead>
+                  <tbody id="res-vehicles-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Manage sub-members -->
+            <div style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; box-shadow:var(--shadow-sm); margin-bottom:16px;">
+              <strong style="font-size:14px; color:var(--text-main); display:block; margin-bottom:12px;">👥 Add Flat Members (Max 2)</strong>
+              <form onsubmit="addMember(event)" style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="member-name" class="form-control" style="padding:6px; font-size:12px;" placeholder="Member Name" required>
+                <input type="tel" id="member-phone" class="form-control" style="padding:6px; font-size:12px;" placeholder="Contact Number" required>
+                <button type="submit" id="btn-add-member" class="btn btn-primary" style="padding:6px; font-size:12px;">Add Sub-Member</button>
+              </form>
+              <div class="table-wrapper" style="margin-top:12px;">
+                <table>
+                  <thead>
+                    <tr><th>Name</th><th>Contact</th><th></th></tr>
+                  </thead>
+                  <tbody id="res-members-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- FCM settings -->
+            <div style="background:#fff; border:1px solid var(--border-color); border-radius:12px; padding:16px; box-shadow:var(--shadow-sm);">
+              <strong style="font-size:14px; color:var(--text-main); display:block; margin-bottom:4px;">🔔 Push notification settings</strong>
+              <p style="font-size:11px; color:var(--text-light); margin-bottom:12px;">Register your smartphone device to receive background FCM push alerts.</p>
+              <button class="btn btn-primary btn-block" style="font-size:12px; padding:8px;" onclick="requestNotificationPermission()">
+                Enable FCM push Alerts
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== 4. SUPER ADMIN PORTAL ==================== -->
+    <main id="admin-view" style="display: none;">
+      
+      <!-- Statistics summary row -->
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="summary-widget">
+          <div class="summary-value" id="stat-total-flats">0 / 96</div>
+          <div class="summary-label">Occupied/Claimed Flats</div>
+        </div>
+        <div class="summary-widget">
+          <div class="summary-value" id="stat-total-visitors">0</div>
+          <div class="summary-label">Total Visitor Logs</div>
+        </div>
+        <div class="summary-widget">
+          <div class="summary-value" id="stat-pending-approvals">0</div>
+          <div class="summary-label">Active Gate Waiting Requests</div>
+        </div>
+      </div>
+
+      <!-- Firebase Setup Card -->
+      <div class="glass-card">
+        <div class="glass-card-title" onclick="document.getElementById('firebase-setup-panel').style.display = document.getElementById('firebase-setup-panel').style.display === 'none' ? 'block' : 'none';" style="cursor: pointer; justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <span class="material-icons" style="color: var(--primary-color);">cloud_sync</span>
+            Firebase Production Project Settings Wizard
+          </div>
+          <span class="material-icons">expand_more</span>
+        </div>
+        
+        <div id="firebase-setup-panel" style="display: none; padding-top: 15px;">
+          <form onsubmit="saveFirebaseConfig(event)">
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="cfg-api-key">API Key *</label>
+                <input type="text" id="cfg-api-key" class="form-control" placeholder="AIzaSy..." required>
+              </div>
+              <div class="form-group">
+                <label for="cfg-project-id">Project ID *</label>
+                <input type="text" id="cfg-project-id" class="form-control" placeholder="orchid-heights-app" required>
+              </div>
+            </div>
+            <div class="grid-3">
+              <div class="form-group">
+                <label for="cfg-db-url">Realtime Database URL (Optional)</label>
+                <input type="url" id="cfg-db-url" class="form-control" placeholder="https://project.firebaseio.com">
+              </div>
+              <div class="form-group">
+                <label for="cfg-sender-id">FCM Messaging Sender ID</label>
+                <input type="text" id="cfg-sender-id" class="form-control" placeholder="103948572">
+              </div>
+              <div class="form-group">
+                <label for="cfg-app-id">App ID</label>
+                <input type="text" id="cfg-app-id" class="form-control" placeholder="1:1039:web:3a">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="cfg-vapid-key">FCM VAPID Public Key (For browser push subscription)</label>
+                <input type="text" id="cfg-vapid-key" class="form-control" placeholder="BFa_qp3...">
+              </div>
+              <div class="form-group">
+                <label for="cfg-server-key">FCM Legacy Server Key (For client-to-client notifications trigger)</label>
+                <input type="text" id="cfg-server-key" class="form-control" placeholder="AAAAu4...">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">💾 Save Settings & Initialize Firebase</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Bulk Excel/CSV Import Export tool -->
+      <div class="glass-card">
+        <div class="glass-card-title">
+          <span class="material-icons" style="color:var(--primary-color);">file_download</span>
+          Excel & CSV Database tools (SheetJS)
+        </div>
+        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+          <div>
+            <label class="btn btn-secondary" style="cursor:pointer; display:inline-flex; align-items:center;">
+              <span class="material-icons" style="font-size:16px; margin-right:4px;">file_upload</span>
+              Import Excel / CSV
+              <input type="file" id="bulk-excel-import" accept=".xlsx, .xls, .csv" style="display:none;" onchange="importFromExcelFile(event)">
+            </label>
+          </div>
+          <button class="btn btn-secondary" onclick="exportRegistryToExcel()">
+            <span class="material-icons" style="font-size:16px; margin-right:4px;">file_download</span>
+            Export Database to Excel (.xlsx)
+          </button>
+          <span style="font-size:11.5px; color:var(--text-light);">Excel sheets must contain columns: <strong>WING</strong>, <strong>FLATE_NO</strong>, <strong>OWNER_NAME_ENGLISH</strong>, <strong>OWNER_NAME_GUJARATI</strong>, <strong>PHONE</strong></span>
+        </div>
+      </div>
+
+      <!-- Broadcaster notifications panel -->
+      <div class="glass-card">
+        <div class="glass-card-title">
+          <span class="material-icons" style="color:var(--primary-color);">campaign</span>
+          Send Broadcaster Society Notifications
+        </div>
+        <form onsubmit="sendAdminBroadcastNotification(event)">
+          <div class="grid-4">
+            <div class="form-group">
+              <label for="broadcast-scope">Dispatch Scope</label>
+              <select id="broadcast-scope" onchange="const s = this.value; document.getElementById('b-wing-box').style.display = (s==='wing'||s==='flat')?'block':'none'; document.getElementById('b-flat-box').style.display = (s==='flat')?'block':'none';" required>
+                <option value="society">🌐 Entire Society (All)</option>
+                <option value="wing">🏢 Single Wing (A/B)</option>
+                <option value="flat">🚪 Single Flat (Specific)</option>
+              </select>
+            </div>
+            <div class="form-group" id="b-wing-box" style="display:none;">
+              <label for="broadcast-wing">Target Wing</label>
+              <select id="broadcast-wing">
+                <option value="A">Wing A</option>
+                <option value="B">Wing B</option>
+              </select>
+            </div>
+            <div class="form-group" id="b-flat-box" style="display:none;">
+              <label for="broadcast-flat">Target Flat</label>
+              <select id="broadcast-flat"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="broadcast-title">Notification Title</label>
+            <input type="text" id="broadcast-title" class="form-control" placeholder="e.g. Society Maintenance Notice, Lift repair scheduled" required>
+          </div>
+          <div class="form-group">
+            <label for="broadcast-body">Message Body</label>
+            <textarea id="broadcast-body" rows="2" class="form-control" placeholder="Write message details..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">🚀 Dispatch Notification Broadcast</button>
+        </form>
+      </div>
+
+      <!-- Flat Management Grid cell sheets -->
+      <div class="glass-card">
+        <div class="glass-card-title">
+          <span class="material-icons" style="color: var(--primary-color);">grid_on</span>
+          Orchid Heights Grid Registry (96 Flats)
+        </div>
+        
+        <div class="flat-grid-header"><h3>WING A</h3></div>
+        <div class="flat-grid" id="grid-wing-a"></div>
+
+        <div class="flat-grid-header"><h3>WING B</h3></div>
+        <div class="flat-grid" id="grid-wing-b"></div>
+      </div>
+
+      <!-- Search database directory editable -->
+      <div class="glass-card">
+        <div class="glass-card-title">
+          <span class="material-icons" style="color:var(--primary-color);">settings</span>
+          Manage Resident Profiles
+        </div>
+        <div class="search-box">
+          <span class="material-icons search-icon">search</span>
+          <input type="text" id="admin-directory-search" class="form-control" placeholder="Search by flat, name, Gujarati name or phone..." onkeyup="renderAllViews()">
+        </div>
+        <div class="table-wrapper">
+          <table id="admin-directory-table">
+            <thead>
+              <tr>
+                <th>Flat</th>
+                <th>Owner Name</th>
+                <th>Contact</th>
+                <th>Vehicles</th>
+                <th>Sub-Members</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- PORTABLE TEST SIMULATOR FOOTER -->
+  <div class="simulation-bar">
+    <div class="sim-info">
+      <span class="sim-tag">🧪 Portal Simulator</span>
+      <span>Verify flows by toggling accounts:</span>
+    </div>
+    <div class="sim-buttons">
+      <button class="btn-sim active" id="sim-btn-login" onclick="switchView('logout')">Auth Portal Login</button>
+      <button class="btn-sim" id="sim-btn-guard" onclick="switchView('security')">Gate Guard View</button>
+      <button class="btn-sim" id="sim-btn-resident" onclick="switchView('owner', 'B', 1104, 'Rahul Popat')">Resident (B-1104)</button>
+      <button class="btn-sim" id="sim-btn-admin" onclick="switchView('admin')">Super Admin View</button>
+      
+      <button class="btn-sim" style="border-color:#3b82f6; color:#3b82f6;" onclick="window.open(window.location.href, '_blank')">
+        🗔 Open in New Tab
+      </button>
+    </div>
+  </div>
+
+  <!-- ADMIN EDIT PROFILE DETAIL MODAL -->
+  <div class="modal-overlay" id="admin-edit-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeAdminEditModal()">×</button>
+      <h2 id="admin-edit-title" style="font-size:16px; font-weight:700; margin-bottom:16px;">Edit Flat details</h2>
+      
+      <form onsubmit="saveAdminFlatDetails(event)">
+        <div class="form-group">
+          <label for="admin-owner-english">Owner Full Name (English)</label>
+          <input type="text" id="admin-owner-english" class="form-control" placeholder="Rahul Jashvantrai Popat">
+        </div>
+        <div class="form-group">
+          <label for="admin-owner-gujarati">Owner Full Name (Gujarati)</label>
+          <input type="text" id="admin-owner-gujarati" class="form-control" placeholder="રાહુલ જશવંતરાય પોપટ">
+        </div>
+        <div class="form-group">
+          <label for="admin-owner-phone">Mobile Contact</label>
+          <input type="tel" id="admin-owner-phone" class="form-control" placeholder="9898180810">
+        </div>
+        <div class="form-group">
+          <label for="admin-owner-password">Access Portal Password</label>
+          <input type="text" id="admin-owner-password" class="form-control" placeholder="admin@123">
+        </div>
+        
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-top:20px;">
+          <button type="button" class="btn btn-danger" onclick="transferOwnership()">🔄 Transfer Ownership</button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-secondary" onclick="closeAdminEditModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Details</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  
+  <script>
+    // Tab toggler on Auth screen
+    function toggleLoginTabs(type) {
+      const resTab = document.getElementById('auth-tab-res');
+      const secTab = document.getElementById('auth-tab-sec');
+      const resForm = document.getElementById('res-login-form');
+      const secForm = document.getElementById('sec-login-form');
+      
+      if (type === 'security') {
+        secTab.classList.add('active');
+        resTab.classList.remove('active');
+        secForm.style.display = 'block';
+        resForm.style.display = 'none';
+      } else {
+        resTab.classList.add('active');
+        secTab.classList.remove('active');
+        resForm.style.display = 'block';
+        secForm.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
