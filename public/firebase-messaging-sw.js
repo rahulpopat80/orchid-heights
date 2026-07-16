@@ -223,6 +223,65 @@ messaging.onBackgroundMessage((payload) => {
   self.registration.showNotification(title, options);
 });
 
+// Native push listener for instant background wake-up and reliable display
+self.addEventListener('push', function(event) {
+  console.log('[SW Native Push] Push event received:', event);
+
+  if (!event.data) {
+    console.warn('[SW Native Push] Push event has no data payload.');
+    return;
+  }
+
+  try {
+    const rawPayload = event.data.json();
+    console.log('[SW Native Push] Parsed raw payload:', rawPayload);
+
+    // FCM payloads sent via HTTP v1 wraps parameters inside a message object or in root
+    const message = rawPayload.message || rawPayload;
+    const notification = message.notification || {};
+    const data = message.data || {};
+
+    const title = notification.title || rawPayload.title || 'Orchid Heights Gatekeeper';
+    const body = notification.body || rawPayload.body || rawPayload.message || 'New gatekeeper notification received.';
+    const icon = notification.image || notification.icon || rawPayload.icon || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png';
+    const type = data.type || rawPayload.type || 'society';
+    const visitorId = data.visitorId || rawPayload.visitorId || data.id || rawPayload.id;
+
+    // Use unique tag to avoid duplicate stack listings
+    const tag = visitorId || type || 'fcm_notif';
+
+    const options = {
+      body: body,
+      icon: icon,
+      badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+      tag: tag,
+      data: data,
+      requireInteraction: type === 'visitor_request' || type === 'visitor'
+    };
+
+    if (type === 'visitor_request' || type === 'visitor') {
+      options.actions = [
+        { action: 'approve', title: '✅ Approve' },
+        { action: 'reject', title: '❌ Reject' }
+      ];
+    }
+
+    event.waitUntil(
+      self.registration.showNotification(title, options)
+    );
+  } catch (err) {
+    console.error('[SW Native Push] Error parsing push data payload:', err);
+    event.waitUntil(
+      self.registration.showNotification('Orchid Heights Update', {
+        body: 'New gatekeeper notification received.',
+        icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+        badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+        tag: 'fcm_notif_err'
+      })
+    );
+  }
+});
+
 // Sync listeners on startup and registration events
 self.addEventListener('install', () => {
   self.skipWaiting();

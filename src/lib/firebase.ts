@@ -1132,7 +1132,9 @@ async function triggerFCMPushForSocietyNotification(payload: {
                   },
                   webpush: {
                     notification: {
-                      icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png"
+                      icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                      tag: payload.metadata?.visitorId || payload.type || "society_notif",
+                      requireInteraction: payload.type === "visitor"
                     },
                     fcm_options: {
                       link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
@@ -1595,7 +1597,9 @@ export async function sendFCMPushToFlat(
                 },
                 webpush: {
                   notification: {
-                    icon: notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"
+                    icon: notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                    tag: notification.data?.visitorId || "visitor_request",
+                    requireInteraction: true
                   },
                   fcm_options: {
                     link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
