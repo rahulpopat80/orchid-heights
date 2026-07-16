@@ -537,14 +537,34 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
               )}
             </div>
 
-            {!isMultiSelectOpen && selectedFlats.length <= 1 && (
-              <div className="bg-slate-100 p-5 rounded-2xl flex items-center justify-between border border-slate-200">
-                <div>
-                  <p className="text-sm text-slate-500 font-bold">લક્ષ્ય ફ્લેટના માલિક</p>
-                  <p className="text-xl font-bold text-slate-800">{flatOwnerName}</p>
+            {/* Show all selected flat owners */}
+            <div className="bg-slate-100 p-5 rounded-2xl border border-slate-200 space-y-2">
+              <p className="text-sm text-slate-500 font-bold">
+                {selectedFlats.length === 1 ? 'લક્ષ્ય ફ્લેટના માલિક' : `${selectedFlats.length} ફ્લેટ પસંદ - માલિક સૂચિ`}
+              </p>
+              {selectedFlats.length <= 1 ? (
+                <p className="text-xl font-bold text-slate-800">{flatOwnerName}</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                  {selectedFlats.map((fId) => {
+                    const parts = fId.split('-');
+                    const fWing = parts[0] as 'A' | 'B';
+                    const fNo = parseInt(parts[1], 10);
+                    const owner = owners.find((o) => o.wing === fWing && o.flatNo === fNo);
+                    const oName = owner && !owner.nameEn.toLowerCase().includes('vacant')
+                      ? (owner.nameGu || owner.nameEn)
+                      : 'Vacant';
+                    return (
+                      <div key={fId} className="bg-white border border-indigo-100 rounded-xl px-3 py-2 flex items-center space-x-2">
+                        <span className="text-[10px] font-black font-mono bg-indigo-600 text-white px-2 py-0.5 rounded">{fId}</span>
+                        <span className="text-sm font-bold text-slate-800 truncate">{oName}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
 
             {!isDailyHelperType && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

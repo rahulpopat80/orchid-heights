@@ -14,6 +14,7 @@ import ResidentDashboard from './components/ResidentDashboard';
 import Directory from './components/Directory';
 import AdminPage from './components/AdminPage';
 import { api, detectServerEnvironment } from './lib/api';
+import { registerFCMToken, subscribeToForegroundMessages } from './lib/firebase';
 
 export default function App() {
   // Session details stored in localStorage for persistent logins
@@ -77,6 +78,35 @@ export default function App() {
       Notification.requestPermission();
     }
   }, []);
+
+  // Register FCM token when owner is logged in
+  useEffect(() => {
+    if (session && (session.role === 'owner' || session.role === 'admin') && session.wing && session.flatNo) {
+      // Register FCM token with a delay to ensure SW is ready
+      setTimeout(() => {
+        registerFCMToken(session.wing!, session.flatNo!).then((token) => {
+          if (token) {
+            console.log('[FCM] Token registered for flat', session.wing, session.flatNo);
+          }
+        });
+      }, 2000);
+
+      // Subscribe to foreground FCM messages
+      const unsubFCM = subscribeToForegroundMessages((payload) => {
+        console.log('[FCM] Foreground message received:', payload);
+        // Show browser notification for foreground messages too
+        if (payload.notification && 'Notification' in window && Notification.permission === 'granted') {
+          new Notification(payload.notification.title || 'Orchid Heights', {
+            body: payload.notification.body || '',
+            icon: payload.notification.image || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+            tag: payload.data?.visitorId || 'fcm_notif',
+            requireInteraction: true
+          });
+        }
+      });
+      return () => unsubFCM();
+    }
+  }, [session]);
 
   // Set default tabs based on authenticated roles
   useEffect(() => {

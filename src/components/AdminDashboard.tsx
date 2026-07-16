@@ -280,6 +280,50 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     }
   };
 
+  // Wipe all transactional data (visitors, notifications, complaints, bookings, etc.)
+  const [wipeLoading, setWipeLoading] = useState<boolean>(false);
+  const [wipeSuccess, setWipeSuccess] = useState<string>('');
+  const [showConfirmWipe, setShowConfirmWipe] = useState<boolean>(false);
+
+  const handleWipeAllData = async () => {
+    setWipeLoading(true);
+    setWipeSuccess('');
+    try {
+      const { getDocs } = await import('firebase/firestore');
+      const collectionsToWipe = [
+        'visitors',
+        'notifications',
+        'society_notifications',
+        'complaints',
+        'amenities_bookings',
+        'gym_theatre_logs',
+        'movies_schedule',
+        'absence_logs',
+        'sos_alerts'
+      ];
+
+      let totalDeleted = 0;
+      for (const collectionName of collectionsToWipe) {
+        const snap = await getDocs(collection(db, collectionName));
+        const deletePromises = snap.docs.map(d => deleteDoc(doc(db, collectionName, d.id)));
+        await Promise.all(deletePromises);
+        totalDeleted += snap.docs.length;
+        console.log(`[WIPE] Deleted ${snap.docs.length} docs from ${collectionName}`);
+      }
+
+      setWipeSuccess(`✅ Successfully wiped ${totalDeleted} records! App is clean and ready for live use.`);
+      setShowConfirmWipe(false);
+      loadAdminData();
+    } catch (error: any) {
+      console.error('Failed to wipe data:', error);
+      setWipeSuccess(`❌ Error during wipe: ${error.message}`);
+    } finally {
+      setWipeLoading(false);
+    }
+  };
+
+
+
   // Inline edit flat owner details
   const handleOpenEditOwner = (owner: FlatOwner) => {
     setEditOwner(owner);
@@ -485,27 +529,53 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
       alert('No gym or movie theatre logs to export.');
       return;
     }
-    let csvContent = `Orchid Heights - Gym & Movie Theatre Logs Report\r\n`;
-    csvContent += `Generated On,${new Date().toLocaleString('en-IN')}\r\n\r\n`;
-    csvContent += `"Flat ID","Amenity","Check-In Time","Check-Out Time","Duration (Mins)","Exit Photo Verification Status"\r\n`;
+    
+    const rows: string[] = [];
+    rows.push(`"ORCHID HEIGHTS - GYM & THEATRE ACCESS LOGS"`);
+    rows.push(`"Generated On: ${new Date().toLocaleString('en-IN')}"`);
+    rows.push(`""`);
+    rows.push([
+      '"Sr."',
+      '"Flat ID"',
+      '"Amenity"',
+      '"Check-In Date"',
+      '"Check-In Time"',
+      '"Check-Out Date"',
+      '"Check-Out Time"',
+      '"Duration (Mins)"',
+      '"Session Status"',
+      '"Exit Photo"'
+    ].join(','));
 
-    gymTheatreLogs.forEach((log) => {
-      const inTime = new Date(log.checkInTime).toLocaleString('en-IN');
-      const outTime = log.checkOutTime ? new Date(log.checkOutTime).toLocaleString('en-IN') : 'ACTIVE SESSION';
-      const duration = log.durationMinutes || 'N/A';
-      const photoStatus = log.exitPhotoUrl ? 'Verified' : 'No Photo';
-      csvContent += `"${log.flatId}","${log.amenity}","${inTime}","${outTime}","${duration}","${photoStatus}"\r\n`;
+    gymTheatreLogs.forEach((log, idx) => {
+      const inTime = new Date(log.checkInTime);
+      const outTime = log.checkOutTime ? new Date(log.checkOutTime) : null;
+      rows.push([
+        `"${idx + 1}"`,
+        `"${log.flatId}"`,
+        `"${log.amenity}"`,
+        `"${inTime.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}"`,
+        `"${inTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}"`,
+        `"${outTime ? outTime.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}"`,
+        `"${outTime ? outTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'ACTIVE SESSION'}"`,
+        `"${log.durationMinutes || 'N/A'}"`,
+        `"${log.checkOutTime ? 'COMPLETED' : 'ACTIVE'}"`,
+        `"${log.exitPhotoUrl ? 'Verified ✓' : 'None'}"`
+      ].join(','));
     });
 
-    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+    const csvString = rows.join('\r\n');
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvString], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `Gym_Theatre_Logs_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `Orchid_Heights_Gym_Theatre_Logs_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
+
 
   // Notice Board: Create or Save notice
   const handleSaveNotice = async (e: React.FormEvent) => {
@@ -2865,7 +2935,56 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   Reset Database to Factory Defaults
                 </button>
               )}
+
+              {/* ===== WIPE ALL TRANSACTIONAL DATA ===== */}
+              <div className="mt-6 pt-6 border-t border-slate-200">
+                <h4 className="font-bold text-sm text-red-700 flex items-center space-x-2 mb-2">
+                  <Database className="w-4 h-4" />
+                  <span>Wipe All Live Data (Launch Clean-Up)</span>
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  Permanently delete ALL visitor entries, notifications, complaints, bookings, gym logs, movies, SOS alerts, and absence logs. <strong>Owner flat data is preserved.</strong> Use this to start fresh before going live.
+                </p>
+
+                {wipeSuccess && (
+                  <div className={`p-3 rounded-xl text-xs font-bold mb-3 ${wipeSuccess.startsWith('✅') ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+                    {wipeSuccess}
+                  </div>
+                )}
+
+                {showConfirmWipe ? (
+                  <div className="space-y-3 bg-white p-4 border border-red-200 rounded-xl">
+                    <p className="text-xs font-bold text-red-700 flex items-center">
+                      <AlertTriangle className="w-4 h-4 mr-1 shrink-0" />
+                      This will DELETE ALL transactional data permanently! Owner data is kept safe.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleWipeAllData} disabled={wipeLoading}
+                        className="flex-1 bg-red-700 hover:bg-red-800 text-white py-2 rounded-lg text-xs font-bold cursor-pointer"
+                      >
+                        {wipeLoading ? '⏳ Wiping...' : '🗑️ Yes, Wipe Everything Now'}
+                      </button>
+                      <button
+                        onClick={() => setShowConfirmWipe(false)}
+                        className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowConfirmWipe(true)}
+                    className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer flex items-center justify-center space-x-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>🗑️ Wipe All Transactional Data</span>
+                  </button>
+                )}
+              </div>
             </div>
+
 
           </div>
         )}

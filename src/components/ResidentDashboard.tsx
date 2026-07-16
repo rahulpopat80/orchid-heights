@@ -428,35 +428,70 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     
     const reportData = guestHistory.filter(v => new Date(v.requestTime) >= threeMonthsAgo);
     
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Visitor Name,Mobile,Wing,Flat,Reason,Type,Visitor Count,Status,Request Time,Responded Time,Responded By,Reject Reason\n";
-    
-    reportData.forEach(v => {
-      const row = [
-        `"${v.fullName.replace(/"/g, '""')}"`,
-        `"${v.mobileNumber}"`,
+    const rows: string[] = [];
+    // Company Header
+    rows.push(`"ORCHID HEIGHTS - GATE VISITOR REPORT"`);
+    rows.push(`"Flat: ${wing}-${flatNo}"`);
+    rows.push(`"Report Period: Last 3 Months | Generated: ${new Date().toLocaleString('en-IN')}"`);
+    rows.push(`""`);
+    // Column Headers
+    rows.push([
+      '"Sr."',
+      '"Visitor Name"',
+      '"Mobile Number"',
+      '"Email"',
+      '"Wing"',
+      '"Flat No"',
+      '"Visitor Type"',
+      '"Reason / Purpose"',
+      '"No. of Visitors"',
+      '"Status"',
+      '"Request Date"',
+      '"Request Time"',
+      '"Response Time"',
+      '"Approved / Rejected By"',
+      '"Rejection Reason"'
+    ].join(','));
+
+    reportData.forEach((v, idx) => {
+      const reqDate = new Date(v.requestTime);
+      const respDate = v.respondedTime ? new Date(v.respondedTime) : null;
+      rows.push([
+        `"${idx + 1}"`,
+        `"${(v.fullName || '').replace(/"/g, '""')}"`,
+        `"${v.mobileNumber || ''}"`,
+        `"${(v.email || '').replace(/"/g, '""')}"`,
         `"${v.wing}"`,
         `"${v.flatNo}"`,
+        `"${v.guestType || ''}"`,
         `"${(v.reason || '').replace(/"/g, '""')}"`,
-        `"${v.guestType}"`,
         `"${v.visitorCount || 1}"`,
-        `"${v.status}"`,
-        `"${v.requestTime}"`,
-        `"${v.respondedTime || ''}"`,
-        `"${(v.respondedBy || '').replace(/"/g, '""')}"`,
-        `"${(v.rejectReason || '').replace(/"/g, '""')}"`
-      ].join(",");
-      csvContent += row + "\n";
+        `"${(v.status || '').toUpperCase()}"`,
+        `"${reqDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}"`,
+        `"${reqDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}"`,
+        `"${respDate ? respDate.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}"`,
+        `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
+        `"${(v.rejectReason || '-').replace(/"/g, '""')}"`
+      ].join(','));
     });
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `visitor_report_flat_${wing}-${flatNo}_3months.csv`);
+
+    if (reportData.length === 0) {
+      rows.push('"No visitor records found for the last 3 months."');
+    }
+
+    const csvString = rows.join('\r\n');
+    // UTF-8 BOM for proper Indian characters display in Excel
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Orchid_Heights_Visitor_Report_${wing}-${flatNo}_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
+
 
   // Submit function booking request
   const handleAddAmenityBooking = async (e: React.FormEvent) => {
@@ -559,7 +594,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     setShowExitPhotoModal(true);
   };
 
-  // Handle Photo input conversion with 15-minute file age verification
+  // Handle Photo input conversion
   const handleExitPhotoChange = (file: File) => {
     if (!file) return;
     if (file.size > 8 * 1024 * 1024) {
@@ -567,29 +602,22 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
       return;
     }
 
-    // Verify 15-minute maximum age of the photo to ensure it is live/recent
     setExitPhotoFile(file);
-    const fileAgeMs = Date.now() - file.lastModified;
-    const fileAgeMinutes = fileAgeMs / 60000;
-    if (fileAgeMinutes > 15) {
-      setGymTheatreError('Security Audit: The exit photo must be a live image captured within the last 15 minutes. Please snap a new photo.');
-      setExitPhotoTimeError(true);
-      setExitPhotoBase64('');
-      return;
-    }
+    setExitPhotoTimeError(false);
+    setGymTheatreError('');
 
-    // Compress the live selfie image to keep database payload ultra-lightweight and prevent size limit crashes
+    // Compress the selfie image to keep database payload lightweight
     compressImage(file, 500, 500, 0.5)
       .then((compressedBase64) => {
         setExitPhotoBase64(compressedBase64);
-        setExitPhotoTimeError(false);
         setGymTheatreError('');
       })
       .catch((err) => {
         console.error('Exit photo compression failed:', err);
-        setGymTheatreError('Failed to process image compression.');
+        setGymTheatreError('Failed to process image. Please try another photo.');
       });
   };
+
 
   // Confirm Check Out with Image upload
   const handleConfirmCheckOut = async () => {

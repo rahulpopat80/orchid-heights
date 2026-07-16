@@ -62,7 +62,7 @@ function setupVisitorListener(wing, flatNo) {
   console.log(`[SW] Starting background visitor snapshot listener for flat ${wing}-${flatNo}`);
 
   activeUnsubscribe.push(db.collection('visitors')
-    .where('wing', '==', wing)
+    .where('wing', '==', wing.toUpperCase())
     .where('flatNo', '==', Number(flatNo))
     .where('status', '==', 'pending')
     .onSnapshot(snapshot => {
@@ -71,13 +71,17 @@ function setupVisitorListener(wing, flatNo) {
           const docId = change.doc.id;
           const visitor = change.doc.data();
 
-          const isFresh = (Date.now() - (visitor.createdAt || Date.now())) < 60000;
+          // Use requestTime (the actual field stored in visitors collection)
+          const timestamp = visitor.requestTime || visitor.createdAt || new Date().toISOString();
+          const ageMs = Date.now() - new Date(timestamp).getTime();
+          // 5 minute freshness window to account for time drift
+          const isFresh = ageMs < 5 * 60 * 1000;
 
           if (!notifiedIds.has(docId) && isFresh) {
             notifiedIds.add(docId);
             
-            const title = `🚪 New Visitor: ${visitor.fullName}`;
-            const body = `Guest Type: ${visitor.guestType}\nWing-Flat: ${visitor.wing}-${visitor.flatNo}\nReason: ${visitor.reason}`;
+            const title = `🚪 ગેટ પર મુલાકાતી: ${visitor.fullName}`;
+            const body = `${visitor.guestType} | ${visitor.mobileNumber}\nFlat ${visitor.wing}-${visitor.flatNo} | ${visitor.reason}`;
             const icon = visitor.photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png';
 
             self.registration.showNotification(title, {
@@ -86,9 +90,9 @@ function setupVisitorListener(wing, flatNo) {
               badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
               tag: docId,
               requireInteraction: true,
-              data: { visitorId: docId, wing, flatNo },
+              data: { visitorId: docId, wing, flatNo, type: 'visitor_request' },
               actions: [
-                { action: 'approve', title: '✅ Approve' },
+                { action: 'approve', title: '✅ Approve Entry' },
                 { action: 'reject', title: '❌ Reject' }
               ]
             });
@@ -100,6 +104,7 @@ function setupVisitorListener(wing, flatNo) {
     }, err => {
       console.error('[SW] Firestore background snapshot listener error:', err);
     }));
+
 
   activeUnsubscribe.push(db.collection('announcements')
     .onSnapshot(snapshot => {

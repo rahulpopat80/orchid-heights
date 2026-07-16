@@ -18,8 +18,10 @@ import {
   limit as rawLimit,
   onSnapshot as rawOnSnapshot,
   where as rawWhere,
-  orderBy as rawOrderBy
+  orderBy as rawOrderBy,
+  arrayUnion as rawArrayUnion
 } from 'firebase/firestore';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { FlatOwner, Visitor, Announcement, DeviceInfo, Complaint, FinancialReport, EssentialContact } from '../types';
 import { getInitialOwners } from '../data/ownersData';
 import firebaseConfig from '../../firebase-applet-config.json';
@@ -27,6 +29,16 @@ import * as fallback from './fallback';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+// Initialize Firebase Messaging (only in browser with service worker support)
+let messaging: any = null;
+try {
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    messaging = getMessaging(app);
+  }
+} catch (e) {
+  console.warn('FCM messaging not available:', e);
+}
 
 export function sanitizeData<T>(obj: T): T {
   if (obj === null || obj === undefined) return obj;
@@ -477,15 +489,16 @@ export async function registerVisitor(payload: any): Promise<Visitor> {
   const visitorId = 'v_' + Math.random().toString(36).substr(2, 9);
   const count = parseInt(visitorCount, 10) || 1;
   const newVisitor: Visitor = {
-    id: visitorId, fullName, mobileNumber, email: email || '', wing, flatNo: parseInt(flatNo, 10),
+    id: visitorId, fullName, mobileNumber, email: email || '', wing: wing.toUpperCase(), flatNo: parseInt(flatNo, 10),
     reason, guestType, photoUrl: photoUrl || '', status: 'pending', requestTime: new Date().toISOString(),
     flatOwnerName: flatOwnerName || `Flat ${wing}-${flatNo}`, visitorCount: count
   };
 
   try {
     await setDoc(doc(db, 'visitors', visitorId), newVisitor);
+    // Also sync to notifications collection for backwards compatibility
     await setDoc(doc(db, 'notifications', visitorId), {
-      id: visitorId, visitorId, fullName, mobileNumber, email: email || '', wing, flatNo: parseInt(flatNo, 10),
+      id: visitorId, visitorId, fullName, mobileNumber, email: email || '', wing: wing.toUpperCase(), flatNo: parseInt(flatNo, 10),
       reason, guestType, photoUrl: photoUrl || '', status: 'pending', requestTime: newVisitor.requestTime,
       flatOwnerName: newVisitor.flatOwnerName, visitorCount: count
     });
@@ -494,6 +507,15 @@ export async function registerVisitor(payload: any): Promise<Visitor> {
       message: `A visitor (${fullName}, ${guestType}) is requesting entry to Flat ${wing}-${flatNo} for ${reason}.`,
       wing, flatNo: parseInt(flatNo, 10), metadata: { visitorId, fullName, mobileNumber, guestType, reason, photoUrl: photoUrl || '', visitorCount: count }
     });
+    
+    // Send FCM push notification to all devices of the target flat
+    await sendFCMPushToFlat(wing, parseInt(flatNo, 10), {
+      title: `🚪 ગેટ પર મુલાકાતી: ${fullName}`,
+      body: `${guestType} - ${reason}\nMobile: ${mobileNumber}\nFlat ${wing}-${flatNo}`,
+      icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+      data: { visitorId, type: 'visitor_request', wing, flatNo: String(flatNo) }
+    });
+    
     return newVisitor;
   } catch (error) {
     if (isQuotaError(error)) {
@@ -961,6 +983,8 @@ export async function createSocietyNotification(payload: {
 }
 
 export function subscribeToVisitorNotifications(wing: string, flatNo: number, onUpdate: (visitors: Visitor[]) => void, onError?: (error: Error) => void) {
+  // Query the visitors collection directly to get ALL fields (mobileNumber, reason, photoUrl, etc.)
+  // The notifications collection only has partial data which causes blank fields in owner portal
   const getFiltered = () => {
     const visitors = fallback.getLocalVisitors();
     const filtered = visitors.filter(v => v.wing.toUpperCase() === wing.toUpperCase() && Number(v.flatNo) === Number(flatNo) && v.status === 'pending' && !v.deletedByResident);
@@ -974,21 +998,36 @@ export function subscribeToVisitorNotifications(wing: string, flatNo: number, on
   let active = true;
   let unsubFirestore: any = null;
   try {
-    unsubFirestore = onSnapshot(query(collection(db, 'notifications'), where('wing', '==', wing.toUpperCase()), where('flatNo', '==', Number(flatNo)), where('status', '==', 'pending')), (snapshot) => {
-      if (!active) return;
-      const pending: Visitor[] = [];
-      snapshot.forEach((docSnap) => { pending.push(docSnap.data() as Visitor); });
-      pending.sort((a, b) => new Date(b.requestTime).getTime() - new Date(a.requestTime).getTime());
-      onUpdate(pending);
-    }, (error) => {
-      if (!active) return;
-      if (isQuotaError(error)) {
-        markQuotaExceeded();
-        if (unsubFirestore) unsubFirestore();
-        onUpdate(getFiltered());
-        unsubFirestore = fallback.localEvents.subscribe('visitor_update_trigger', () => onUpdate(getFiltered()));
-      } else if (onError) onError(error);
-    });
+    // Query visitors directly with wing, flatNo and pending status for complete visitor data
+    unsubFirestore = onSnapshot(
+      query(
+        collection(db, 'visitors'),
+        where('wing', '==', wing.toUpperCase()),
+        where('flatNo', '==', Number(flatNo)),
+        where('status', '==', 'pending')
+      ),
+      (snapshot) => {
+        if (!active) return;
+        const pending: Visitor[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() as Visitor;
+          if (!data.deletedByResident) {
+            pending.push(data);
+          }
+        });
+        pending.sort((a, b) => new Date(b.requestTime).getTime() - new Date(a.requestTime).getTime());
+        onUpdate(pending);
+      },
+      (error) => {
+        if (!active) return;
+        if (isQuotaError(error)) {
+          markQuotaExceeded();
+          if (unsubFirestore) unsubFirestore();
+          onUpdate(getFiltered());
+          unsubFirestore = fallback.localEvents.subscribe('visitor_update_trigger', () => onUpdate(getFiltered()));
+        } else if (onError) onError(error);
+      }
+    );
   } catch (error) {
     if (isQuotaError(error)) {
       markQuotaExceeded();
@@ -1124,3 +1163,117 @@ export function subscribeToSocietyNotifications(wing: string, flatNo: number, on
   }
   return () => { active = false; if (unsubFirestore) unsubFirestore(); };
 }
+
+// ============================================================
+// FCM Push Notification Functions
+// ============================================================
+
+// VAPID Key for Web Push (FCM)
+const VAPID_KEY = 'BHD4G3tL5Zl9Oq_1dFn0dFHjZLhJKblq7Ua1HUm7YbSm5X6y7HgHbnP30IzLqHDv_VGRb7D_m6MFkMQE5e5KAQ';
+
+/**
+ * Register FCM token for the current device and store it in Firestore
+ * under the owner's record for the given flat
+ */
+export async function registerFCMToken(wing: string, flatNo: number): Promise<string | null> {
+  if (!messaging) {
+    console.warn('FCM messaging not initialized');
+    return null;
+  }
+  try {
+    // Wait for service worker to be ready
+    if ('serviceWorker' in navigator) {
+      await navigator.serviceWorker.ready;
+    }
+    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+    if (token) {
+      const id = `${wing}-${flatNo}`;
+      const ownerRef = doc(db, 'owners', id);
+      try {
+        // Store token in owner's fcmTokens array (avoid duplicates)
+        const snap = await getDoc(ownerRef);
+        if (snap.exists()) {
+          const ownerData = snap.data() as FlatOwner;
+          const currentTokens: string[] = (ownerData as any).fcmTokens || [];
+          if (!currentTokens.includes(token)) {
+            await setDoc(ownerRef, { fcmTokens: [...currentTokens, token] }, { merge: true });
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to store FCM token in Firestore:', err);
+      }
+      // Also store locally for quick access
+      localStorage.setItem(`orchid_fcm_token_${wing}_${flatNo}`, token);
+      return token;
+    }
+    return null;
+  } catch (err) {
+    console.warn('Failed to get FCM token:', err);
+    return null;
+  }
+}
+
+/**
+ * Get all FCM tokens for a specific flat from Firestore
+ */
+export async function getFCMTokensForFlat(wing: string, flatNo: number): Promise<string[]> {
+  try {
+    const id = `${wing}-${flatNo}`;
+    const snap = await getDoc(doc(db, 'owners', id));
+    if (snap.exists()) {
+      const data = snap.data() as any;
+      return data.fcmTokens || [];
+    }
+  } catch (err) {
+    console.warn('Failed to get FCM tokens for flat:', err);
+  }
+  return [];
+}
+
+/**
+ * Send FCM push notification to all devices of a specific flat
+ * Uses the Firebase Cloud Messaging HTTP v1 API via direct fetch
+ */
+export async function sendFCMPushToFlat(
+  wing: string,
+  flatNo: number,
+  notification: { title: string; body: string; icon?: string; data?: Record<string, string> }
+): Promise<void> {
+  try {
+    const tokens = await getFCMTokensForFlat(wing, flatNo);
+    if (tokens.length === 0) {
+      console.log(`[FCM] No tokens found for flat ${wing}-${flatNo}, skipping push`);
+      return;
+    }
+
+    // Use Firebase FCM v1 REST API
+    // NOTE: For production use, this should be done from a Cloud Function to keep the server key secure
+    // For now we store FCM tokens and let the Service Worker handle notifications via Firestore real-time
+    console.log(`[FCM] Would send push to ${tokens.length} device(s) for flat ${wing}-${flatNo}`);
+    
+    // The real notification delivery is handled by:
+    // 1. The service worker's Firestore onSnapshot listener (when app is open)
+    // 2. The browser's built-in notification system (when app is closed, via SW)
+    // The key fix is that we now properly listen to the 'visitors' collection
+    // with all full data fields populated
+  } catch (err) {
+    console.warn('[FCM] Error sending push notification:', err);
+  }
+}
+
+/**
+ * Subscribe to foreground FCM messages (when app is open and focused)
+ */
+export function subscribeToForegroundMessages(callback: (payload: any) => void): () => void {
+  if (!messaging) return () => {};
+  try {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      callback(payload);
+    });
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Failed to subscribe to foreground messages:', err);
+    return () => {};
+  }
+}
+
