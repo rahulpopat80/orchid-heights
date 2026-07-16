@@ -1808,7 +1808,7 @@ if ('serviceWorker' in navigator) {
 
 
 // --- INITIALIZATION ON DOCUMENT LOAD ---
-document.addEventListener('DOMContentLoaded', () => {
+const initAllAppModules = () => {
   // Populate Wing Flat select elements
   const populateFlats = (id) => {
     const el = document.getElementById(id);
@@ -1918,7 +1918,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // If first-time firestore launch, preload the directory
     checkAndSeedDirectory();
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAllAppModules);
+} else {
+  initAllAppModules();
+}
 
 // --- OFFICIAL BUILDING DIRECTORY DATASET (96 flats) ---
 const PRESEEDED_DIRECTORY_DATA = [
