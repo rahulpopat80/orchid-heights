@@ -2049,7 +2049,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
                   {/* Active Gate Visitor Approval Requests */}
                   {activePoll.map((visitor) => (
-                    <div key={visitor.id} className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-start space-x-3 text-left">
+                    <div key={visitor.id} className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-start space-x-3 text-left relative group">
                       <Users className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                       <div className="space-y-2.5 w-full">
                         <div>
@@ -2070,6 +2070,13 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                           Review Request Detail
                         </button>
                       </div>
+                      <button
+                        onClick={() => handleDismissNotification(visitor.id)}
+                        className="absolute top-3 right-3 p-1 hover:bg-amber-100 text-amber-600 hover:text-amber-800 rounded-lg transition cursor-pointer select-none"
+                        title="Dismiss alert"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   ))}
 
@@ -2117,14 +2124,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   })}
 
                   {/* Recent Society Announcements */}
-                  {announcements.slice(0, 5).map((notice) => {
+                  {announcements.filter(a => !dismissedNotifIds.includes(a.id)).slice(0, 5).map((notice) => {
                     const noticeTitle = notice.title || notice.text?.slice(0, 40) || 'Society Notice';
                     const noticeMessage = notice.message || notice.content || notice.text || '';
                     const noticeDate = notice.createdAt || notice.timestamp || new Date().toISOString();
                     return (
-                      <div key={notice.id} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-start space-x-3 text-left">
+                      <div key={notice.id} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-start space-x-3 text-left relative group">
                         <Megaphone className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
-                        <div className="space-y-1 w-full">
+                        <div className="space-y-1 w-full pr-6">
                           <p className="text-xs font-black text-slate-800 uppercase tracking-wider">
                             📢 NOTICE: {noticeTitle}
                           </p>
@@ -2135,9 +2142,17 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                             Posted: {new Date(noticeDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </p>
                         </div>
+                        <button
+                          onClick={() => handleDismissNotification(notice.id)}
+                          className="absolute top-3 right-3 p-1 hover:bg-slate-200/60 text-slate-400 hover:text-slate-600 rounded-lg transition cursor-pointer select-none"
+                          title="Dismiss notice"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     );
                   })}
+
                 </>
               )}
             </div>

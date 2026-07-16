@@ -629,9 +629,9 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
               <p className="text-xl font-bold text-slate-700">કોઈ બાકી વિનંતી નથી</p>
             </div>
           ) : (
-            <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
+            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
               {pendingVisitors.map((v) => (
-                <div key={v.id} className="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-2xl relative">
+                <div key={v.id} className="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-2xl relative animate-fade-in">
                   <button onClick={() => handleDeleteVisitor(v.id, v.fullName)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 bg-white rounded-xl shadow-sm">
                     <Trash2 className="w-6 h-6" />
                   </button>
@@ -649,8 +649,76 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
               ))}
             </div>
           )}
+
+          {/* ===== TODAY'S COMPLETED GATE ENTRIES FOR SECURITY ===== */}
+          <div className="mt-8 pt-8 border-t border-slate-200">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-display font-bold text-xl text-slate-800">આજના પૂર્ણ થયેલ પ્રવેશ</h3>
+                <p className="text-sm text-slate-500 mt-1">આજના બધા મંજૂર કે અસ્વીકાર થયેલ મુલાકાતીઓ.</p>
+              </div>
+              <span className="bg-indigo-150 text-indigo-800 border border-indigo-200 text-sm font-bold px-3 py-1.5 rounded-full">
+                {filteredLogs.filter(v => {
+                  const todayStr = new Date().toDateString();
+                  return new Date(v.requestTime).toDateString() === todayStr;
+                }).length} મુલાકાતીઓ
+              </span>
+            </div>
+
+            {/* Logs Search Input */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="નામ, ફોન કે ફ્લેટ નંબરથી શોધો..."
+                value={logsSearch}
+                onChange={(e) => setLogsSearch(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            {filteredLogs.filter(v => {
+              const todayStr = new Date().toDateString();
+              return new Date(v.requestTime).toDateString() === todayStr;
+            }).length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-8">આજે હજી સુધી કોઈ વિનંતી પૂરી થઈ નથી.</p>
+            ) : (
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                {filteredLogs.filter(v => {
+                  const todayStr = new Date().toDateString();
+                  return new Date(v.requestTime).toDateString() === todayStr;
+                }).map((v) => (
+                  <div 
+                    key={v.id} 
+                    className={`p-4 rounded-xl border flex items-center justify-between gap-4 text-sm ${
+                      v.status === 'approved' ? 'border-emerald-100 bg-emerald-50/20' : 'border-red-100 bg-red-50/20'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <img src={v.photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png'} className="w-12 h-12 rounded-lg object-cover bg-slate-200 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 truncate">{v.fullName}</p>
+                        <p className="text-xs text-slate-500 font-semibold">
+                          ફ્લેટ {v.wing}-{v.flatNo} • {v.guestType} • {new Date(v.requestTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
+                        v.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {v.status === 'approved' ? 'મંજૂર' : 'અસ્વીકાર'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
   );
 }
+

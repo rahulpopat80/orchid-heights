@@ -977,6 +977,108 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     document.body.removeChild(link);
   };
 
+  /**
+   * Building-Wide Master Visitor Log Downloader
+   * Downloads visitor entries from all flats based on specified time range filter:
+   * 'today', '1month', '2month', 'all'
+   */
+  const handleDownloadMasterVisitorLogs = async (range: 'today' | '1month' | '2month' | 'all') => {
+    try {
+      // Fetch all visitors from Firebase collection
+      const list = await api.getVisitors({ includeDeleted: true });
+      if (list.length === 0) {
+        alert('No visitor logs found in the system database.');
+        return;
+      }
+
+      const now = new Date();
+      let filtered = [...list];
+
+      // Time range filtering
+      if (range === 'today') {
+        const todayStr = now.toDateString();
+        filtered = list.filter(v => new Date(v.requestTime).toDateString() === todayStr);
+      } else if (range === '1month') {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        filtered = list.filter(v => new Date(v.requestTime) >= oneMonthAgo);
+      } else if (range === '2month') {
+        const twoMonthsAgo = new Date();
+        twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+        filtered = list.filter(v => new Date(v.requestTime) >= twoMonthsAgo);
+      }
+
+      if (filtered.length === 0) {
+        alert(`No visitor records found for range: ${range.toUpperCase()}`);
+        return;
+      }
+
+      // Build a well-formatted professional CSV
+      const rows: string[] = [];
+      rows.push(`"ORCHID HEIGHTS - BUILDING MASTER VISITOR LOG"`);
+      rows.push(`"Filter Period: ${range.toUpperCase()} | Generated: ${new Date().toLocaleString('en-IN')}"`);
+      rows.push(`"Total Visitor Entries: ${filtered.length}"`);
+      rows.push(`""`);
+      rows.push([
+        '"Sr."',
+        '"Visitor Name"',
+        '"Mobile Number"',
+        '"Email"',
+        '"Wing"',
+        '"Flat No"',
+        '"Flat Owner Name"',
+        '"Visitor Type"',
+        '"Reason / Purpose"',
+        '"Count"',
+        '"Status"',
+        '"Request Date"',
+        '"Request Time"',
+        '"Response Time"',
+        '"Approved/Rejected By"',
+        '"Reject Reason"',
+        '"Log Status"'
+      ].join(','));
+
+      filtered.forEach((v, idx) => {
+        const reqDate = new Date(v.requestTime);
+        const respDate = v.respondedTime ? new Date(v.respondedTime) : null;
+        rows.push([
+          `"${idx + 1}"`,
+          `"${(v.fullName || '').replace(/"/g, '""')}"`,
+          `"${v.mobileNumber || ''}"`,
+          `"${(v.email || '').replace(/"/g, '""')}"`,
+          `"${v.wing}"`,
+          `"${v.flatNo}"`,
+          `"${(v.flatOwnerName || '').replace(/"/g, '""')}"`,
+          `"${v.guestType || ''}"`,
+          `"${(v.reason || '').replace(/"/g, '""')}"`,
+          `"${v.visitorCount || 1}"`,
+          `"${(v.status || '').toUpperCase()}"`,
+          `"${reqDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}"`,
+          `"${reqDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}"`,
+          `"${respDate ? respDate.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}"`,
+          `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
+          `"${(v.rejectReason || '-').replace(/"/g, '""')}"`,
+          `"${v.deletedByResident ? 'Deleted by Resident' : 'Active Log'}"`
+        ].join(','));
+      });
+
+      const csvString = rows.join('\r\n');
+      const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Orchid_Heights_Master_Visitor_Logs_${range}_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert('Error exporting master logs: ' + err.message);
+    }
+  };
+
+
   // Filter flats list based on search query
   const filteredOwners = owners.filter((owner) => {
     const q = adminSearch.toLowerCase().trim();
@@ -2821,73 +2923,114 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* Form 1: Password Changer */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-indigo-600">
-                <Key className="w-5 h-5" />
-                <h3 className="font-display font-bold text-base text-slate-800">Admin Password Override</h3>
+            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              <div>
+                <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-indigo-600">
+                  <Key className="w-5 h-5" />
+                  <h3 className="font-display font-bold text-base text-slate-800">Admin Password Override</h3>
+                </div>
+
+                {passError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                    <span>{passError}</span>
+                  </div>
+                )}
+
+                {passSuccess && (
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>{passSuccess}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Wing</label>
+                      <select
+                        value={selectedWing}
+                        onChange={(e) => setSelectedWing(e.target.value as 'A' | 'B')}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:bg-white"
+                      >
+                        <option value="A">Wing A</option>
+                        <option value="B">Wing B</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Flat No</label>
+                      <select
+                        value={selectedFlatNo}
+                        onChange={(e) => setSelectedFlatNo(parseInt(e.target.value, 10))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:bg-white"
+                      >
+                        {flats.map((f) => (
+                          <option key={f} value={f}>{f}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">New Password</label>
+                    <input
+                      type="text" required
+                      placeholder="Enter new custom password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-medium outline-none focus:bg-white"
+                    />
+                  </div>
+
+                  <button
+                    type="submit" disabled={passLoading}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer"
+                  >
+                    {passLoading ? 'Updating...' : 'Update Password Override'}
+                  </button>
+                </form>
               </div>
 
-              {passError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                  <span>{passError}</span>
+              {/* ===== MASTER VISITOR LOGS CSV DOWNLOADER ===== */}
+              <div className="border-t border-slate-100 pt-6">
+                <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-emerald-600">
+                  <FileSpreadsheet className="w-5 h-5" />
+                  <h3 className="font-display font-bold text-base text-slate-800">Master Building Visitor Reports</h3>
                 </div>
-              )}
+                <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                  Download a highly detailed, professional Excel-compatible CSV of visitor entries across all wings and flats.
+                </p>
 
-              {passSuccess && (
-                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
-                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{passSuccess}</span>
-                </div>
-              )}
-
-              <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Wing</label>
-                    <select
-                      value={selectedWing}
-                      onChange={(e) => setSelectedWing(e.target.value as 'A' | 'B')}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:bg-white"
-                    >
-                      <option value="A">Wing A</option>
-                      <option value="B">Wing B</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Flat No</label>
-                    <select
-                      value={selectedFlatNo}
-                      onChange={(e) => setSelectedFlatNo(parseInt(e.target.value, 10))}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:bg-white"
-                    >
-                      {flats.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <button
+                    onClick={() => handleDownloadMasterVisitorLogs('today')}
+                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
+                  >
+                    📅 Download Today's Entries
+                  </button>
+                  <button
+                    onClick={() => handleDownloadMasterVisitorLogs('1month')}
+                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
+                  >
+                    📊 Download 1 Month Logs
+                  </button>
+                  <button
+                    onClick={() => handleDownloadMasterVisitorLogs('2month')}
+                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
+                  >
+                    📈 Download 2 Month Logs
+                  </button>
+                  <button
+                    onClick={() => handleDownloadMasterVisitorLogs('all')}
+                    className="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
+                  >
+                    🗂️ Download All-Time Logs
+                  </button>
                 </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">New Password</label>
-                  <input
-                    type="text" required
-                    placeholder="Enter new custom password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-medium outline-none focus:bg-white"
-                  />
-                </div>
-
-                <button
-                  type="submit" disabled={passLoading}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer"
-                >
-                  {passLoading ? 'Updating...' : 'Update Password Override'}
-                </button>
-              </form>
+              </div>
             </div>
+
 
             {/* Factory Reset */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-orange-200 bg-orange-50/10">
