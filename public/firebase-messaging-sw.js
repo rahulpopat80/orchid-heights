@@ -112,12 +112,15 @@ function setupVisitorListener(wing, flatNo) {
         if (change.type === 'added') {
           const docId = change.doc.id;
           const ann = change.doc.data();
-          const isFresh = (Date.now() - new Date(ann.timestamp || Date.now()).getTime()) < 60000;
+          const timestamp = ann.timestamp || new Date().toISOString();
+          const ageMs = Date.now() - new Date(timestamp).getTime();
+          const isFresh = ageMs < 5 * 60 * 1000;
           
           let shouldNotify = false;
-          if (ann.target === 'all') shouldNotify = true;
-          if (ann.target === 'wing' && ann.wing === wing) shouldNotify = true;
-          if (ann.target === 'flat' && ann.wing === wing && ann.flatNo === Number(flatNo)) shouldNotify = true;
+          const targetType = (ann.target || 'all').toLowerCase();
+          if (targetType === 'all') shouldNotify = true;
+          if (targetType === 'wing' && ann.wing && ann.wing.toUpperCase() === wing.toUpperCase()) shouldNotify = true;
+          if (targetType === 'flat' && ann.wing && ann.wing.toUpperCase() === wing.toUpperCase() && Number(ann.flatNo) === Number(flatNo)) shouldNotify = true;
 
           if (shouldNotify && !notifiedIds.has(docId) && isFresh) {
             notifiedIds.add(docId);
@@ -134,18 +137,21 @@ function setupVisitorListener(wing, flatNo) {
       });
     }));
 
+
   activeUnsubscribe.push(db.collection('financial_reports')
     .onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added') {
           const docId = change.doc.id;
           const fin = change.doc.data();
-          const isFresh = (Date.now() - new Date(fin.date || fin.createdAt || Date.now()).getTime()) < 60000;
+          const timestamp = fin.createdAt || new Date().toISOString();
+          const ageMs = Date.now() - new Date(timestamp).getTime();
+          const isFresh = ageMs < 5 * 60 * 1000;
           
           if (!notifiedIds.has(docId) && isFresh) {
             notifiedIds.add(docId);
             self.registration.showNotification(`💰 Financial Ledger Update`, {
-              body: `New ${fin.type}: ${fin.title} - ₹${fin.amount}`,
+              body: `New ${fin.reportType || 'report'}: ${fin.title} - ₹${fin.totalExpense || 0}`,
               icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
               tag: docId,
               data: { url: '/?activeTab=resident' }
@@ -156,6 +162,7 @@ function setupVisitorListener(wing, flatNo) {
         }
       });
     }));
+
 
   activeUnsubscribe.push(db.collection('complaints')
     .where('wing', '==', wing)
