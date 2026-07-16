@@ -116,9 +116,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       } else {
         setError(data.message || 'Login failed. Please check credentials.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      setError('Connection to server failed. Please try again.');
+      setError(`Login failed: ${err.message || 'Connection to server failed. Please try again.'}`);
     } finally {
       setLoading(false);
     }
