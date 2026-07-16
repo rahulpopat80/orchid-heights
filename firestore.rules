@@ -1,82 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper function to check if user has Admin role
-    function isAdmin() {
-      return request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // Helper function to check if user has Security role
-    function isSecurity() {
-      return request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'security';
-    }
-
-    // Helper function to check if user is the Owner of a specific flat
-    function isFlatOwner(wing, flat) {
-      return request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner' &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.wing == wing &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.flat == flat;
-    }
-
-    // User profiles collection
-    match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin() || isSecurity());
-      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
-    }
-
-    // Building Directory (flats) collection
-    match /buildingDirectory/{flatKey} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
-    }
-
-    // Visitor Requests collection
-    match /visitorRequests/{requestId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && (isSecurity() || isAdmin());
-      // Security and Admins can update. Flat owners can only update the status & answeredAt/answeredBy fields for requests targeting their flat
-      allow update: if request.auth != null && (
-        isSecurity() || 
-        isAdmin() || 
-        (
-          isFlatOwner(resource.data.wing, resource.data.flat) && 
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'answeredAt', 'answeredBy', 'rejectionReason'])
-        )
-      );
-      allow delete: if isAdmin();
-    }
-
-    // Visitor History collection (audit log)
-    match /visitorHistory/{historyId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    // Notifications collection (for real-time database sync fallback)
-    match /notifications/{notificationId} {
-      allow read: if request.auth != null && (
-        isAdmin() || 
-        isSecurity() || 
-        (
-          resource.data.targetType == 'society' ||
-          (resource.data.targetType == 'wing' && resource.data.targetWing == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.wing) ||
-          (resource.data.targetType == 'flat' && resource.data.targetWing == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.wing && resource.data.targetFlat == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.flat)
-        )
-      );
-      allow create: if request.auth != null && (isSecurity() || isAdmin());
-      allow update, delete: if isAdmin();
-    }
-
-    // Global settings collection (contains VAPID, Server Keys, etc.)
-    match /settings/{settingId} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
