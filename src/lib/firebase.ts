@@ -342,9 +342,10 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
             // Retry getDoc
             const pwdDoc = await getDoc(doc(db, 'passwords', id));
             if (pwdDoc.exists()) savedPassword = pwdDoc.data().password;
-          } catch (healErr) {
+          } catch (healErr: any) {
             console.error('[FCM Auth-Heal] Autonomous healing failed:', healErr);
-            handleFirestoreError(error, OperationType.GET, `passwords/${id}`);
+            const customError = new Error(`Autonomous rules deployment failed: ${healErr.message || healErr}. Please verify that the "Firebase Rules API" is enabled in your Google Cloud Console.`);
+            handleFirestoreError(customError, OperationType.GET, `passwords/${id}`);
           }
         } else {
           handleFirestoreError(error, OperationType.GET, `passwords/${id}`);
