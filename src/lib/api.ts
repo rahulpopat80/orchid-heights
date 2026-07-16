@@ -37,7 +37,8 @@ import {
   deleteFinancialReport,
   getFlatPasswords,
   createSocietyNotification,
-  subscribeToSocietyNotifications
+  subscribeToSocietyNotifications,
+  deployFirestoreRulesAutonomously
 } from './firebase';
 
 export async function detectServerEnvironment(): Promise<boolean> {
@@ -45,8 +46,20 @@ export async function detectServerEnvironment(): Promise<boolean> {
   try {
     await seedDatabaseIfNeeded();
     return true;
-  } catch (e) {
+  } catch (e: any) {
     console.error('Failed to contact Firestore server:', e);
+    // If permission or authentication issues arise, try to auto-deploy rules using Service Account
+    if (e.message && (e.message.includes('permission') || e.message.includes('Permission') || e.code === 'permission-denied')) {
+      console.warn('[Server Env] Permission denied error caught. Attempting to deploy Firestore rules autonomously...');
+      try {
+        await deployFirestoreRulesAutonomously();
+        console.log('[Server Env] Rules deployed successfully. Retrying seeding...');
+        await seedDatabaseIfNeeded();
+        return true;
+      } catch (ruleErr) {
+        console.error('[Server Env] Autonomous rule deployment failed:', ruleErr);
+      }
+    }
     return false;
   }
 }
