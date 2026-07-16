@@ -25,7 +25,6 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { FlatOwner, Visitor, Announcement, DeviceInfo, Complaint, FinancialReport, EssentialContact } from '../types';
 import { getInitialOwners } from '../data/ownersData';
 import firebaseConfig from '../../firebase-applet-config.json';
-import serviceAccount from '../../service-account.json';
 import * as fallback from './fallback';
 
 const app = initializeApp(firebaseConfig);
@@ -1338,21 +1337,23 @@ export async function sendFCMPushToFlat(
       return;
     }
 
-    if (
-      !serviceAccount ||
-      serviceAccount.private_key === "YOUR_PRIVATE_KEY_HERE" ||
-      serviceAccount.client_email === "YOUR_CLIENT_EMAIL_HERE"
-    ) {
+    const clientEmail = import.meta.env.VITE_FIREBASE_CLIENT_EMAIL;
+    const privateKey = import.meta.env.VITE_FIREBASE_PRIVATE_KEY;
+
+    if (!clientEmail || !privateKey || clientEmail === "YOUR_CLIENT_EMAIL_HERE" || privateKey === "YOUR_PRIVATE_KEY_HERE") {
       console.warn(
-        "[FCM] Service Account key not configured in service-account.json. Background push notifications are skipped."
+        "[FCM] Firebase service account environment variables (VITE_FIREBASE_CLIENT_EMAIL / VITE_FIREBASE_PRIVATE_KEY) not configured. Background push notifications are skipped."
       );
       return;
     }
 
+    // Replace escaped newlines in private key
+    const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+
     console.log(`[FCM] Authenticating with Google OAuth for FCM v1...`);
     const accessToken = await getGoogleAccessToken(
-      serviceAccount.client_email,
-      serviceAccount.private_key
+      clientEmail,
+      formattedPrivateKey
     );
 
     console.log(`[FCM] Sending push payload using FCM v1 to ${tokens.length} device tokens:`, tokens);
