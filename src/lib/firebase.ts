@@ -25,6 +25,7 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { FlatOwner, Visitor, Announcement, DeviceInfo, Complaint, FinancialReport, EssentialContact } from '../types';
 import { getInitialOwners } from '../data/ownersData';
 import firebaseConfig from '../../firebase-applet-config.json';
+import serviceAccount from '../../service-account.json';
 import * as fallback from './fallback';
 
 const app = initializeApp(firebaseConfig);
@@ -1234,6 +1235,97 @@ export async function getFCMTokensForFlat(wing: string, flatNo: number): Promise
  * Send FCM push notification to all devices of a specific flat
  * Uses the Firebase Cloud Messaging HTTP legacy REST API to dispatch background notification payloads
  */
+// Helper functions for FCM v1 JWT signing
+function base64url(source: ArrayBuffer | string): string {
+  let base64 = "";
+  if (typeof source === "string") {
+    base64 = btoa(unescape(encodeURIComponent(source)));
+  } else {
+    const bytes = new Uint8Array(source);
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    base64 = btoa(binary);
+  }
+  return base64.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+function base64ToArrayBuffer(b64: string): ArrayBuffer {
+  const binaryString = atob(b64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function getGoogleAccessToken(clientEmail: string, privateKeyPem: string): Promise<string> {
+  const pemHeader = "-----BEGIN PRIVATE KEY-----";
+  const pemFooter = "-----END PRIVATE KEY-----";
+  let pemContents = privateKeyPem.trim();
+  if (pemContents.startsWith(pemHeader)) {
+    pemContents = pemContents.substring(pemHeader.length);
+  }
+  if (pemContents.endsWith(pemFooter)) {
+    pemContents = pemContents.substring(0, pemContents.length - pemFooter.length);
+  }
+  pemContents = pemContents.replace(/\s/g, "");
+
+  const derBuffer = base64ToArrayBuffer(pemContents);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    "pkcs8",
+    derBuffer,
+    {
+      name: "RSASSA-PKCS1-v1_5",
+      hash: { name: "SHA-256" }
+    },
+    false,
+    ["sign"]
+  );
+
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: "RS256", typ: "JWT" };
+  const claim = {
+    iss: clientEmail,
+    scope: "https://www.googleapis.com/auth/firebase.messaging",
+    aud: "https://oauth2.googleapis.com/token",
+    exp: now + 3600,
+    iat: now
+  };
+
+  const encodedHeader = base64url(JSON.stringify(header));
+  const encodedClaim = base64url(JSON.stringify(claim));
+  const tokenInput = `${encodedHeader}.${encodedClaim}`;
+
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    cryptoKey,
+    new TextEncoder().encode(tokenInput)
+  );
+
+  const encodedSignature = base64url(signature);
+  const assertion = `${tokenInput}.${encodedSignature}`;
+
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${assertion}`
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to get OAuth token: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
 export async function sendFCMPushToFlat(
   wing: string,
   flatNo: number,
@@ -1246,40 +1338,69 @@ export async function sendFCMPushToFlat(
       return;
     }
 
-    console.log(`[FCM] Sending push payload directly to ${tokens.length} device tokens:`, tokens);
+    if (
+      !serviceAccount ||
+      serviceAccount.private_key === "YOUR_PRIVATE_KEY_HERE" ||
+      serviceAccount.client_email === "YOUR_CLIENT_EMAIL_HERE"
+    ) {
+      console.warn(
+        "[FCM] Service Account key not configured in service-account.json. Background push notifications are skipped."
+      );
+      return;
+    }
 
-    // Send to each token individually using the FCM HTTP endpoint
-    // We send to the legacy HTTP endpoint for simple direct web pushes
+    console.log(`[FCM] Authenticating with Google OAuth for FCM v1...`);
+    const accessToken = await getGoogleAccessToken(
+      serviceAccount.client_email,
+      serviceAccount.private_key
+    );
+
+    console.log(`[FCM] Sending push payload using FCM v1 to ${tokens.length} device tokens:`, tokens);
+
+    // Send to each token individually using the FCM v1 endpoint
     for (const token of tokens) {
       try {
-        await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // IMPORTANT: Replace the key below with your actual Legacy Server Key from Firebase Console -> Project Settings -> Cloud Messaging.
-            // You may need to enable 'Cloud Messaging API (Legacy)' in Google Cloud Console first.
-            'Authorization': 'key=YOUR_LEGACY_SERVER_KEY_HERE'
-          },
-          body: JSON.stringify({
-            to: token,
-            notification: {
-              title: notification.title,
-              body: notification.body,
-              icon: notification.icon || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
-              click_action: 'https://elaborate-valor-f2t1j.firebaseapp.com/?activeTab=resident'
+        const response = await fetch(
+          `https://fcm.googleapis.com/v1/projects/${firebaseConfig.projectId}/messages:send`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`
             },
-            data: {
-              ...notification.data,
-              click_action: 'https://elaborate-valor-f2t1j.firebaseapp.com/?activeTab=resident'
-            }
-          })
-        });
+            body: JSON.stringify({
+              message: {
+                token: token,
+                notification: {
+                  title: notification.title,
+                  body: notification.body
+                },
+                webpush: {
+                  notification: {
+                    icon: notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"
+                  },
+                  fcm_options: {
+                    link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
+                  }
+                },
+                data: notification.data || {}
+              }
+            })
+          }
+        );
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.warn(`[FCM] Delivery failed for token ${token.substring(0, 8)}...: ${errText}`);
+        } else {
+          console.log(`[FCM] Notification successfully sent to token ${token.substring(0, 8)}...`);
+        }
       } catch (postErr) {
         console.warn(`[FCM] Individual token delivery failed for ${token.substring(0, 8)}...`, postErr);
       }
     }
   } catch (err) {
-    console.warn('[FCM] Error sending push notification:', err);
+    console.warn("[FCM] Error sending push notification:", err);
   }
 }
 
