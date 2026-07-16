@@ -1,11 +1,10 @@
 {
-  "projectId": "elaborate-valor-f2t1j",
-  "appId": "1:193733254976:web:8ba04c424389e3dd1fa4a5",
-  "apiKey": "AIzaSyARuaG8wXchD_21vQQcgMkBam1eFpDyn7w",
-  "authDomain": "elaborate-valor-f2t1j.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-orchidheightsgat-9723728d-dfbd-4989-888d-4a04d2bdfd45",
-  "storageBucket": "elaborate-valor-f2t1j.firebasestorage.app",
-  "messagingSenderId": "193733254976",
-  "measurementId": "",
-  "oAuthClientId": "193733254976-tqt5mkdrd2nou779oshkd2ghc80qgctv.apps.googleusercontent.com"
+  "apiKey": "AIzaSyAHHKnOR_UkAjDQ8wFdBpVALYrY1rPK3Es",
+  "authDomain": "orchidheights-d46f2.firebaseapp.com",
+  "projectId": "orchidheights-d46f2",
+  "storageBucket": "orchidheights-d46f2.firebasestorage.app",
+  "messagingSenderId": "408063641296",
+  "appId": "1:408063641296:web:c0d1b7e79c69681704c0d5",
+  "measurementId": "G-5LT0NLG2E5",
+  "firestoreDatabaseId": "(default)"
 }

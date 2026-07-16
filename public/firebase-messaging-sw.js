@@ -8,12 +8,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-com
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
 
 firebase.initializeApp({
-  apiKey: "AIzaSyARuaG8wXchD_21vQQcgMkBam1eFpDyn7w",
-  authDomain: "elaborate-valor-f2t1j.firebaseapp.com",
-  projectId: "elaborate-valor-f2t1j",
-  storageBucket: "elaborate-valor-f2t1j.firebasestorage.app",
-  messagingSenderId: "193733254976",
-  appId: "1:193733254976:web:8ba04c424389e3dd1fa4a5"
+  apiKey: "AIzaSyAHHKnOR_UkAjDQ8wFdBpVALYrY1rPK3Es",
+  authDomain: "orchidheights-d46f2.firebaseapp.com",
+  projectId: "orchidheights-d46f2",
+  storageBucket: "orchidheights-d46f2.firebasestorage.app",
+  messagingSenderId: "408063641296",
+  appId: "1:408063641296:web:c0d1b7e79c69681704c0d5"
 });
 
 const messaging = firebase.messaging();

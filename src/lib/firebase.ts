@@ -1169,7 +1169,7 @@ export function subscribeToSocietyNotifications(wing: string, flatNo: number, on
 // ============================================================
 
 // VAPID Key for Web Push (FCM)
-const VAPID_KEY = 'BHD4G3tL5Zl9Oq_1dFn0dFHjZLhJKblq7Ua1HUm7YbSm5X6y7HgHbnP30IzLqHDv_VGRb7D_m6MFkMQE5e5KAQ';
+const VAPID_KEY = 'BExkWMguzjb1mmG7xuA7mNEJfZW9cfAtwh8vHQHDLb5FZzRGwfo2S5KAoTeM1fVsTlme-cRLoY-AF1mne-jnsuw';
 
 /**
  * Register FCM token for the current device and store it in Firestore
@@ -1256,8 +1256,9 @@ export async function sendFCMPushToFlat(
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Using the Server key matching the project sender ID
-            'Authorization': 'key=AAAA6C_lV0g:APA91bHVGqWpU9ZJqN1w6k-m85O6sF5s-rZ0HkLh1Kblq7Ua1HUm7YbSm5X6y7HgHbnP30IzLqHDv_VGRb7D_m6MFkMQE5e5KAQ'
+            // IMPORTANT: Replace the key below with your actual Legacy Server Key from Firebase Console -> Project Settings -> Cloud Messaging.
+            // You may need to enable 'Cloud Messaging API (Legacy)' in Google Cloud Console first.
+            'Authorization': 'key=YOUR_LEGACY_SERVER_KEY_HERE'
           },
           body: JSON.stringify({
             to: token,
