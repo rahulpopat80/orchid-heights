@@ -1232,7 +1232,7 @@ export async function getFCMTokensForFlat(wing: string, flatNo: number): Promise
 
 /**
  * Send FCM push notification to all devices of a specific flat
- * Uses the Firebase Cloud Messaging HTTP v1 API via direct fetch
+ * Uses the Firebase Cloud Messaging HTTP legacy REST API to dispatch background notification payloads
  */
 export async function sendFCMPushToFlat(
   wing: string,
@@ -1246,20 +1246,42 @@ export async function sendFCMPushToFlat(
       return;
     }
 
-    // Use Firebase FCM v1 REST API
-    // NOTE: For production use, this should be done from a Cloud Function to keep the server key secure
-    // For now we store FCM tokens and let the Service Worker handle notifications via Firestore real-time
-    console.log(`[FCM] Would send push to ${tokens.length} device(s) for flat ${wing}-${flatNo}`);
-    
-    // The real notification delivery is handled by:
-    // 1. The service worker's Firestore onSnapshot listener (when app is open)
-    // 2. The browser's built-in notification system (when app is closed, via SW)
-    // The key fix is that we now properly listen to the 'visitors' collection
-    // with all full data fields populated
+    console.log(`[FCM] Sending push payload directly to ${tokens.length} device tokens:`, tokens);
+
+    // Send to each token individually using the FCM HTTP endpoint
+    // We send to the legacy HTTP endpoint for simple direct web pushes
+    for (const token of tokens) {
+      try {
+        await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Using the Server key matching the project sender ID
+            'Authorization': 'key=AAAA6C_lV0g:APA91bHVGqWpU9ZJqN1w6k-m85O6sF5s-rZ0HkLh1Kblq7Ua1HUm7YbSm5X6y7HgHbnP30IzLqHDv_VGRb7D_m6MFkMQE5e5KAQ'
+          },
+          body: JSON.stringify({
+            to: token,
+            notification: {
+              title: notification.title,
+              body: notification.body,
+              icon: notification.icon || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+              click_action: 'https://elaborate-valor-f2t1j.firebaseapp.com/?activeTab=resident'
+            },
+            data: {
+              ...notification.data,
+              click_action: 'https://elaborate-valor-f2t1j.firebaseapp.com/?activeTab=resident'
+            }
+          })
+        });
+      } catch (postErr) {
+        console.warn(`[FCM] Individual token delivery failed for ${token.substring(0, 8)}...`, postErr);
+      }
+    }
   } catch (err) {
     console.warn('[FCM] Error sending push notification:', err);
   }
 }
+
 
 /**
  * Subscribe to foreground FCM messages (when app is open and focused)
