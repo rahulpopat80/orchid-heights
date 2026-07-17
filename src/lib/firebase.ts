@@ -1135,20 +1135,27 @@ async function triggerFCMPushForSocietyNotification(payload: {
               body: JSON.stringify({
                 message: {
                   token: token,
-                  // PURE DATA MESSAGE: Forces OS to wake up Service Worker instead of hijacking notification
-                  data: {
-                    type: String(payload.type),
+                  notification: {
                     title: String(payload.title),
-                    body: String(payload.message),
-                    icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                    visitorId: String(payload.metadata?.visitorId || ""),
-                    wing: String(payload.wing || ""),
-                    flatNo: String(payload.flatNo || "")
-                  },
-                  android: {
-                    priority: "high"
+                    body: String(payload.message)
                   },
                   webpush: {
+                    notification: {
+                      icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                      badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                      requireInteraction: payload.type === 'visitor',
+                      vibrate: [200, 100, 200],
+                      tag: String(payload.metadata?.visitorId || payload.type || "society_notif"),
+                      data: {
+                        type: String(payload.type),
+                        visitorId: String(payload.metadata?.visitorId || ""),
+                        wing: String(payload.wing || ""),
+                        flatNo: String(payload.flatNo || "")
+                      }
+                    },
+                    fcm_options: {
+                      link: "/?activeTab=resident"
+                    },
                     headers: {
                       Urgency: "high",
                       TTL: "86400"
@@ -1604,19 +1611,30 @@ export async function sendFCMPushToFlat(
             body: JSON.stringify({
               message: {
                 token: token,
-                // PURE DATA MESSAGE: Forces OS to wake up Service Worker instead of hijacking notification
-                data: {
+                notification: {
                   title: String(notification.title),
-                  body: String(notification.body),
-                  icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
-                  ...Object.fromEntries(
-                    Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
-                  )
-                },
-                android: {
-                  priority: "high"
+                  body: String(notification.body)
                 },
                 webpush: {
+                  notification: {
+                    icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
+                    badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                    requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
+                    vibrate: [200, 100, 200],
+                    tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
+                    data: Object.fromEntries(
+                      Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                    ),
+                    ...( (notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request') ? {
+                      actions: [
+                        { action: 'approve', title: '✅ Approve Entry' },
+                        { action: 'reject', title: '❌ Reject' }
+                      ]
+                    } : {})
+                  },
+                  fcm_options: {
+                    link: "/?activeTab=resident"
+                  },
                   headers: {
                     Urgency: "high",
                     TTL: "86400"
