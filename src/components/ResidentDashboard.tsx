@@ -87,29 +87,36 @@ const stopHighFrequencyAlarm = () => {
 const triggerNewVisitorNotification = (visitor: Visitor) => {
   playHighFrequencyAlarm();
   
-  if ('Notification' in window) {
-    if (Notification.permission === 'granted') {
-      try {
-        const title = `🚪 New Visitor: ${visitor.fullName}`;
-        const countText = visitor.visitorCount && visitor.visitorCount > 1 ? ` (${visitor.visitorCount} Visitors)` : '';
-        const bodyText = `Type: ${visitor.guestType}${countText}\nWing-Flat: ${visitor.wing}-${visitor.flatNo}\nReason: ${visitor.reason}${visitor.email ? `\nEmail: ${visitor.email}` : ''}`;
-        
-        new Notification(title, {
-          body: bodyText,
-          icon: visitor.photoUrl || '/icon.png',
-          tag: visitor.id,
-          requireInteraction: true,
-          actions: [
-            { action: 'approve', title: '✅ Approve' },
-            { action: 'reject', title: '❌ Reject' }
-          ]
-        } as any);
-      } catch (err) {
-        console.warn('Failed to construct desktop Notification:', err);
-      }
-    }
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  // Use Service Worker registration to show notification — this supports Approve/Reject action buttons
+  // and works on Android Chrome reliably. new Notification() does NOT support actions.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((registration) => {
+      const countText = visitor.visitorCount && visitor.visitorCount > 1 ? ` (${visitor.visitorCount} persons)` : '';
+      registration.showNotification(`🚪 Visitor: ${visitor.fullName}${countText}`, {
+        body: `${visitor.guestType} | Mobile: ${visitor.mobileNumber}\nFlat ${visitor.wing}-${visitor.flatNo} | ${visitor.reason}`,
+        icon: visitor.photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+        badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+        tag: visitor.id,
+        requireInteraction: true,
+        data: {
+          visitorId: visitor.id,
+          type: 'visitor',
+          wing: visitor.wing,
+          flatNo: String(visitor.flatNo)
+        },
+        actions: [
+          { action: 'approve', title: '✅ Approve Entry' },
+          { action: 'reject', title: '❌ Reject' }
+        ]
+      } as any);
+    }).catch((err) => {
+      console.warn('[Notification] SW registration not ready, falling back:', err);
+    });
   }
 };
+
 
 interface ResidentDashboardProps {
   session: UserSession;

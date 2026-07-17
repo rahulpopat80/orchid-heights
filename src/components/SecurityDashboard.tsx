@@ -8,7 +8,7 @@ import { Shield, Plus, Clock, Search, AlertCircle, CheckCircle2, Trash2, Refresh
 import { FlatOwner, Visitor, DailyHelper } from '../types';
 import WebcamCapture from './WebcamCapture';
 import { api, detectServerEnvironment } from '../lib/api';
-import { collection, onSnapshot, doc, setDoc, updateDoc, db } from '../lib/firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc, db, sendFCMPushToFlat } from '../lib/firebase';
 
 const playDecisionSound = (status: 'approved' | 'rejected' | 'expired') => {
   if (status === 'expired') return;
@@ -263,6 +263,24 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             acknowledged: false,
             status: 'pending'
           });
+
+          // 🔔 Send FCM push to ALL devices of this flat immediately
+          // This is what makes notification arrive even when app is closed
+          sendFCMPushToFlat(fWing, fNo, {
+            title: `🚪 ગેટ પર મુલાકાતી: ${fullName.trim()}`,
+            body: `${guestType} - ${defaultReason}\nMobile: ${mobileNumber.trim()}`,
+            icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+            data: {
+              visitorId: String(visitorId),
+              type: 'visitor',
+              wing: String(fWing),
+              flatNo: String(fNo),
+              fullName: String(fullName.trim()),
+              guestType: String(guestType),
+              mobileNumber: String(mobileNumber.trim()),
+              reason: String(defaultReason)
+            }
+          }).catch((err: any) => console.warn('[FCM] Push failed for flat:', fWing, fNo, err));
         }
       }
 
