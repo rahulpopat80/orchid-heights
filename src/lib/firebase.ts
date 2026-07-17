@@ -1135,29 +1135,7 @@ async function triggerFCMPushForSocietyNotification(payload: {
               body: JSON.stringify({
                 message: {
                   token: token,
-                  // notification block = shown immediately by OS even when app is closed
-                  notification: {
-                    title: payload.title,
-                    body: payload.message
-                  },
-                  // webpush block = controls Chrome/Edge web push behavior
-                  webpush: {
-                    notification: {
-                      icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                      badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                      tag: payload.metadata?.visitorId || payload.type || "society_notif",
-                      requireInteraction: payload.type === "visitor",
-                      vibrate: [200, 100, 200]
-                    },
-                    fcm_options: {
-                      link: "/?activeTab=resident"
-                    },
-                    headers: {
-                      Urgency: "high",
-                      TTL: "86400"
-                    }
-                  },
-                  // data block = ALL values MUST be strings for FCM compliance
+                  // PURE DATA MESSAGE: Forces OS to wake up Service Worker instead of hijacking notification
                   data: {
                     type: String(payload.type),
                     title: String(payload.title),
@@ -1166,6 +1144,15 @@ async function triggerFCMPushForSocietyNotification(payload: {
                     visitorId: String(payload.metadata?.visitorId || ""),
                     wing: String(payload.wing || ""),
                     flatNo: String(payload.flatNo || "")
+                  },
+                  android: {
+                    priority: "high"
+                  },
+                  webpush: {
+                    headers: {
+                      Urgency: "high",
+                      TTL: "86400"
+                    }
                   }
                 }
               })
@@ -1617,31 +1604,24 @@ export async function sendFCMPushToFlat(
             body: JSON.stringify({
               message: {
                 token: token,
-                // notification block shown by OS immediately when app is closed
-                notification: {
-                  title: notification.title,
-                  body: notification.body
+                // PURE DATA MESSAGE: Forces OS to wake up Service Worker instead of hijacking notification
+                data: {
+                  title: String(notification.title),
+                  body: String(notification.body),
+                  icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
+                  ...Object.fromEntries(
+                    Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                  )
+                },
+                android: {
+                  priority: "high"
                 },
                 webpush: {
-                  notification: {
-                    icon: notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                    badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                    tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
-                    requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
-                    vibrate: [200, 100, 200]
-                  },
-                  fcm_options: {
-                    link: "/?activeTab=resident"
-                  },
                   headers: {
                     Urgency: "high",
                     TTL: "86400"
                   }
-                },
-                // ALL data values must be strings (FCM requirement)
-                data: Object.fromEntries(
-                  Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
-                )
+                }
               }
             })
           }
