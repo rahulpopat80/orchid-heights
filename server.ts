@@ -278,6 +278,39 @@ async function startServer() {
     }
   });
 
+  // FCM Proxy to bypass CORS during local development
+  app.post('/api/fcm', async (req, res) => {
+    try {
+      const { projectId, accessToken, payload } = req.body;
+      if (!projectId || !accessToken || !payload) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const response = await fetch(
+        `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        return res.status(response.status).json({ error: errText });
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error: any) {
+      console.error('FCM proxy error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // --- VITE MIDDLEWARE SETUP ---
 
   if (process.env.NODE_ENV !== 'production') {

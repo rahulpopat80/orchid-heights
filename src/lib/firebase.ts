@@ -1124,17 +1124,12 @@ async function triggerFCMPushForSocietyNotification(payload: {
       // Deliver to each token
       for (const token of allTokens) {
         try {
-          const response = await fetch(
-            `https://fcm.googleapis.com/v1/projects/${firebaseConfig.projectId}/messages:send`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`
-              },
-              body: JSON.stringify({
-                message: {
-                  token: token,
+          const payloadBody = {
+            projectId: firebaseConfig.projectId,
+            accessToken,
+            payload: {
+              message: {
+                token: token,
                   notification: {
                     title: String(payload.title),
                     body: String(payload.message)
@@ -1160,11 +1155,17 @@ async function triggerFCMPushForSocietyNotification(payload: {
                       Urgency: "high",
                       TTL: "86400"
                     }
-                  }
-                }
-              })
+              }
             }
-          );
+          };
+
+          const response = await fetch('/api/fcm', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payloadBody)
+          });
 
           if (!response.ok) {
             const errText = await response.text();
@@ -1600,17 +1601,12 @@ export async function sendFCMPushToFlat(
     // Send to each token individually using the FCM v1 endpoint
     for (const token of tokens) {
       try {
-        const response = await fetch(
-          `https://fcm.googleapis.com/v1/projects/${firebaseConfig.projectId}/messages:send`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-              message: {
-                token: token,
+        const payloadBody = {
+          projectId: firebaseConfig.projectId,
+          accessToken,
+          payload: {
+            message: {
+              token: token,
                 notification: {
                   title: String(notification.title),
                   body: String(notification.body)
@@ -1641,9 +1637,16 @@ export async function sendFCMPushToFlat(
                   }
                 }
               }
-            })
-          }
-        );
+            }
+          };
+
+          const response = await fetch('/api/fcm', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payloadBody)
+          });
 
         if (!response.ok) {
           const errText = await response.text();
