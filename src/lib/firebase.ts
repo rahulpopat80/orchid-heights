@@ -1134,19 +1134,19 @@ async function triggerFCMPushForSocietyNotification(payload: {
                     title: String(payload.title),
                     body: String(payload.message)
                   },
+                  data: {
+                    type: String(payload.type),
+                    visitorId: String(payload.metadata?.visitorId || ""),
+                    wing: String(payload.wing || ""),
+                    flatNo: String(payload.flatNo || "")
+                  },
                   webpush: {
                     notification: {
                       icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
                       badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
                       requireInteraction: payload.type === 'visitor',
                       vibrate: [200, 100, 200],
-                      tag: String(payload.metadata?.visitorId || payload.type || "society_notif"),
-                      data: {
-                        type: String(payload.type),
-                        visitorId: String(payload.metadata?.visitorId || ""),
-                        wing: String(payload.wing || ""),
-                        flatNo: String(payload.flatNo || "")
-                      }
+                      tag: String(payload.metadata?.visitorId || payload.type || "society_notif")
                     },
                     fcm_options: {
                       link: "/?activeTab=resident"
@@ -1170,6 +1170,7 @@ async function triggerFCMPushForSocietyNotification(payload: {
 
           if (!response.ok) {
             const errText = await response.text();
+            alert(`FCM Delivery Failed: ${errText}`);
             throw new Error(`FCM Server returned status ${response.status}: ${errText}`);
           }
           console.log(`[FCM Trigger] Notification successfully broadcast-sent to token ${token.substring(0, 8)}...`);
@@ -1612,6 +1613,9 @@ export async function sendFCMPushToFlat(
                   title: String(notification.title),
                   body: String(notification.body)
                 },
+                data: Object.fromEntries(
+                  Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                ),
                 webpush: {
                   notification: {
                     icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
@@ -1619,9 +1623,6 @@ export async function sendFCMPushToFlat(
                     requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
                     vibrate: [200, 100, 200],
                     tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
-                    data: Object.fromEntries(
-                      Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
-                    ),
                     ...( (notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request') ? {
                       actions: [
                         { action: 'approve', title: '✅ Approve Entry' },
@@ -1651,6 +1652,7 @@ export async function sendFCMPushToFlat(
 
         if (!response.ok) {
           const errText = await response.text();
+          alert(`FCM Delivery Failed: ${errText}`);
           throw new Error(`FCM Server returned status ${response.status}: ${errText}`);
         }
         console.log(`[FCM] Notification successfully sent to token ${token.substring(0, 8)}...`);
