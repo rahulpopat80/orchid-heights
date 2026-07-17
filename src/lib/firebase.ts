@@ -1130,11 +1130,9 @@ async function triggerFCMPushForSocietyNotification(payload: {
             payload: {
               message: {
                 token: token,
-                  notification: {
-                    title: String(payload.title),
-                    body: String(payload.message)
-                  },
                   data: {
+                    title: String(payload.title),
+                    body: String(payload.message),
                     type: String(payload.type),
                     visitorId: String(payload.metadata?.visitorId || ""),
                     wing: String(payload.wing || ""),
@@ -1609,12 +1607,14 @@ export async function sendFCMPushToFlat(
           payload: {
             message: {
               token: token,
-                notification: {
-                  title: String(notification.title),
-                  body: String(notification.body)
-                },
-                data: Object.fromEntries(
-                  Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                data: Object.assign(
+                  {
+                    title: String(notification.title),
+                    body: String(notification.body)
+                  },
+                  Object.fromEntries(
+                    Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                  )
                 ),
                 webpush: {
                   notification: {
