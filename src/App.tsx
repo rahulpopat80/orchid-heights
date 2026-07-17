@@ -73,64 +73,105 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Register service worker and request Notification permission on startup
+  // Register service worker and aggressively request Notification permission on startup
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      const currentProjectId = firebaseConfig.projectId;
-      const cachedProject = localStorage.getItem('orchid_sw_project_id');
+    const setupSW = async () => {
+      if (!('serviceWorker' in navigator)) return;
 
-      if (cachedProject !== currentProjectId) {
-        console.log('[SW Migration] Migrating service worker to new project:', currentProjectId);
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          for (let reg of registrations) {
-            reg.unregister();
-            console.log('[SW Migration] Unregistered old SW scope:', reg.scope);
+      try {
+        // Force-unregister old SW if project changed
+        const currentProjectId = firebaseConfig.projectId;
+        const cachedProject = localStorage.getItem('orchid_sw_project_id');
+
+        if (cachedProject && cachedProject !== currentProjectId) {
+          console.log('[SW] Project changed. Unregistering old service workers...');
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            await reg.unregister();
           }
-          // Register fresh service worker
-          navigator.serviceWorker.register('/firebase-messaging-sw.js').then((newReg) => {
-            console.log('[SW Migration] Registered new SW scope:', newReg.scope);
-            localStorage.setItem('orchid_sw_project_id', currentProjectId);
-          });
-        });
-      } else {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js').then((reg) => {
-          console.log('Orchid Heights service worker registered:', reg.scope);
-          // Check for service worker updates immediately
-          reg.update();
-        }).catch((err) => {
-          console.error('Orchid Heights service worker registration failed:', err);
-        });
-      }
-    }
+          localStorage.setItem('orchid_sw_project_id', currentProjectId);
+        }
 
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
+        // Always register/update service worker on every page load
+        const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+          updateViaCache: 'none' // Always fetch fresh SW file, never use cache
+        });
+
+        // Force immediate update to pick up latest SW code
+        await reg.update();
+        console.log('[SW] Service worker registered and updated:', reg.scope);
+        localStorage.setItem('orchid_sw_project_id', currentProjectId);
+
+      } catch (err) {
+        console.error('[SW] Service worker setup failed:', err);
+      }
+
+      // Aggressively request notification permission
+      if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+          const perm = await Notification.requestPermission();
+          console.log('[Notifications] Permission result:', perm);
+        } else {
+          console.log('[Notifications] Permission already:', Notification.permission);
+        }
+      }
+    };
+
+    setupSW();
   }, []);
 
-  // Register FCM token when owner is logged in
+  // Register FCM token on every app boot when owner is logged in
+  // This ensures the device token is always fresh and registered
   useEffect(() => {
     if (session && (session.role === 'owner' || session.role === 'admin') && session.wing && session.flatNo) {
-      // Register FCM token with a delay to ensure SW is ready
-      setTimeout(() => {
-        registerFCMToken(session.wing!, session.flatNo!).then((token) => {
-          if (token) {
-            console.log('[FCM] Token registered for flat', session.wing, session.flatNo);
-          }
-        });
-      }, 2000);
+      const setupFCM = async () => {
+        // Wait for SW to be ready
+        await navigator.serviceWorker.ready;
+        
+        // Small delay to ensure SW is fully activated
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Subscribe to foreground FCM messages
+        const token = await registerFCMToken(session.wing!, session.flatNo!);
+        if (token) {
+          console.log('[FCM] Token registered/refreshed for flat', session.wing, session.flatNo, '→', token.substring(0, 20) + '...');
+        } else {
+          console.warn('[FCM] Failed to get token - notifications may not work. Check browser permissions.');
+        }
+      };
+
+      setupFCM().catch(err => console.warn('[FCM] Setup error:', err));
+
+      // Subscribe to foreground FCM messages (when app is OPEN)
       const unsubFCM = subscribeToForegroundMessages((payload) => {
-        console.log('[FCM] Foreground message received:', payload);
-        // Show browser notification for foreground messages too
-        if (payload.notification && 'Notification' in window && Notification.permission === 'granted') {
-          new Notification(payload.notification.title || 'Orchid Heights', {
-            body: payload.notification.body || '',
-            icon: payload.notification.image || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
-            tag: payload.data?.visitorId || 'fcm_notif',
-            requireInteraction: true
-          });
+        console.log('[FCM Foreground] Message received:', payload);
+        // Show OS notification for foreground messages too (otherwise they only show in-app)
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const data = payload.data || {};
+          const notif = payload.notification || {};
+          const type = data.type || '';
+          const visitorId = data.visitorId;
+          
+          if (navigator.serviceWorker.controller) {
+            // Use service worker to show notification (supports actions like approve/reject)
+            navigator.serviceWorker.ready.then(reg => {
+              const opts: any = {
+                body: notif.body || data.body || '',
+                icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+                badge: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+                tag: visitorId || type || 'foreground_notif',
+                data: data,
+                requireInteraction: type === 'visitor' || type === 'visitor_request',
+                vibrate: [200, 100, 200]
+              };
+              if (type === 'visitor' || type === 'visitor_request') {
+                opts.actions = [
+                  { action: 'approve', title: '✅ Approve Entry' },
+                  { action: 'reject', title: '❌ Reject' }
+                ];
+              }
+              reg.showNotification(notif.title || 'Orchid Heights', opts);
+            });
+          }
         }
       });
       return () => unsubFCM();

@@ -562,12 +562,21 @@ export async function registerVisitor(payload: any): Promise<Visitor> {
       wing, flatNo: parseInt(flatNo, 10), metadata: { visitorId, fullName, mobileNumber, guestType, reason, photoUrl: photoUrl || '', visitorCount: count }
     });
     
-    // Send FCM push notification to all devices of the target flat
+    // Send FCM push notification to all devices of the target flat (instant wake-up)
     await sendFCMPushToFlat(wing, parseInt(flatNo, 10), {
       title: `🚪 ગેટ પર મુલાકાતી: ${fullName}`,
       body: `${guestType} - ${reason}\nMobile: ${mobileNumber}\nFlat ${wing}-${flatNo}`,
       icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
-      data: { visitorId, type: 'visitor_request', wing, flatNo: String(flatNo) }
+      data: {
+        visitorId: String(visitorId),
+        type: 'visitor',
+        wing: String(wing),
+        flatNo: String(flatNo),
+        fullName: String(fullName),
+        guestType: String(guestType),
+        mobileNumber: String(mobileNumber),
+        reason: String(reason)
+      }
     });
     
     return newVisitor;
@@ -1126,21 +1135,38 @@ async function triggerFCMPushForSocietyNotification(payload: {
               body: JSON.stringify({
                 message: {
                   token: token,
+                  // notification block = shown immediately by OS even when app is closed
                   notification: {
                     title: payload.title,
                     body: payload.message
                   },
+                  // webpush block = controls Chrome/Edge web push behavior
                   webpush: {
                     notification: {
                       icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                      badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
                       tag: payload.metadata?.visitorId || payload.type || "society_notif",
-                      requireInteraction: payload.type === "visitor"
+                      requireInteraction: payload.type === "visitor",
+                      vibrate: [200, 100, 200]
                     },
                     fcm_options: {
-                      link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
+                      link: "/?activeTab=resident"
+                    },
+                    headers: {
+                      Urgency: "high",
+                      TTL: "86400"
                     }
                   },
-                  data: { type: payload.type }
+                  // data block = ALL values MUST be strings for FCM compliance
+                  data: {
+                    type: String(payload.type),
+                    title: String(payload.title),
+                    body: String(payload.message),
+                    icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                    visitorId: String(payload.metadata?.visitorId || ""),
+                    wing: String(payload.wing || ""),
+                    flatNo: String(payload.flatNo || "")
+                  }
                 }
               })
             }
@@ -1591,6 +1617,7 @@ export async function sendFCMPushToFlat(
             body: JSON.stringify({
               message: {
                 token: token,
+                // notification block shown by OS immediately when app is closed
                 notification: {
                   title: notification.title,
                   body: notification.body
@@ -1598,14 +1625,23 @@ export async function sendFCMPushToFlat(
                 webpush: {
                   notification: {
                     icon: notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                    tag: notification.data?.visitorId || "visitor_request",
-                    requireInteraction: true
+                    badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                    tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
+                    requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
+                    vibrate: [200, 100, 200]
                   },
                   fcm_options: {
-                    link: `https://${firebaseConfig.projectId}.firebaseapp.com/?activeTab=resident`
+                    link: "/?activeTab=resident"
+                  },
+                  headers: {
+                    Urgency: "high",
+                    TTL: "86400"
                   }
                 },
-                data: notification.data || {}
+                // ALL data values must be strings (FCM requirement)
+                data: Object.fromEntries(
+                  Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                )
               }
             })
           }
