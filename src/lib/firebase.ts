@@ -19,9 +19,12 @@ import {
   onSnapshot as rawOnSnapshot,
   where as rawWhere,
   orderBy as rawOrderBy,
-  arrayUnion as rawArrayUnion
+  arrayUnion as rawArrayUnion,
+  writeBatch as rawWriteBatch
 } from 'firebase/firestore';
 import { getMessaging, getToken, deleteToken, onMessage } from 'firebase/messaging';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { FlatOwner, Visitor, Announcement, DeviceInfo, Complaint, FinancialReport, EssentialContact } from '../types';
 import { getInitialOwners } from '../data/ownersData';
 import firebaseConfig from '../../firebase-applet-config.json';
@@ -1386,62 +1389,89 @@ const VAPID_KEY = 'BExkWMguzjb1mmG7xuA7mNEJfZW9cfAtwh8vHQHDLb5FZzRGwfo2S5KAoTeM1
  * under the owner's record for the given flat
  */
 export async function registerFCMToken(wing: string, flatNo: number): Promise<string | null> {
+  const currentProjectId = firebaseConfig.projectId;
+  const cachedProject = localStorage.getItem('orchid_fcm_project_id');
+
+  // Force deletion of old token if project migrated to ensure we get a token for the new project
+  if (cachedProject !== currentProjectId) {
+    console.log('[FCM] Project migrated. Deleting old cached FCM token...');
+    try {
+      if (messaging) await deleteToken(messaging);
+    } catch (delErr) {
+      console.warn('Could not delete old FCM token:', delErr);
+    }
+    localStorage.removeItem(`orchid_fcm_token_${wing}_${flatNo}`);
+    localStorage.setItem('orchid_fcm_project_id', currentProjectId);
+  }
+
+  const id = `${wing}-${flatNo}`;
+  const ownerRef = doc(db, 'owners', id);
+
+  const saveTokenToFirestore = async (t: string) => {
+    try {
+      const snap = await getDoc(ownerRef);
+      if (snap.exists()) {
+        const ownerData = snap.data() as FlatOwner;
+        const currentTokens: string[] = (ownerData as any).fcmTokens || [];
+        if (!currentTokens.includes(t)) {
+          await setDoc(ownerRef, { fcmTokens: [...currentTokens, t] }, { merge: true });
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to store FCM token in Firestore:', err);
+    }
+    localStorage.setItem(`orchid_fcm_token_${wing}_${flatNo}`, t);
+  };
+
+  // NATIVE APP FLOW (Capacitor / Android / iOS)
+  if (Capacitor.isNativePlatform()) {
+    return new Promise(async (resolve) => {
+      let permissions = await PushNotifications.checkPermissions();
+      if (permissions.receive === 'prompt') {
+        permissions = await PushNotifications.requestPermissions();
+      }
+      if (permissions.receive !== 'granted') {
+        console.warn('Native Push permissions denied');
+        return resolve(null);
+      }
+
+      await PushNotifications.register();
+
+      PushNotifications.addListener('registration', (token) => {
+        console.log('[FCM] Native device token registered:', token.value);
+        saveTokenToFirestore(token.value);
+        resolve(token.value);
+      });
+
+      PushNotifications.addListener('registrationError', (error) => {
+        console.error('[FCM] Error on native registration:', error);
+        resolve(null);
+      });
+    });
+  }
+
+  // WEB APP FLOW (PWA / Browser)
   if (!messaging) {
-    console.warn('FCM messaging not initialized');
+    console.warn('FCM messaging not initialized for web');
     return null;
   }
+  
   try {
-    const currentProjectId = firebaseConfig.projectId;
-    const cachedProject = localStorage.getItem('orchid_fcm_project_id');
-
-    // Force deletion of old token if project migrated to ensure we get a token for the new project
-    if (cachedProject !== currentProjectId) {
-      console.log('[FCM] Project migrated. Deleting old cached FCM token...');
-      try {
-        await deleteToken(messaging);
-      } catch (delErr) {
-        console.warn('Could not delete old FCM token:', delErr);
-      }
-      localStorage.removeItem(`orchid_fcm_token_${wing}_${flatNo}`);
-      localStorage.setItem('orchid_fcm_project_id', currentProjectId);
-    }
-
     let swReg: ServiceWorkerRegistration | undefined = undefined;
     if ('serviceWorker' in navigator) {
-      // Register or retrieve the active service worker registration
       swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
       await navigator.serviceWorker.ready;
     }
 
-    // Explicitly link VAPID key and our custom Service Worker registration
     const token = await getToken(messaging, { 
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: swReg 
     });
 
     if (token) {
-      const id = `${wing}-${flatNo}`;
-      const ownerRef = doc(db, 'owners', id);
-      try {
-        // Store token in owner's fcmTokens array (avoid duplicates)
-        const snap = await getDoc(ownerRef);
-        if (snap.exists()) {
-          const ownerData = snap.data() as FlatOwner;
-          const currentTokens: string[] = (ownerData as any).fcmTokens || [];
-          if (!currentTokens.includes(token)) {
-            await setDoc(ownerRef, { fcmTokens: [...currentTokens, token] }, { merge: true });
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to store FCM token in Firestore:', err);
-      }
-      // Also store locally for quick access
-      localStorage.setItem(`orchid_fcm_token_${wing}_${flatNo}`, token);
+      await saveTokenToFirestore(token);
       return token;
     }
-    return null;
-  } catch (err) {
-    console.warn('Failed to get FCM token:', err);
     return null;
   }
 }
