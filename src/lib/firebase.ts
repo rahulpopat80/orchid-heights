@@ -1155,9 +1155,10 @@ async function triggerFCMPushForSocietyNotification(payload: {
                       Urgency: "high",
                       TTL: "86400"
                     }
+                  }
+                }
               }
-            }
-          };
+            };
 
           const response = await fetch('/api/fcm', {
             method: "POST",
