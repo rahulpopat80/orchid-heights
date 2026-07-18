@@ -1059,7 +1059,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
           `"${respDate ? respDate.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}"`,
           `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
           `"${(v.rejectReason || '-').replace(/"/g, '""')}"`,
-          `"${v.deletedByResident ? 'Deleted by Resident' : 'Active Log'}"`
+          `"${v.deletedByResident ? 'DELETED BY RESIDENT' : v.status === 'pending' ? 'PENDING (AWAITING)' : 'ACTIVE LOG'}"`
         ].join(','));
       });
 
@@ -1233,7 +1233,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Phone</label>
                         <input
                           type="tel" placeholder="10-digit primary"
-                          value={editPhone} onChange={(e) => setEditPhone(e.target.value)}
+                          value={editPhone} onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
                         />
                       </div>
@@ -1241,7 +1241,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alt Contact</label>
                         <input
                           type="tel" placeholder="Alternate phone"
-                          value={editSecondary} onChange={(e) => setEditSecondary(e.target.value)}
+                          value={editSecondary} onChange={(e) => setEditSecondary(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
                         />
                       </div>
@@ -1404,7 +1404,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           type="tel"
                           placeholder="Phone (Optional)"
                           value={adminNewMemberPhone}
-                          onChange={(e) => setAdminNewMemberPhone(e.target.value)}
+                          onChange={(e) => setAdminNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
                         />
                       </div>
@@ -2582,7 +2582,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     <input
                       type="tel" required placeholder="10-digit number"
                       value={contactPhone}
-                      onChange={(e) => setContactPhone(e.target.value)}
+                      onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
                     />
                   </div>
@@ -2593,7 +2593,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   <input
                     type="tel" placeholder="Alt phone number"
                     value={contactAltPhone}
-                    onChange={(e) => setContactAltPhone(e.target.value)}
+                    onChange={(e) => setContactAltPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
                   />
                 </div>

@@ -330,8 +330,8 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
     });
   };
 
-  const pendingVisitors = visitors.filter((v) => v.status === 'pending');
-  const resolvedVisitors = visitors.filter((v) => v.status !== 'pending');
+  const pendingVisitors = visitors.filter((v) => v.status === 'pending' && !v.deletedByResident);
+  const resolvedVisitors = visitors.filter((v) => v.status !== 'pending' && !v.deletedByResident);
 
   const filteredLogs = resolvedVisitors.filter((v) => {
     const q = logsSearch.toLowerCase().trim();
@@ -492,7 +492,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                   placeholder="૧૦-અંકનો મોબાઇલ નંબર લખો"
                   value={mobileNumber}
                   disabled={!!(selectedHelperId && selectedHelperId !== 'new')}
-                  onChange={(e) => setMobileNumber(e.target.value)}
+                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl py-3 px-4 text-lg font-bold"
                 />
               </div>

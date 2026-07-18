@@ -312,8 +312,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     </button>
                   </div>
                   <p className="text-[10px] text-slate-400 font-medium mt-2 leading-relaxed bg-slate-50 border border-slate-100 p-2 rounded-lg">
-                    💡 Hint: Default resident password is <span className="font-mono text-indigo-600 font-semibold">admin@123</span>.<br />
-                    🔑 Admin account: <span className="font-semibold text-indigo-600">B-1104</span>, password <span className="font-mono text-indigo-600 font-semibold">9898180810</span>.
+                    💡 Hint: Default resident password is <span className="font-mono text-indigo-600 font-semibold">admin@123</span>.
                   </p>
                 </div>
               </>

@@ -17,8 +17,8 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (username === 'orchidheights' && password === '9898180810') {
-      onLoginSuccess({ username: 'orchidheights', role: 'admin' });
+    if (username === 'admin' && password === 'admin@123') {
+      onLoginSuccess({ username: 'admin', role: 'admin' });
     } else {
       setError('Invalid admin credentials. Access Denied.');
     }
@@ -178,7 +178,7 @@ export default function AdminPage({
               <h1 className="font-display font-bold text-sm sm:text-base text-white tracking-tight">
                 Orchid Heights Admin Portal
               </h1>
-              <p className="text-[10px] text-slate-400">Authenticated: orchidheights</p>
+              <p className="text-[10px] text-slate-400">Authenticated: admin</p>
             </div>
           </div>
           <button

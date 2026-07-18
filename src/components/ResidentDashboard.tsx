@@ -273,11 +273,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
   useEffect(() => {
     const handleLocationSync = () => {
       const path = window.location.pathname;
-      if (path === '/notifications') {
-        setIsNotificationsOpen(true);
-      } else {
-        setIsNotificationsOpen(false);
-      }
 
       if (path === '/gate-visitors') {
         setActiveSubSection('visitors');
@@ -285,26 +280,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
         setActiveSubSection('complaints');
       } else if (path === '/directory') {
         setActiveSubSection('directory');
-      } else if (path === '/amenities') {
-        setActiveSubSection('amenities');
-      } else if (path === '/amenities/gym-theatre') {
-        setActiveSubSection('gym_theatre');
-      } else if (path === '/amenities/movie') {
-        setActiveSubSection('movie_schedule');
-      } else if (path === '/amenities/booking') {
-        setActiveSubSection('amenities_booking');
-      } else if (path === '/services') {
+      } else if (path === '/amenities' || path === '/amenities/gym-theatre' || path === '/amenities/movie' || path === '/amenities/booking') {
+        setActiveSubSection('amenity');
+      } else if (path === '/services' || path === '/services/local-services' || path === '/services/building-services') {
         setActiveSubSection('services');
-      } else if (path === '/services/local-services') {
-        setActiveSubSection('local_services');
-      } else if (path === '/services/building-services') {
-        setActiveSubSection('building_services');
-      } else if (path === '/help-desk') {
-        setActiveSubSection('help_desk');
-      } else if (path === '/help-desk/noticies') {
-        setActiveSubSection('notices');
-      } else if (path === '/help-desk/financial-ledger') {
-        setActiveSubSection('financials');
+      } else if (path === '/help-desk' || path === '/help-desk/noticies' || path === '/help-desk/financial-ledger') {
+        setActiveSubSection('helpdesk');
+      } else if (path === '/notifications-center') {
+        setActiveSubSection('notifications');
       } else if (path === '/home' || path === '/') {
         setActiveSubSection(null);
       }
@@ -317,11 +300,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
   const navigateToRoute = (path: string, subSec: string | null) => {
     setActiveSubSection(subSec);
-    if (path === '/notifications') {
-      setIsNotificationsOpen(true);
-    } else {
-      setIsNotificationsOpen(false);
-    }
     window.history.pushState(null, '', path);
   };
 
@@ -927,10 +905,17 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     updateOwnerProfile({ vehicles: updatedVehicles }, 'Vehicle registry plate deleted.');
   };
 
-  const handleSaveGeneral = (e: React.FormEvent) => {
+  const handleSaveGeneral = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!myOwnerData) return;
-    updateOwnerProfile({ secondaryContact: altContact }, 'Settings updated successfully.');
+    const fields: any = { secondaryContact: altContact };
+    if (newPassword.trim().length >= 4) {
+      fields.password = newPassword.trim();
+    }
+    await updateOwnerProfile(fields, 'Contact and security settings saved successfully.');
+    if (newPassword.trim().length >= 4) {
+      setNewPassword('');
+    }
   };
 
   // Complaints, Financials, Contacts state
@@ -1497,7 +1482,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-visitors"
                 onClick={() => {
                   setLastVisitedSubSection('visitors');
-                  setActiveSubSection('visitors');
+                  navigateToRoute('/gate-visitors', 'visitors');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'visitors' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1524,7 +1509,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-complaints"
                 onClick={() => {
                   setLastVisitedSubSection('complaints');
-                  setActiveSubSection('complaints');
+                  navigateToRoute('/complaints', 'complaints');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'complaints' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1551,7 +1536,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-directory"
                 onClick={() => {
                   setLastVisitedSubSection('directory');
-                  setActiveSubSection('directory');
+                  navigateToRoute('/directory', 'directory');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'directory' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1578,7 +1563,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-amenity"
                 onClick={() => {
                   setLastVisitedSubSection('amenity');
-                  setActiveSubSection('amenity');
+                  navigateToRoute('/amenities', 'amenity');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'amenity' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1605,7 +1590,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-services"
                 onClick={() => {
                   setLastVisitedSubSection('services');
-                  setActiveSubSection('services');
+                  navigateToRoute('/services', 'services');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'services' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1632,7 +1617,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-helpdesk"
                 onClick={() => {
                   setLastVisitedSubSection('helpdesk');
-                  setActiveSubSection('helpdesk');
+                  navigateToRoute('/help-desk', 'helpdesk');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'helpdesk' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1659,7 +1644,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 id="block-notifications"
                 onClick={() => {
                   setLastVisitedSubSection('notifications');
-                  setActiveSubSection('notifications');
+                  navigateToRoute('/notifications-center', 'notifications');
                 }}
                 className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'notifications' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
@@ -1691,7 +1676,10 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <button
-                onClick={() => setActiveSubSection(null)}
+                onClick={() => {
+                  setActiveSubSection(null);
+                  window.history.pushState(null, '', '/home');
+                }}
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition cursor-pointer select-none border border-slate-200 shadow-sm"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
@@ -2107,6 +2095,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           onClick={() => {
             setActiveMainTab('community');
             setActiveSubSection(null);
+            window.history.pushState(null, '', '/home');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
             activeMainTab === 'community' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
@@ -2135,7 +2124,15 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity cursor-pointer"
-            onClick={() => setIsNotificationsOpen(false)}
+            onClick={() => {
+              // Auto-dismiss all society notifications and announcements when closing
+              const notifIds = societyNotifications.map(n => n.id);
+              const annIds = announcements.map(a => a.id);
+              const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
+              setDismissedNotifIds(allIds);
+              localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
+              setIsNotificationsOpen(false);
+            }}
           />
           
           {/* Modal Container */}
@@ -2147,7 +2144,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 <h3 className="font-sans font-black text-base text-slate-800 uppercase tracking-tight">Notification Center</h3>
               </div>
               <button
-                onClick={() => setIsNotificationsOpen(false)}
+                onClick={() => {
+                  const notifIds = societyNotifications.map(n => n.id);
+                  const annIds = announcements.map(a => a.id);
+                  const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
+                  setDismissedNotifIds(allIds);
+                  localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
+                  setIsNotificationsOpen(false);
+                }}
                 className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -2296,7 +2300,15 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
             {/* Footer */}
             <div className="p-4 border-t border-slate-100 bg-slate-50 text-center">
               <button
-                onClick={() => setIsNotificationsOpen(false)}
+                onClick={() => {
+                  // Auto-dismiss all society notifications and announcements when closing
+                  const notifIds = societyNotifications.map(n => n.id);
+                  const annIds = announcements.map(a => a.id);
+                  const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
+                  setDismissedNotifIds(allIds);
+                  localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
+                  setIsNotificationsOpen(false);
+                }}
                 className="text-indigo-600 hover:text-indigo-700 font-sans font-extrabold text-xs uppercase tracking-wider transition cursor-pointer select-none"
               >
                 Close Panel

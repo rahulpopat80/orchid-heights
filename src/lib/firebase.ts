@@ -289,7 +289,7 @@ export async function seedDatabaseIfNeeded() {
       for (const owner of initialOwners) {
         const id = `${owner.wing}-${owner.flatNo}`;
         await setDoc(doc(db, 'owners', id), owner);
-        const password = (owner.wing === 'B' && owner.flatNo === 1104) ? '9898180810' : 'admin@123';
+        const password = 'admin@123';
         await setDoc(doc(db, 'passwords', id), { wing: owner.wing, flatNo: owner.flatNo, password });
       }
       console.log('--- Firestore database seeded successfully! ---');
@@ -376,8 +376,7 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
               isRegistered = currentDevices.some((d) => 
                 d.os === device.os && 
                 d.browser === device.browser && 
-                d.userAgent === device.userAgent && 
-                d.ipAddress === device.ipAddress
+                d.userAgent === device.userAgent
               );
             }
 
@@ -483,7 +482,7 @@ export async function updateOwnerDetails(wing: string, flatNo: number, payload: 
     if (nameGu !== undefined) updated.nameGu = nameGu;
     if (phone !== undefined) updated.phone = phone;
     if (secondaryContact !== undefined) updated.secondaryContact = secondaryContact;
-    if (members !== undefined) updated.members = members.slice(0, 2);
+    if (members !== undefined) updated.members = members.slice(0, 5);
     if (vehicles !== undefined) updated.vehicles = vehicles;
     if (payload.notificationsEnabled !== undefined) updated.notificationsEnabled = payload.notificationsEnabled;
 
@@ -617,7 +616,7 @@ export async function pollPendingVisitorAlerts(wing: string, flatNo: number): Pr
     const pending: Visitor[] = [];
     snap.forEach((docSnap) => {
       const v = docSnap.data() as Visitor;
-      if (v.wing.toUpperCase() === wing.toUpperCase() && Number(v.flatNo) === Number(flatNo) && v.status === 'pending') {
+      if (v.wing.toUpperCase() === wing.toUpperCase() && Number(v.flatNo) === Number(flatNo) && v.status === 'pending' && !v.deletedByResident) {
         pending.push(v);
       }
     });
@@ -792,8 +791,7 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
         existingIdx = currentDevices.findIndex((d) => 
           d.os === device.os && 
           d.browser === device.browser && 
-          d.userAgent === device.userAgent && 
-          d.ipAddress === device.ipAddress
+          d.userAgent === device.userAgent
         );
       }
 

@@ -262,7 +262,7 @@ export default function LocalServicesSection({
                     required
                     placeholder="e.g. +91 9876543210"
                     value={helperPhone}
-                    onChange={(e) => setHelperPhone(e.target.value)}
+                    onChange={(e) => setHelperPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
                   />
                 </div>
