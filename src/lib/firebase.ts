@@ -1130,14 +1130,18 @@ async function triggerFCMPushForSocietyNotification(payload: {
             payload: {
               message: {
                 token: token,
-                  data: {
-                    title: String(payload.title),
-                    body: String(payload.message),
-                    type: String(payload.type),
-                    visitorId: String(payload.metadata?.visitorId || ""),
-                    wing: String(payload.wing || ""),
-                    flatNo: String(payload.flatNo || "")
-                  },
+                notification: {
+                  title: String(payload.title),
+                  body: String(payload.message)
+                },
+                data: {
+                  title: String(payload.title),
+                  body: String(payload.message),
+                  type: String(payload.type),
+                  visitorId: String(payload.metadata?.visitorId || ""),
+                  wing: String(payload.wing || ""),
+                  flatNo: String(payload.flatNo || "")
+                },
                   webpush: {
                     notification: {
                       icon: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
@@ -1607,40 +1611,44 @@ export async function sendFCMPushToFlat(
           payload: {
             message: {
               token: token,
-                data: Object.assign(
-                  {
-                    title: String(notification.title),
-                    body: String(notification.body)
-                  },
-                  Object.fromEntries(
-                    Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
-                  )
-                ),
-                webpush: {
-                  notification: {
-                    icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
-                    badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
-                    requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
-                    vibrate: [200, 100, 200],
-                    tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
-                    ...( (notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request') ? {
-                      actions: [
-                        { action: 'approve', title: '✅ Approve Entry' },
-                        { action: 'reject', title: '❌ Reject' }
-                      ]
-                    } : {})
-                  },
-                  fcm_options: {
-                    link: "/?activeTab=resident"
-                  },
-                  headers: {
-                    Urgency: "high",
-                    TTL: "86400"
-                  }
+              notification: {
+                title: String(notification.title),
+                body: String(notification.body)
+              },
+              data: Object.assign(
+                {
+                  title: String(notification.title),
+                  body: String(notification.body)
+                },
+                Object.fromEntries(
+                  Object.entries(notification.data || {}).map(([k, v]) => [k, String(v)])
+                )
+              ),
+              webpush: {
+                notification: {
+                  icon: String(notification.icon || "https://i.ibb.co/zT5tpcdY/1000296229-1.png"),
+                  badge: "https://i.ibb.co/zT5tpcdY/1000296229-1.png",
+                  requireInteraction: notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request',
+                  vibrate: [200, 100, 200],
+                  tag: String(notification.data?.visitorId || notification.data?.type || "orchid_notif"),
+                  ...( (notification.data?.type === 'visitor' || notification.data?.type === 'visitor_request') ? {
+                    actions: [
+                      { action: 'approve', title: '✅ Approve Entry' },
+                      { action: 'reject', title: '❌ Reject' }
+                    ]
+                  } : {})
+                },
+                fcm_options: {
+                  link: "/?activeTab=resident"
+                },
+                headers: {
+                  Urgency: "high",
+                  TTL: "86400"
                 }
               }
             }
-          };
+          }
+        };
 
           const response = await fetch('/api/fcm', {
             method: "POST",
