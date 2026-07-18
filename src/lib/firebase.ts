@@ -1130,10 +1130,6 @@ async function triggerFCMPushForSocietyNotification(payload: {
             payload: {
               message: {
                 token: token,
-                  notification: {
-                    title: String(payload.title),
-                    body: String(payload.message)
-                  },
                   data: {
                     title: String(payload.title),
                     body: String(payload.message),
@@ -1389,62 +1385,14 @@ const VAPID_KEY = 'BExkWMguzjb1mmG7xuA7mNEJfZW9cfAtwh8vHQHDLb5FZzRGwfo2S5KAoTeM1
  * under the owner's record for the given flat
  */
 export async function registerFCMToken(wing: string, flatNo: number): Promise<string | null> {
-  const currentProjectId = firebaseConfig.projectId;
-  const cachedProject = localStorage.getItem('orchid_fcm_project_id');
-
-  const id = `${wing}-${flatNo}`;
-  const ownerRef = doc(db, 'owners', id);
-
-  const saveTokenToFirestore = async (t: string) => {
-    try {
-      const snap = await getDoc(ownerRef);
-      if (snap.exists()) {
-        const ownerData = snap.data() as FlatOwner;
-        const currentTokens: string[] = (ownerData as any).fcmTokens || [];
-        if (!currentTokens.includes(t)) {
-          await setDoc(ownerRef, { fcmTokens: [...currentTokens, t] }, { merge: true });
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to store FCM token in Firestore:', err);
-    }
-    localStorage.setItem(`orchid_fcm_token_${wing}_${flatNo}`, t);
-  };
-
-  // NATIVE APP FLOW (Capacitor on Android / iOS)
-  if (typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform?.()) {
-    try {
-      const { PushNotifications } = await import('@capacitor/push-notifications');
-      let permStatus = await PushNotifications.checkPermissions();
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions();
-      }
-      if (permStatus.receive === 'granted') {
-        await PushNotifications.register();
-        return new Promise((resolve) => {
-          PushNotifications.addListener('registration', async (token) => {
-            console.log('[FCM] Native device token registered:', token.value);
-            await saveTokenToFirestore(token.value);
-            resolve(token.value);
-          });
-          PushNotifications.addListener('registrationError', (err) => {
-            console.error('[FCM] Native registration error:', err);
-            resolve(null);
-          });
-        });
-      }
-    } catch (nativeErr) {
-      console.warn('Capacitor native push registration failed, falling back to Web FCM:', nativeErr);
-    }
-  }
-
-  // WEB APP FLOW (PWA / Browser)
   if (!messaging) {
     console.warn('FCM messaging not initialized');
     return null;
   }
-
   try {
+    const currentProjectId = firebaseConfig.projectId;
+    const cachedProject = localStorage.getItem('orchid_fcm_project_id');
+
     // Force deletion of old token if project migrated to ensure we get a token for the new project
     if (cachedProject !== currentProjectId) {
       console.log('[FCM] Project migrated. Deleting old cached FCM token...');
@@ -1459,23 +1407,42 @@ export async function registerFCMToken(wing: string, flatNo: number): Promise<st
 
     let swReg: ServiceWorkerRegistration | undefined = undefined;
     if ('serviceWorker' in navigator) {
+      // Register or retrieve the active service worker registration
       swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
       await navigator.serviceWorker.ready;
     }
 
+    // Explicitly link VAPID key and our custom Service Worker registration
     const token = await getToken(messaging, { 
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: swReg 
     });
 
     if (token) {
-      await saveTokenToFirestore(token);
+      const id = `${wing}-${flatNo}`;
+      const ownerRef = doc(db, 'owners', id);
+      try {
+        // Store token in owner's fcmTokens array (avoid duplicates)
+        const snap = await getDoc(ownerRef);
+        if (snap.exists()) {
+          const ownerData = snap.data() as FlatOwner;
+          const currentTokens: string[] = (ownerData as any).fcmTokens || [];
+          if (!currentTokens.includes(token)) {
+            await setDoc(ownerRef, { fcmTokens: [...currentTokens, token] }, { merge: true });
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to store FCM token in Firestore:', err);
+      }
+      // Also store locally for quick access
+      localStorage.setItem(`orchid_fcm_token_${wing}_${flatNo}`, token);
       return token;
     }
+    return null;
   } catch (err) {
-    console.warn('Failed to get Web FCM token:', err);
+    console.warn('Failed to get FCM token:', err);
+    return null;
   }
-  return null;
 }
 
 /**
@@ -1640,10 +1607,6 @@ export async function sendFCMPushToFlat(
           payload: {
             message: {
               token: token,
-                notification: {
-                  title: String(notification.title),
-                  body: String(notification.body)
-                },
                 data: Object.assign(
                   {
                     title: String(notification.title),
