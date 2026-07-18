@@ -1488,24 +1488,16 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('visitors');
                   navigateToRoute('/gate-visitors', 'visitors');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'visitors' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <Users className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Gate Visitors
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    Manage Guest Entries
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Gate Visitors
+                </h4>
               </div>
 
               {/* Block 2: Complaint Box */}
@@ -1515,24 +1507,16 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('complaints');
                   navigateToRoute('/complaints', 'complaints');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'complaints' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#EC4899] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <ClipboardList className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#EC4899] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <ClipboardList className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Complaint Box
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    Raise & Resolve Issues
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Complaint Box
+                </h4>
               </div>
 
               {/* Block 3: Resident Directory */}
@@ -1542,24 +1526,16 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('directory');
                   navigateToRoute('/directory', 'directory');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'directory' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <BookOpen className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <BookOpen className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Resident Directory
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    Look up Neighbours
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Resident Directory
+                </h4>
               </div>
 
               {/* Block 4: Amenities Bookings */}
@@ -1569,24 +1545,16 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('amenity');
                   navigateToRoute('/amenities', 'amenity');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'amenity' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <Sparkles className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Amenities Bookings
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    View Building Amenities
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Amenities Bookings
+                </h4>
               </div>
 
               {/* Block 5: Local Services */}
@@ -1596,24 +1564,16 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('services');
                   navigateToRoute('/services', 'services');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'services' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#DB2777] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <Wrench className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#DB2777] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <Wrench className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Local Services
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    Contacts for House Help etc.
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Local Services
+                </h4>
               </div>
 
               {/* Block 6: Help & Financial */}
@@ -1623,54 +1583,38 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   setLastVisitedSubSection('helpdesk');
                   navigateToRoute('/help-desk', 'helpdesk');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'helpdesk' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <FileText className="w-7 h-7" />
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Help & Financial
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    Raise Issues, Society Ledger
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Help & Financial
+                </h4>
               </div>
 
-              {/* Block 8: Society Alerts & Logs (Dedicated Notifications Block - 2-week history) */}
+              {/* Block 7: Society Alerts & Logs */}
               <div
                 id="block-notifications"
                 onClick={() => {
                   setLastVisitedSubSection('notifications');
                   navigateToRoute('/notifications-center', 'notifications');
                 }}
-                className={`bg-white rounded-3xl p-5 border shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group ${
+                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
                   highlightBlock === 'notifications' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <div className="w-11 h-11 rounded-full bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-sm relative">
-                    <Bell className="w-5 h-5" />
-                    {societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-rose-600 rounded-full animate-ping" />
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+                <div className="w-14 h-14 rounded-none bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-sm relative mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <Bell className="w-7 h-7" />
+                  {societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-2 border-white bg-rose-600 rounded-none animate-ping" />
+                  )}
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                    Society Alerts & Logs
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                    2-Week Notification History
-                  </p>
-                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  Society Alerts & Logs
+                </h4>
               </div>
 
             </div>

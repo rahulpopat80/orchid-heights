@@ -329,6 +329,7 @@ export default function ProfileSection({
                 <input
                   type="tel"
                   placeholder="e.g. 9876543210"
+                  autoComplete="new-password"
                   value={altContact}
                   onChange={(e) => setAltContact(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition"

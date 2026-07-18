@@ -161,43 +161,27 @@ export default function LocalServicesSection({
             {/* Sub-Block 1: Orchid Heights Local Services */}
             <div
               onClick={() => navigateToRoute('/services/local-services', 'local_helpers')}
-              className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
+              className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="w-11 h-11 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm">
-                  <User className="w-5 h-5" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+              <div className="w-14 h-14 rounded-none bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                <User className="w-7 h-7" />
               </div>
-              <div className="mt-4">
-                <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                  Orchid Heights Local Services
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                  Maid, Cook, Milkman, Newspaper Guy
-                </p>
-              </div>
+              <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                Orchid Heights Local Services
+              </h4>
             </div>
 
             {/* Sub-Block 2: Building Services & Contacts */}
             <div
               onClick={() => navigateToRoute('/services/building-services', 'building_services')}
-              className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
+              className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="w-11 h-11 rounded-full bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-sm">
-                  <Wrench className="w-5 h-5" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+              <div className="w-14 h-14 rounded-none bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                <Wrench className="w-7 h-7" />
               </div>
-              <div className="mt-4">
-                <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                  Building Services & Contacts
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                  Society Electricians, Plumbers, Security
-                </p>
-              </div>
+              <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                Building Services & Contacts
+              </h4>
             </div>
           </div>
         </div>

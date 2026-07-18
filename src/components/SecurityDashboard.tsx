@@ -259,11 +259,20 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
         };
 
         let redirectAlert = '';
+        let targetWing = fWing;
+        let targetFlatNo = fNo;
+
         try {
           const absenceDoc = await getDoc(doc(db, 'absences', flatId));
           if (absenceDoc.exists()) {
             const absenceData = absenceDoc.data();
             redirectAlert = `🚨 ALERT: Flat ${flatId} is ABSENT / OUT OF STATION!\n\nPlease redirect this delivery/visitor to:\n➡️ ${absenceData.redirectFlatId} (${absenceData.redirectName})`;
+            
+            if (absenceData.redirectFlatId) {
+              const redirectedParts = absenceData.redirectFlatId.split('-');
+              targetWing = redirectedParts[0] as 'A' | 'B';
+              targetFlatNo = parseInt(redirectedParts[1], 10);
+            }
           }
         } catch (e) {
           console.error("Failed to check absence for flat", flatId);
@@ -284,8 +293,9 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
           await setDoc(doc(db, 'notifications', visitorId), {
             id: visitorId,
             type: 'visitor_request',
-            wing: fWing,
-            flatNo: fNo,
+            wing: targetWing,
+            flatNo: targetFlatNo,
+            originalTargetFlat: flatId,
             visitorName: fullName.trim(),
             guestType,
             timestamp: new Date().toISOString(),
@@ -295,15 +305,16 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
 
           // 🔔 Send FCM push to ALL devices of this flat immediately
           // This is what makes notification arrive even when app is closed
-          sendFCMPushToFlat(fWing, fNo, {
+          sendFCMPushToFlat(targetWing, targetFlatNo, {
             title: `🚪 ગેટ પર મુલાકાતી: ${fullName.trim()}`,
             body: `${guestType} - ${defaultReason}\nMobile: ${mobileNumber.trim()}`,
             icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
             data: {
               visitorId: String(visitorId),
               type: 'visitor',
-              wing: String(fWing),
-              flatNo: String(fNo),
+              wing: String(targetWing),
+              flatNo: String(targetFlatNo),
+              originalTargetFlat: String(flatId),
               fullName: String(fullName.trim()),
               guestType: String(guestType),
               mobileNumber: String(mobileNumber.trim()),

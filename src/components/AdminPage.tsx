@@ -17,8 +17,8 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (username === 'admin' && password === 'admin@123') {
-      onLoginSuccess({ username: 'admin', role: 'admin' });
+    if (username === 'orchidheights' && password === '9898180810') {
+      onLoginSuccess({ username: 'orchidheights', role: 'admin' });
     } else {
       setError('Invalid admin credentials. Access Denied.');
     }

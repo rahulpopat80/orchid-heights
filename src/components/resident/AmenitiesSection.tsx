@@ -354,43 +354,27 @@ export default function AmenitiesSection({
             {/* Sub-Block 1: Gym & Movie Theatre Access Gate */}
             <div
               onClick={() => navigateToRoute('/amenities/gym-theatre', 'gym_theatre')}
-              className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
+              className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="w-11 h-11 rounded-full bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-sm">
-                  <Dumbbell className="w-5 h-5" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+              <div className="w-14 h-14 rounded-none bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                <Dumbbell className="w-7 h-7" />
               </div>
-              <div className="mt-4">
-                <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                  Gym & Theatre Access
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                  Aagman/Vidaay Check-In Gate
-                </p>
-              </div>
+              <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                Gym & Theatre Access
+              </h4>
             </div>
 
             {/* Sub-Block 2: Movie Theatre Schedule */}
             <div
               onClick={() => navigateToRoute('/amenities/movie', 'movies')}
-              className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
+              className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="w-11 h-11 rounded-full bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0 shadow-sm">
-                  <Film className="w-5 h-5" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+              <div className="w-14 h-14 rounded-none bg-violet-50 text-violet-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                <Film className="w-7 h-7" />
               </div>
-              <div className="mt-4">
-                <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                  Movie Theatre Schedule
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                  Upload & View Screenings
-                </p>
-              </div>
+              <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                Movie Theatre Schedule
+              </h4>
             </div>
 
             {/* Sub-Block 3: Function Hall Booking Suite */}
