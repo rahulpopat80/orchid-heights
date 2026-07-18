@@ -380,22 +380,14 @@ export default function AmenitiesSection({
             {/* Sub-Block 3: Function Hall Booking Suite */}
             <div
               onClick={() => navigateToRoute('/amenities/booking', 'bookings')}
-              className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
+              className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="w-11 h-11 rounded-full bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0 shadow-sm">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition" />
+              <div className="w-14 h-14 rounded-none bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                <Calendar className="w-7 h-7" />
               </div>
-              <div className="mt-4">
-                <h4 className="font-display font-black text-slate-800 text-sm tracking-tight leading-snug">
-                  Function Hall Bookings
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-normal mt-1">
-                  Reservations & Decision Engine
-                </p>
-              </div>
+              <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                Function Hall Bookings
+              </h4>
             </div>
           </div>
         </div>

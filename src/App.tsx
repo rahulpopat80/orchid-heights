@@ -381,17 +381,23 @@ export default function App() {
               </div>
             </div>
           ) : !session ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key="login-page"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Login onLoginSuccess={handleLoginSuccess} />
-              </motion.div>
-            </AnimatePresence>
+            location.pathname !== '/login' ? (
+              <Navigate to="/login" replace />
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="login-page"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                </motion.div>
+              </AnimatePresence>
+            )
+          ) : location.pathname === '/login' ? (
+            <Navigate to="/" replace />
           ) : (
             <div className="min-h-screen bg-slate-50 flex flex-col font-sans antialiased text-slate-900">
               {/* Navigation Header */}
