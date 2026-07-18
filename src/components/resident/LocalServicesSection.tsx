@@ -130,22 +130,6 @@ export default function LocalServicesSection({
       setFormError('An error occurred. Please try again.');
     }
   };
-        await setDoc(doc(db, 'daily_helpers', newId), newHelper);
-        setFormSuccess('New helper registered and mapped to your flat!');
-      }
-
-      // Reset
-      setTimeout(() => {
-        setShowAddForm(false);
-        setEditingHelperId(null);
-        setHelperName('');
-        setHelperPhone('');
-      }, 1000);
-
-    } catch (err: any) {
-      setFormError(err.message || 'Failed to save helper.');
-    }
-  };
 
   const handleDeleteHelper = async (id: string) => {
     if (!confirm('Are you sure you want to remove this service provider completely from the society records?')) return;
