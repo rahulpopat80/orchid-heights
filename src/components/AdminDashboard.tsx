@@ -8,11 +8,12 @@ import {
   Key, Edit3, Trash2, Database, AlertTriangle, ShieldCheck, Check, 
   RefreshCw, X, Search, Phone, Megaphone, Plus, Smartphone, FileText, 
   ClipboardList, BookOpen, Eye, EyeOff, Upload, Download, Image, User, 
-  LogOut, Mail, Clock, ShieldAlert, FileSpreadsheet, Dumbbell, Sparkles, Film, CheckSquare, Calendar
+  LogOut, Mail, Clock, ShieldAlert, FileSpreadsheet, Dumbbell, Sparkles, Film, CheckSquare, Calendar, ArrowLeft, Grid
 } from 'lucide-react';
 import { FlatOwner, Announcement, Complaint, FinancialReport, EssentialContact, Visitor, AmenityBooking, GymTheatreLog } from '../types';
 import { api } from '../lib/api';
 import { db, collection, doc, query, onSnapshot, orderBy, updateDoc, deleteDoc } from '../lib/firebase';
+import AdminVisitorRecords from './admin/AdminVisitorRecords';
 
 interface AdminDashboardProps {
   owners: FlatOwner[];
@@ -20,10 +21,10 @@ interface AdminDashboardProps {
   onLogoutAdmin?: () => void;
 }
 
-type AdminTab = 'flats' | 'notices' | 'complaints' | 'finance' | 'address-book' | 'system' | 'amenities';
+type AdminTab = 'home' | 'flats' | 'notices' | 'complaints' | 'finance' | 'address-book' | 'system' | 'amenities' | 'visitors';
 
 export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<AdminTab>('flats');
+  const [activeTab, setActiveTab] = useState<AdminTab>('home');
   
   // Amenities Master State
   const [amenityBookings, setAmenityBookings] = useState<AmenityBooking[]>([]);
@@ -1123,39 +1124,53 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
         )}
       </div>
 
-      {/* Responsive Navigation Tab Buttons */}
-      <div className="flex overflow-x-auto no-scrollbar bg-white border border-slate-200 p-1 rounded-xl shadow-sm gap-1 scroll-smooth">
-        {(
-          [
-            { id: 'flats', label: 'Flats Directory', icon: Smartphone },
-            { id: 'notices', label: 'Society Notices', icon: Megaphone },
-            { id: 'complaints', label: 'Complaints', icon: ClipboardList },
-            { id: 'finance', label: 'Financial Ledger', icon: FileSpreadsheet },
-            { id: 'address-book', label: 'Address Book', icon: BookOpen },
-            { id: 'amenities', label: 'Amenities', icon: Sparkles },
-            { id: 'system', label: 'System Utils', icon: Database }
-          ] as const
-        ).map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setSelectedFlat(null);
-              }}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition shrink-0 cursor-pointer ${
-                activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Admin Home Blocks */}
+      {activeTab === 'home' && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { id: 'flats', label: 'Flats Directory', icon: Smartphone, color: 'text-blue-600', bg: 'bg-blue-50' },
+            { id: 'notices', label: 'Society Notices', icon: Megaphone, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+            { id: 'complaints', label: 'Complaints', icon: ClipboardList, color: 'text-rose-600', bg: 'bg-rose-50' },
+            { id: 'finance', label: 'Financial Ledger', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { id: 'address-book', label: 'Address Book', icon: BookOpen, color: 'text-amber-600', bg: 'bg-amber-50' },
+            { id: 'amenities', label: 'Amenities', icon: Sparkles, color: 'text-purple-600', bg: 'bg-purple-50' },
+            { id: 'system', label: 'System Utils', icon: Database, color: 'text-slate-600', bg: 'bg-slate-50' },
+            { id: 'visitors', label: 'Visitor Gate Records', icon: ShieldCheck, color: 'text-teal-600', bg: 'bg-teal-50' }
+          ].map((block) => {
+            const Icon = block.icon;
+            return (
+              <div
+                key={block.id}
+                onClick={() => {
+                  setActiveTab(block.id as AdminTab);
+                  setSelectedFlat(null);
+                }}
+                className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
+              >
+                <div className={`w-14 h-14 rounded-none ${block.bg} ${block.color} flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300`}>
+                  <Icon className="w-7 h-7" />
+                </div>
+                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                  {block.label}
+                </h4>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Global Back Button for inner views (except visitors which has its own) */}
+      {activeTab !== 'home' && activeTab !== 'visitors' && (
+        <div className="mb-6">
+          <button
+            onClick={() => setActiveTab('home')}
+            className="flex items-center space-x-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </button>
+        </div>
+      )}
 
       {/* Loading bar indicators */}
       {loading && (
@@ -3130,6 +3145,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
 
           </div>
+        )}
+
+        {/* 8. VISITOR RECORDS TAB */}
+        {activeTab === 'visitors' && (
+          <AdminVisitorRecords onBack={() => setActiveTab('home')} />
         )}
 
       </div>

@@ -19,6 +19,7 @@ import HelpDeskSection from './resident/HelpDeskSection';
 import NoticeSection from './resident/NoticeSection';
 import ProfileSection from './resident/ProfileSection';
 import BuildingServicesSection from './resident/BuildingServicesSection';
+import { generateVisitorPDF } from '../lib/pdfGenerator';
 
 let alarmIntervalId: any = null;
 let alarmAudioContext: AudioContext | null = null;
@@ -466,75 +467,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
   const [absenceError, setAbsenceError] = useState<string>('');
   const [absenceSuccess, setAbsenceSuccess] = useState<string>('');
 
-  // Download 3-month visitor logs as CSV
+  // Download 3-month visitor logs as PDF
   const handleDownloadVisitorReport = () => {
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
     
     const reportData = guestHistory.filter(v => new Date(v.requestTime) >= threeMonthsAgo);
     
-    const rows: string[] = [];
-    // Company Header
-    rows.push(`"ORCHID HEIGHTS - GATE VISITOR REPORT"`);
-    rows.push(`"Flat: ${wing}-${flatNo}"`);
-    rows.push(`"Report Period: Last 3 Months | Generated: ${new Date().toLocaleString('en-IN')}"`);
-    rows.push(`""`);
-    // Column Headers
-    rows.push([
-      '"Sr."',
-      '"Visitor Name"',
-      '"Mobile Number"',
-      '"Email"',
-      '"Wing"',
-      '"Flat No"',
-      '"Visitor Type"',
-      '"Reason / Purpose"',
-      '"No. of Visitors"',
-      '"Status"',
-      '"Request Date"',
-      '"Request Time"',
-      '"Response Time"',
-      '"Approved / Rejected By"',
-      '"Rejection Reason"'
-    ].join(','));
-
-    reportData.forEach((v, idx) => {
-      const reqDate = new Date(v.requestTime);
-      const respDate = v.respondedTime ? new Date(v.respondedTime) : null;
-      rows.push([
-        `"${idx + 1}"`,
-        `"${(v.fullName || '').replace(/"/g, '""')}"`,
-        `"${v.mobileNumber || ''}"`,
-        `"${(v.email || '').replace(/"/g, '""')}"`,
-        `"${v.wing}"`,
-        `"${v.flatNo}"`,
-        `"${v.guestType || ''}"`,
-        `"${(v.reason || '').replace(/"/g, '""')}"`,
-        `"${v.visitorCount || 1}"`,
-        `"${(v.status || '').toUpperCase()}"`,
-        `"${reqDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}"`,
-        `"${reqDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}"`,
-        `"${respDate ? respDate.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}"`,
-        `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
-        `"${(v.rejectReason || '-').replace(/"/g, '""')}"`
-      ].join(','));
-    });
-
-    if (reportData.length === 0) {
-      rows.push('"No visitor records found for the last 3 months."');
-    }
-
-    const csvString = rows.join('\r\n');
-    // UTF-8 BOM for proper Indian characters display in Excel
-    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `Orchid_Heights_Visitor_Report_${wing}-${flatNo}_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    generateVisitorPDF(reportData, "GATE VISITOR REPORT", `Flat: ${wing}-${flatNo} | Report Period: Last 3 Months`);
   };
 
 
