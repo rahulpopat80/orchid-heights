@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell, ShieldAlert, Check, X, Users, Car, Phone, Lock, Eye, EyeOff, ClipboardList, AlertCircle, Trash2, Plus, Clock, RefreshCw, Megaphone, FileText, Download, Search, Wrench, CheckCircle, Upload, Calendar, Home, User, Dumbbell, Film, Sparkles, BookOpen, MapPin, CheckSquare, PlusCircle, ChevronRight, ArrowLeft } from 'lucide-react';
 import { FlatOwner, Visitor, Vehicle, UserSession, Announcement, AmenityBooking, GymTheatreLog, DailyHelper, AbsenceLog, EssentialContact } from '../types';
 import { api, detectServerEnvironment } from '../lib/api';
-import { db, collection, doc, setDoc, addDoc, getDocs, onSnapshot, updateDoc, deleteDoc, query, where, orderBy } from '../lib/firebase';
+import { db, collection, doc, setDoc, addDoc, getDocs, onSnapshot, updateDoc, deleteDoc, query, where, orderBy, sendFCMPushToFlat } from '../lib/firebase';
 import { compressImage } from '../lib/imageCompressor';
 import { uploadFileInChunks } from '../lib/fileStorage';
 
@@ -268,6 +268,62 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
   // Sub-tabs state inside Resident Portal
   const [residentTab, setResidentTab] = useState<'home' | 'notices' | 'complaints' | 'financials' | 'contacts'>('home');
+
+  // Sync URL Path with activeSubSection and modal states
+  useEffect(() => {
+    const handleLocationSync = () => {
+      const path = window.location.pathname;
+      if (path === '/notifications') {
+        setIsNotificationsOpen(true);
+      } else {
+        setIsNotificationsOpen(false);
+      }
+
+      if (path === '/gate-visitors') {
+        setActiveSubSection('visitors');
+      } else if (path === '/complaints') {
+        setActiveSubSection('complaints');
+      } else if (path === '/directory') {
+        setActiveSubSection('directory');
+      } else if (path === '/amenities') {
+        setActiveSubSection('amenities');
+      } else if (path === '/amenities/gym-theatre') {
+        setActiveSubSection('gym_theatre');
+      } else if (path === '/amenities/movie') {
+        setActiveSubSection('movie_schedule');
+      } else if (path === '/amenities/booking') {
+        setActiveSubSection('amenities_booking');
+      } else if (path === '/services') {
+        setActiveSubSection('services');
+      } else if (path === '/services/local-services') {
+        setActiveSubSection('local_services');
+      } else if (path === '/services/building-services') {
+        setActiveSubSection('building_services');
+      } else if (path === '/help-desk') {
+        setActiveSubSection('help_desk');
+      } else if (path === '/help-desk/noticies') {
+        setActiveSubSection('notices');
+      } else if (path === '/help-desk/financial-ledger') {
+        setActiveSubSection('financials');
+      } else if (path === '/home' || path === '/') {
+        setActiveSubSection(null);
+      }
+    };
+
+    handleLocationSync();
+    window.addEventListener('popstate', handleLocationSync);
+    return () => window.removeEventListener('popstate', handleLocationSync);
+  }, []);
+
+  const navigateToRoute = (path: string, subSec: string | null) => {
+    setActiveSubSection(subSec);
+    if (path === '/notifications') {
+      setIsNotificationsOpen(true);
+    } else {
+      setIsNotificationsOpen(false);
+    }
+    window.history.pushState(null, '', path);
+  };
 
   // Load real-time persistent data for Amenities, Helpers, and Absences
   useEffect(() => {
@@ -697,7 +753,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     }
   };
 
-  // Absence Log Planner Actions
   const handleSaveAbsence = async (e: React.FormEvent) => {
     e.preventDefault();
     setAbsenceSuccess('');
@@ -709,6 +764,35 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     }
 
     const flatId = `${wing}-${flatNo}`;
+
+    // Collect redirected flat targets
+    const redirectedFlats = Array.from(new Set([
+      absMilkRedirect.trim().toUpperCase(),
+      absNewspaperRedirect.trim().toUpperCase(),
+      absParcelRedirect.trim().toUpperCase()
+    ])).filter(Boolean);
+
+    // Overlapping absence conflict check
+    for (const rawTarget of redirectedFlats) {
+      const formattedTarget = rawTarget.includes('-') ? rawTarget : `${rawTarget[0]}-${rawTarget.slice(1)}`;
+      const isTargetAbsent = absenceLogs.some((a) => {
+        const aFlat = a.flatId.toUpperCase();
+        if (aFlat === rawTarget || aFlat === formattedTarget) {
+          const newFrom = new Date(absDateFrom).getTime();
+          const newTo = new Date(absDateTo).getTime();
+          const existingFrom = new Date(a.dateFrom).getTime();
+          const existingTo = new Date(a.dateTo).getTime();
+          return newFrom <= existingTo && newTo >= existingFrom;
+        }
+        return false;
+      });
+
+      if (isTargetAbsent) {
+        setAbsenceError(`⚠️ Cannot assign delivery redirection: Flat ${formattedTarget} is also marked absent during these dates.`);
+        return;
+      }
+    }
+
     const payload: Omit<AbsenceLog, 'id'> = {
       flatId,
       dateFrom: absDateFrom,
@@ -722,6 +806,24 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     try {
       await addDoc(collection(db, 'absence_logs'), payload);
       setAbsenceSuccess('Your planned absence vacation calendar block has been registered. The gatekeeper has been automated to bypass alerting your flat.');
+
+      // Push notification to each assigned flat owner
+      for (const rawTarget of redirectedFlats) {
+        const formattedTarget = rawTarget.includes('-') ? rawTarget : `${rawTarget[0]}-${rawTarget.slice(1)}`;
+        const parts = formattedTarget.split('-');
+        if (parts.length === 2) {
+          const targetWing = parts[0];
+          const targetFlatNo = parseInt(parts[1], 10);
+          if (targetWing && !isNaN(targetFlatNo)) {
+            sendFCMPushToFlat(targetWing, targetFlatNo, {
+              title: `📦 Delivery Redirection Assigned`,
+              body: `Flat ${flatId} has assigned your flat (${formattedTarget}) for delivery redirection from ${absDateFrom} to ${absDateTo}.`,
+              data: { type: 'absence_redirection', fromFlat: flatId }
+            }).catch((err) => console.warn('Failed to send redirection notification:', err));
+          }
+        }
+      }
+
       setAbsDateFrom('');
       setAbsDateTo('');
       setAbsMilkRedirect('');
@@ -782,10 +884,15 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMember.trim() || !myOwnerData) return;
+    const currentMembers = myOwnerData.members || [];
+    if (currentMembers.length >= 5) {
+      alert('⚠️ Member limit reached: You can add up to a maximum of 5 household family members per flat.');
+      return;
+    }
     const memberStr = newMemberPhone.trim()
       ? `${newMember.trim()} (${newMemberPhone.trim()})`
       : newMember.trim();
-    const updatedMembers = [...(myOwnerData.members || []), memberStr];
+    const updatedMembers = [...currentMembers, memberStr];
     updateOwnerProfile({ members: updatedMembers }, 'Household family member registered successfully.');
     setNewMember('');
     setNewMemberPhone('');
@@ -1750,11 +1857,24 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   </span>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-display font-black text-slate-800 text-base">Alerts & Logs</h3>
-                  <p className="text-[10.5px] text-slate-400 font-medium leading-normal font-sans">
-                    Real-time safety broadcasts, visitor check-ins, scheduled movie reminders, and complaint updates.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1 text-left">
+                    <h3 className="font-display font-black text-slate-800 text-base">Alerts & Logs</h3>
+                    <p className="text-[10.5px] text-slate-400 font-medium leading-normal font-sans">
+                      Real-time safety broadcasts, visitor check-ins, scheduled movie reminders, and complaint updates.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const allIds = societyNotifications.map((n) => n.id);
+                      const updated = Array.from(new Set([...dismissedNotifIds, ...allIds]));
+                      setDismissedNotifIds(updated);
+                      localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(updated));
+                    }}
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg shrink-0"
+                  >
+                    Clear All
+                  </button>
                 </div>
 
                 {(() => {
@@ -1762,6 +1882,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
                   const filteredNotifs = societyNotifications.filter((n) => {
+                    if (dismissedNotifIds.includes(n.id)) return false;
                     const notifTime = n.timestamp ? new Date(n.timestamp).getTime() : Date.now();
                     return notifTime >= twoWeeksAgo.getTime();
                   });

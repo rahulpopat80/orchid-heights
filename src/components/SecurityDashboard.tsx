@@ -76,15 +76,29 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
   const [showStatusAlert, setShowStatusAlert] = useState<Visitor | null>(null);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
+  const [absenceLogs, setAbsenceLogs] = useState<any[]>([]);
+
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'daily_helpers'), (snapshot) => {
+    const unsubscribeHelpers = onSnapshot(collection(db, 'daily_helpers'), (snapshot) => {
       const list: DailyHelper[] = [];
       snapshot.forEach((doc) => {
         list.push({ id: doc.id, ...doc.data() } as DailyHelper);
       });
       setDailyHelpers(list);
     });
-    return () => unsubscribe();
+
+    const unsubscribeAbsence = onSnapshot(collection(db, 'absence_logs'), (snapshot) => {
+      const list: any[] = [];
+      snapshot.forEach((doc) => {
+        list.push({ id: doc.id, ...doc.data() });
+      });
+      setAbsenceLogs(list);
+    });
+
+    return () => {
+      unsubscribeHelpers();
+      unsubscribeAbsence();
+    };
   }, []);
 
   const handleManualRefresh = async () => {
@@ -400,6 +414,32 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             </div>
           </div>
 
+          {(() => {
+            const currentFlatId = `${wing}-${flatNo}`;
+            const activeAbs = absenceLogs.find(a => {
+              if (a.flatId !== currentFlatId) return false;
+              const now = new Date().getTime();
+              const from = new Date(a.dateFrom).getTime();
+              const to = new Date(a.dateTo).getTime();
+              return now >= from && now <= to + (24 * 60 * 60 * 1000 - 1);
+            });
+            if (!activeAbs) return null;
+            return (
+              <div className="bg-amber-500 text-white p-4 rounded-2xl mb-6 shadow-md border-2 border-amber-600 space-y-2 animate-pulse">
+                <div className="flex items-center space-x-2 font-bold text-lg">
+                  <AlertCircle className="w-6 h-6 shrink-0" />
+                  <span>📦 ડિલિવરી નોટિસ: ફ્લેટ {currentFlatId} ગેરહાજર છે!</span>
+                </div>
+                <p className="text-xs font-semibold leading-relaxed">
+                  રહેવાસી {activeAbs.dateFrom} થી {activeAbs.dateTo} સુધી બહાર ગયા છે.
+                  {activeAbs.milkRedirectFlat && <span className="block mt-1">🥛 દૂધ ➔ ફ્લેટ {activeAbs.milkRedirectFlat} પર આપો</span>}
+                  {activeAbs.newspaperRedirectFlat && <span className="block mt-0.5">📰 છાપું ➔ ફ્લેટ {activeAbs.newspaperRedirectFlat} પર આપો</span>}
+                  {activeAbs.parcelRedirectFlat && <span className="block mt-0.5">📦 કુરિયર/પાર્સલ ➔ ફ્લેટ {activeAbs.parcelRedirectFlat} પર આપો</span>}
+                </p>
+              </div>
+            );
+          })()}
+
           {formError && (
             <div className="bg-red-50 border border-red-100 text-red-700 p-4 rounded-xl text-sm flex items-start space-x-2 mb-6 font-bold">
               <AlertCircle className="w-5 h-5 shrink-0" />
@@ -650,9 +690,6 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
               {pendingVisitors.map((v) => (
                 <div key={v.id} className="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-2xl relative animate-fade-in">
-                  <button onClick={() => handleDeleteVisitor(v.id, v.fullName)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 bg-white rounded-xl shadow-sm">
-                    <Trash2 className="w-6 h-6" />
-                  </button>
                   <div className="flex items-center space-x-4 mb-4">
                     <img src={v.photoUrl} className="w-20 h-20 rounded-xl object-cover bg-slate-200 border-2 border-white shadow-sm" />
                     <div>

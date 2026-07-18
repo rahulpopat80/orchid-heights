@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { FlatOwner, UserSession } from './types';
 import Login from './components/Login';
@@ -301,7 +301,18 @@ export default function App() {
     loadOwners(); // reload fresh directory data
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (session && session.wing && session.flatNo) {
+      const flatKey = `${session.wing}_${session.flatNo}`;
+      const deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
+      if (deviceId) {
+        try {
+          await (api as any).deregisterDevice(session.wing, session.flatNo, deviceId);
+        } catch (err) {
+          console.warn('Failed to deregister device on logout:', err);
+        }
+      }
+    }
     setSession(null);
     localStorage.removeItem('orchid_gate_session');
     setActiveTab('directory');
@@ -397,25 +408,21 @@ export default function App() {
                     transition={{ duration: 0.2 }}
                     className="w-full h-full"
                   >
-                    {activeTab === 'security' && session.role === 'security' && (
+                    {session.role === 'security' ? (
                       <SecurityDashboard
                         owners={owners}
                         onRefreshOwners={loadOwners}
                       />
-                    )}
-
-                    {activeTab === 'resident' && (session.role === 'owner' || session.role === 'admin') && (
+                    ) : location.pathname === '/directory' ? (
+                      <Directory
+                        owners={owners}
+                        session={session}
+                      />
+                    ) : (
                       <ResidentDashboard
                         session={session}
                         owners={owners}
                         onRefreshOwners={loadOwners}
-                      />
-                    )}
-
-                    {activeTab === 'directory' && (
-                      <Directory
-                        owners={owners}
-                        session={session}
                       />
                     )}
                   </motion.div>

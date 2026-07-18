@@ -156,12 +156,26 @@ self.addEventListener('notificationclick', function(event) {
     // Normal click - focus or open the app
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+        let targetPath = '/home';
+        if (visitorId && visitorId !== 'fcm_notif' && visitorId !== 'society' && visitorId !== 'visitor') {
+          targetPath = '/gate-visitors';
+        } else if (notifData.type === 'visitor' || notifData.type === 'visitor_request') {
+          targetPath = '/gate-visitors';
+        } else if (notifData.type === 'notice' || notifData.type === 'announcement') {
+          targetPath = '/help-desk/noticies';
+        } else if (notifData.type === 'complaint') {
+          targetPath = '/complaints';
+        } else if (notifData.type === 'financial') {
+          targetPath = '/help-desk/financial-ledger';
+        }
+        
         for (const client of clientList) {
           if ('focus' in client) {
+            client.navigate(targetPath).catch(() => {});
             return client.focus();
           }
         }
-        return clients.openWindow('/?activeTab=resident');
+        return clients.openWindow(targetPath);
       })
     );
   }

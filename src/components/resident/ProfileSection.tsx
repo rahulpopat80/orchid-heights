@@ -187,7 +187,7 @@ export default function ProfileSection({
                   type="tel"
                   placeholder="Contact No. (Optional)"
                   value={newMemberPhone}
-                  onChange={(e) => setNewMemberPhone(e.target.value)}
+                  onChange={(e) => setNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg px-3 py-2 text-xs font-medium outline-none transition w-full sm:w-40"
                 />
               </div>
@@ -330,7 +330,7 @@ export default function ProfileSection({
                   type="tel"
                   placeholder="e.g. 9876543210"
                   value={altContact}
-                  onChange={(e) => setAltContact(e.target.value)}
+                  onChange={(e) => setAltContact(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition"
                 />
               </div>
