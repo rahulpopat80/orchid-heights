@@ -18,6 +18,8 @@ import { registerFCMToken, subscribeToForegroundMessages } from './lib/firebase'
 import firebaseConfig from '../firebase-applet-config.json';
 
 export default function App() {
+  const navigate = useNavigate();
+
   // Session details stored in localStorage for persistent logins
   const [session, setSession] = useState<UserSession | null>(() => {
     try {
@@ -299,6 +301,9 @@ export default function App() {
     setSession(userSession);
     localStorage.setItem('orchid_gate_session', JSON.stringify(userSession));
     loadOwners(); // reload fresh directory data
+    if (userSession.role === 'security') navigate('/security');
+    else if (userSession.role === 'admin') navigate('/admin');
+    else navigate('/home');
   };
 
   const handleLogout = async () => {

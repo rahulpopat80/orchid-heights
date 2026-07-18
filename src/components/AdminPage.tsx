@@ -54,6 +54,7 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoComplete="off"
               className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:bg-slate-900/50 rounded-xl py-3 px-4 text-sm font-semibold text-white outline-none transition"
               placeholder="Username"
             />
@@ -67,6 +68,7 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:bg-slate-900/50 rounded-xl py-3 pl-4 pr-10 text-sm font-semibold text-white outline-none transition"
                 placeholder="Password"
               />

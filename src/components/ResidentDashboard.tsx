@@ -289,6 +289,10 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
       } else if (path === '/notifications-center') {
         setActiveSubSection('notifications');
       } else if (path === '/home' || path === '/') {
+        setActiveMainTab('community');
+        setActiveSubSection(null);
+      } else if (path === '/me') {
+        setActiveMainTab('personal');
         setActiveSubSection(null);
       }
     };
@@ -2108,6 +2112,8 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
         <button
           onClick={() => {
             setActiveMainTab('personal');
+            setActiveSubSection(null);
+            window.history.pushState(null, '', '/me');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
             activeMainTab === 'personal' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'

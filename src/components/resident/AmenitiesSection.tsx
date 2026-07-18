@@ -109,24 +109,42 @@ export default function AmenitiesSection({
   // Sub-Blocks active screen state
   const [activeSub, setActiveSub] = useState<'menu' | 'gym_theatre' | 'movies' | 'bookings'>('menu');
 
-  // Listen to notification overrides
+  // Sync with URL and listen to popstate
+  useEffect(() => {
+    const handleLocationSync = () => {
+      const path = window.location.pathname;
+      if (path === '/amenities/gym-theatre') setActiveSub('gym_theatre');
+      else if (path === '/amenities/movie') setActiveSub('movies');
+      else if (path === '/amenities/booking') setActiveSub('bookings');
+      else if (path === '/amenities') setActiveSub('menu');
+    };
+    handleLocationSync();
+    window.addEventListener('popstate', handleLocationSync);
+    return () => window.removeEventListener('popstate', handleLocationSync);
+  }, []);
+
+  const navigateToRoute = (path: string, sub: 'menu' | 'gym_theatre' | 'movies' | 'bookings') => {
+    setActiveSub(sub);
+    window.history.pushState(null, '', path);
+  };
+
   useEffect(() => {
     if (activeTabOverride) {
-      if (activeTabOverride === 'bookings') setActiveSub('bookings');
-      if (activeTabOverride === 'gym_theatre') setActiveSub('gym_theatre');
-      if (activeTabOverride === 'movies') setActiveSub('movies');
+      if (activeTabOverride === 'bookings') navigateToRoute('/amenities/booking', 'bookings');
+      if (activeTabOverride === 'gym_theatre') navigateToRoute('/amenities/gym-theatre', 'gym_theatre');
+      if (activeTabOverride === 'movies') navigateToRoute('/amenities/movie', 'movies');
       if (onClearOverride) onClearOverride();
     }
-  }, [activeTabOverride]);
+  }, [activeTabOverride, onClearOverride]);
 
   // Listen to deep redirect event from notifications block
   useEffect(() => {
     const handleDeepRedirect = () => {
       const target = localStorage.getItem('orchid_deep_redirect');
       if (target) {
-        if (target === 'bookings') setActiveSub('bookings');
-        if (target === 'gym_theatre') setActiveSub('gym_theatre');
-        if (target === 'movies') setActiveSub('movies');
+        if (target === 'bookings') navigateToRoute('/amenities/booking', 'bookings');
+        if (target === 'gym_theatre') navigateToRoute('/amenities/gym-theatre', 'gym_theatre');
+        if (target === 'movies') navigateToRoute('/amenities/movie', 'movies');
         localStorage.removeItem('orchid_deep_redirect');
       }
     };
@@ -335,7 +353,7 @@ export default function AmenitiesSection({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Sub-Block 1: Gym & Movie Theatre Access Gate */}
             <div
-              onClick={() => setActiveSub('gym_theatre')}
+              onClick={() => navigateToRoute('/amenities/gym-theatre', 'gym_theatre')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -356,7 +374,7 @@ export default function AmenitiesSection({
 
             {/* Sub-Block 2: Movie Theatre Schedule */}
             <div
-              onClick={() => setActiveSub('movies')}
+              onClick={() => navigateToRoute('/amenities/movie', 'movies')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -377,7 +395,7 @@ export default function AmenitiesSection({
 
             {/* Sub-Block 3: Function Hall Booking Suite */}
             <div
-              onClick={() => setActiveSub('bookings')}
+              onClick={() => navigateToRoute('/amenities/booking', 'bookings')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[150px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -404,7 +422,7 @@ export default function AmenitiesSection({
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -570,7 +588,7 @@ export default function AmenitiesSection({
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -879,7 +897,7 @@ export default function AmenitiesSection({
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />

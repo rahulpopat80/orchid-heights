@@ -8,7 +8,7 @@ import { Shield, Plus, Clock, Search, AlertCircle, CheckCircle2, Trash2, Refresh
 import { FlatOwner, Visitor, DailyHelper } from '../types';
 import WebcamCapture from './WebcamCapture';
 import { api, detectServerEnvironment } from '../lib/api';
-import { collection, onSnapshot, doc, setDoc, updateDoc, db, sendFCMPushToFlat } from '../lib/firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc, db, sendFCMPushToFlat, getDoc } from '../lib/firebase';
 
 const playDecisionSound = (status: 'approved' | 'rejected' | 'expired') => {
   if (status === 'expired') return;
@@ -258,12 +258,27 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
           visitorCount: isDailyHelperType ? 1 : visitorCount
         };
 
+        let redirectAlert = '';
+        try {
+          const absenceDoc = await getDoc(doc(db, 'absences', flatId));
+          if (absenceDoc.exists()) {
+            const absenceData = absenceDoc.data();
+            redirectAlert = `🚨 ALERT: Flat ${flatId} is ABSENT / OUT OF STATION!\n\nPlease redirect this delivery/visitor to:\n➡️ ${absenceData.redirectFlatId} (${absenceData.redirectName})`;
+          }
+        } catch (e) {
+          console.error("Failed to check absence for flat", flatId);
+        }
+
         if (statusVal === 'approved') {
           newVisitor.respondedTime = new Date().toISOString();
           newVisitor.respondedBy = 'System Auto-Bypass';
         }
 
         await setDoc(doc(db, 'visitors', visitorId), newVisitor);
+
+        if (redirectAlert) {
+          setTimeout(() => alert(redirectAlert), 100);
+        }
 
         if (statusVal === 'pending') {
           await setDoc(doc(db, 'notifications', visitorId), {

@@ -85,13 +85,32 @@ export default function HelpDeskSection({
     viewMode === 'complaints' ? 'complaints' : 'menu'
   );
 
+  // Sync with URL and listen to popstate
+  useEffect(() => {
+    const handleLocationSync = () => {
+      const path = window.location.pathname;
+      if (path === '/help-desk/noticies') setActiveSub('notices');
+      else if (path === '/help-desk/financial-ledger') setActiveSub('financials');
+      else if (path === '/help-desk') setActiveSub(viewMode === 'complaints' ? 'complaints' : 'menu');
+    };
+    handleLocationSync();
+    window.addEventListener('popstate', handleLocationSync);
+    return () => window.removeEventListener('popstate', handleLocationSync);
+  }, [viewMode]);
+
+  const navigateToRoute = (path: string, sub: 'menu' | 'notices' | 'complaints' | 'financials') => {
+    setActiveSub(sub);
+    window.history.pushState(null, '', path);
+  };
+
   // Monitor notification redirects
   useEffect(() => {
     if (activeTabOverride) {
-      setActiveSub(activeTabOverride);
+      if (activeTabOverride === 'notices') navigateToRoute('/help-desk/noticies', 'notices');
+      if (activeTabOverride === 'financials') navigateToRoute('/help-desk/financial-ledger', 'financials');
       if (onClearOverride) onClearOverride();
     }
-  }, [activeTabOverride]);
+  }, [activeTabOverride, onClearOverride]);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -204,7 +223,7 @@ export default function HelpDeskSection({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Sub-Block 1: Society Notices */}
             <div
-              onClick={() => setActiveSub('notices')}
+              onClick={() => navigateToRoute('/help-desk/noticies', 'notices')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -225,7 +244,7 @@ export default function HelpDeskSection({
 
             {/* Sub-Block 2: Financial Ledger */}
             <div
-              onClick={() => setActiveSub('financials')}
+              onClick={() => navigateToRoute('/help-desk/financial-ledger', 'financials')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -252,7 +271,7 @@ export default function HelpDeskSection({
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/help-desk', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -358,7 +377,7 @@ export default function HelpDeskSection({
           {viewMode !== 'complaints' && (
             <div className="border-b border-slate-100 pb-3">
               <button
-                onClick={() => setActiveSub('menu')}
+                onClick={() => navigateToRoute('/help-desk', 'menu')}
                 className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -573,7 +592,7 @@ export default function HelpDeskSection({
         <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/help-desk', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />

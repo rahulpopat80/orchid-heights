@@ -36,6 +36,24 @@ export default function LocalServicesSection({
   const myFlatId = `${wing}-${flatNo}`;
   const [activeSub, setActiveSub] = useState<'menu' | 'local_helpers' | 'building_services'>('menu');
 
+  // Sync with URL and listen to popstate
+  useEffect(() => {
+    const handleLocationSync = () => {
+      const path = window.location.pathname;
+      if (path === '/services/local-services') setActiveSub('local_helpers');
+      else if (path === '/services/building-services') setActiveSub('building_services');
+      else if (path === '/services') setActiveSub('menu');
+    };
+    handleLocationSync();
+    window.addEventListener('popstate', handleLocationSync);
+    return () => window.removeEventListener('popstate', handleLocationSync);
+  }, []);
+
+  const navigateToRoute = (path: string, sub: 'menu' | 'local_helpers' | 'building_services') => {
+    setActiveSub(sub);
+    window.history.pushState(null, '', path);
+  };
+
   // Add & Edit State variables
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingHelperId, setEditingHelperId] = useState<string | null>(null);
@@ -142,7 +160,7 @@ export default function LocalServicesSection({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Sub-Block 1: Orchid Heights Local Services */}
             <div
-              onClick={() => setActiveSub('local_helpers')}
+              onClick={() => navigateToRoute('/services/local-services', 'local_helpers')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -163,7 +181,7 @@ export default function LocalServicesSection({
 
             {/* Sub-Block 2: Building Services & Contacts */}
             <div
-              onClick={() => setActiveSub('building_services')}
+              onClick={() => navigateToRoute('/services/building-services', 'building_services')}
               className="bg-white rounded-3xl p-5 border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between min-h-[140px] text-left hover:shadow-md transition cursor-pointer relative group"
             >
               <div className="flex items-center justify-between w-full">
@@ -191,7 +209,7 @@ export default function LocalServicesSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => {
-                setActiveSub('menu');
+                navigateToRoute('/services', 'menu');
                 setShowAddForm(false);
               }}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
@@ -379,7 +397,7 @@ export default function LocalServicesSection({
         <div className="space-y-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex items-center justify-between">
             <button
-              onClick={() => setActiveSub('menu')}
+              onClick={() => navigateToRoute('/services', 'menu')}
               className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
             >
               <ArrowLeft className="w-4 h-4" />

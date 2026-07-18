@@ -343,6 +343,7 @@ export default function ProfileSection({
                     placeholder="Enter new account password..."
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
                     className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition pr-10"
                   />
                   <button
