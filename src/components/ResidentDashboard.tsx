@@ -468,13 +468,13 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
   const [absenceSuccess, setAbsenceSuccess] = useState<string>('');
 
   // Download 3-month visitor logs as PDF
-  const handleDownloadVisitorReport = () => {
+  const handleDownloadVisitorReport = async () => {
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
     
     const reportData = guestHistory.filter(v => new Date(v.requestTime) >= threeMonthsAgo);
     
-    generateVisitorPDF(reportData, "GATE VISITOR REPORT", `Flat: ${wing}-${flatNo} | Report Period: Last 3 Months`);
+    await generateVisitorPDF(reportData, "GATE VISITOR REPORT", `Flat: ${wing}-${flatNo} | Report Period: Last 3 Months`);
   };
 
 
@@ -1878,12 +1878,11 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                               {notif.type === 'movie_schedule' && (
                                 <button
                                   onClick={() => {
+                                    setIsNotificationsOpen(false);
                                     setLastVisitedSubSection('amenity');
                                     setActiveSubSection('amenity');
                                     localStorage.setItem('orchid_deep_redirect', 'movies');
-                                    setTimeout(() => {
-                                      window.dispatchEvent(new Event('orchid_amenities_redirect'));
-                                    }, 100);
+                                    setTimeout(() => window.dispatchEvent(new Event('orchid_amenities_redirect')), 100);
                                   }}
                                   className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
                                 >
@@ -1894,12 +1893,62 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                               {notif.type === 'complaint' && (
                                 <button
                                   onClick={() => {
+                                    setIsNotificationsOpen(false);
                                     setLastVisitedSubSection('complaints');
                                     setActiveSubSection('complaints');
                                   }}
                                   className="text-[9px] font-black uppercase tracking-tight bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-100 px-2 py-1 rounded-lg cursor-pointer"
                                 >
                                   Open Ticket
+                                </button>
+                              )}
+
+                              {notif.type === 'notice' && (
+                                <button
+                                  onClick={() => {
+                                    setIsNotificationsOpen(false);
+                                    setActiveSubSection('helpdesk');
+                                  }}
+                                  className="text-[9px] font-black uppercase tracking-tight bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-lg cursor-pointer"
+                                >
+                                  View Notice
+                                </button>
+                              )}
+
+                              {notif.type === 'financial' && (
+                                <button
+                                  onClick={() => {
+                                    setIsNotificationsOpen(false);
+                                    setActiveSubSection('helpdesk');
+                                  }}
+                                  className="text-[9px] font-black uppercase tracking-tight bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-lg cursor-pointer"
+                                >
+                                  View Ledger
+                                </button>
+                              )}
+
+                              {notif.type === 'amenity_request' && (
+                                <button
+                                  onClick={() => {
+                                    setIsNotificationsOpen(false);
+                                    setLastVisitedSubSection('amenity');
+                                    setActiveSubSection('amenity');
+                                  }}
+                                  className="text-[9px] font-black uppercase tracking-tight bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 px-2 py-1 rounded-lg cursor-pointer"
+                                >
+                                  View Bookings
+                                </button>
+                              )}
+
+                              {notif.type === 'visitor' && (
+                                <button
+                                  onClick={() => {
+                                    setIsNotificationsOpen(false);
+                                    setActiveSubSection('visitors');
+                                  }}
+                                  className="text-[9px] font-black uppercase tracking-tight bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-100 px-2 py-1 rounded-lg cursor-pointer"
+                                >
+                                  View Visitors
                                 </button>
                               )}
 
@@ -2211,3 +2260,4 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     </div>
   );
 }
+

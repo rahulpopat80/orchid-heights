@@ -12,7 +12,7 @@ import {
   Bell, 
   Calendar,
   ChevronRight,
-  ArrowLeft,
+  ArrowLeft, Trash2,
   Check
 } from 'lucide-react';
 import { api } from '../../lib/api';
@@ -659,4 +659,5 @@ export default function HelpDeskSection({
     </div>
   );
 }
+
 

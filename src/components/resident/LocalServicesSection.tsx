@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Wrench, 
-  Plus, 
-  Trash2, 
-  ShieldCheck, 
-  ChevronRight, 
-  ArrowLeft, 
-  Edit3, 
-  UserPlus, 
-  Phone,
-  Check,
-  User,
-  X,
-  AlertCircle
-} from 'lucide-react';
+import { Briefcase, Key, Star, Wrench, Shield, Phone, ChevronRight, CheckCircle2, MoreVertical, Search, Edit2, Camera, UserPlus, X, Heart } from 'lucide-react';
 import { DailyHelper, EssentialContact } from '../../types';
 import { db, setDoc, doc, deleteDoc, updateDoc } from '../../lib/firebase';
 import BuildingServicesSection from './BuildingServicesSection';
+import { compressImage } from '../../lib/imageUtils';
 
 interface LocalServicesSectionProps {
   wing: string;
@@ -90,35 +77,59 @@ export default function LocalServicesSection({
     setFormError('');
     setFormSuccess('');
 
-    if (!helperName.trim()) {
-      setFormError('Name is required.');
-      return;
-    }
-    if (!helperPhone.trim()) {
-      setFormError('Phone number is required.');
+    if (!helperName.trim() || !helperPhone.trim()) {
+      setFormError('Please fill in all required fields.');
       return;
     }
 
     try {
       if (editingHelperId) {
-        // Edit flow
-        const ref = doc(db, 'daily_helpers', editingHelperId);
-        await updateDoc(ref, {
-          name: helperName.trim(),
-          phone: helperPhone.trim(),
-          role: helperRole
-        });
-        setFormSuccess('Helper details updated successfully!');
+        // Update
+        const target = dailyHelpers.find(h => h.id === editingHelperId);
+        if (target) {
+          const payload: any = {
+            name: helperName,
+            phone: helperPhone,
+            role: helperRole
+          };
+          if (helperPhoto) {
+            payload.photoUrl = helperPhoto;
+          }
+          await updateDoc(doc(db, 'daily_helpers', editingHelperId), payload);
+          setFormSuccess('Helper details updated!');
+        }
       } else {
-        // Add flow
-        const newId = 'helper_' + Math.random().toString(36).substring(2, 11);
+        if (!helperPhoto) {
+          setPhotoError('Photo is required for registration.');
+          return;
+        }
+        // Create
+        const newId = 'dh_' + Math.random().toString(36).substr(2, 9);
         const newHelper: DailyHelper = {
           id: newId,
-          name: helperName.trim(),
-          phone: helperPhone.trim(),
+          name: helperName,
+          phone: helperPhone,
           role: helperRole,
-          flats: [myFlatId] // Auto-map to the creator flat!
+          flats: [myFlatId], // Auto-map to the creator flat!
+          photoUrl: helperPhoto
         };
+        await setDoc(doc(db, 'daily_helpers', newId), newHelper);
+        setFormSuccess('New helper registered and mapped to your flat!');
+      }
+
+      // Reset
+      setTimeout(() => {
+        setShowAddForm(false);
+        setEditingHelperId(null);
+        setHelperName('');
+        setHelperPhone('');
+        setHelperPhoto('');
+        setPhotoError('');
+      }, 1000);
+    } catch (err) {
+      setFormError('An error occurred. Please try again.');
+    }
+  };
         await setDoc(doc(db, 'daily_helpers', newId), newHelper);
         setFormSuccess('New helper registered and mapped to your flat!');
       }
@@ -400,4 +411,5 @@ export default function LocalServicesSection({
     </div>
   );
 }
+
 

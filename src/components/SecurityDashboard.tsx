@@ -358,11 +358,23 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
         }
       }
 
-      if (isBypassed && selectedHelperId) {
+      if (isBypassed && selectedHelperId && selectedHelperId !== 'new') {
         await updateDoc(doc(db, 'daily_helpers', selectedHelperId), {
           flats: selectedFlats
         });
         playDecisionSound('approved');
+      }
+
+      if (isDailyHelperType && selectedHelperId === 'new') {
+        const newHelperId = 'dh_' + Math.random().toString(36).substr(2, 9);
+        await setDoc(doc(db, 'daily_helpers', newHelperId), {
+           id: newHelperId,
+           name: fullName.trim(),
+           phone: mobileNumber.trim(),
+           role: guestType,
+           flats: selectedFlats,
+           photoUrl: photoUrl
+        });
       }
 
       setFullName('');
@@ -834,4 +846,5 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
     </div>
   );
 }
+
 

@@ -572,13 +572,22 @@ export default function AmenitiesSection({
             </button>
             <div className="flex items-center gap-2">
               {role === 'admin' && (
-                <button
-                  onClick={handleDownloadMoviesCSV}
-                  className="px-2.5 py-1 border border-slate-200 hover:border-slate-300 rounded-xl text-[9px] font-black uppercase text-slate-600 transition flex items-center gap-1 cursor-pointer select-none"
-                >
-                  <Download className="w-3 h-3" />
-                  <span>Export CSV</span>
-                </button>
+                <>
+                  <button
+                    onClick={handleDownloadMoviesCSV}
+                    className="px-2.5 py-1 border border-slate-200 hover:border-slate-300 rounded-xl text-[9px] font-black uppercase text-slate-600 transition flex items-center gap-1 cursor-pointer select-none bg-white"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span>CSV</span>
+                  </button>
+                  <button
+                    onClick={handleDownloadMoviesPDF}
+                    className="px-2.5 py-1 border border-rose-200 hover:border-rose-300 rounded-xl text-[9px] font-black uppercase text-rose-600 transition flex items-center gap-1 cursor-pointer select-none bg-rose-50"
+                  >
+                    <FileText className="w-3 h-3" />
+                    <span>PDF</span>
+                  </button>
+                </>
               )}
               <button
                 onClick={() => setShowAddMovieForm(!showAddMovieForm)}
@@ -904,16 +913,15 @@ export default function AmenitiesSection({
 
               <form onSubmit={handleAddAmenityBooking} className="space-y-4 text-xs font-semibold">
                 <div>
-                  <label className="block text-[9px] font-bold text-slate-500 mb-1.5 uppercase">Location / Venue Property</label>
-                  <select
+                  <label className="block text-[9px] font-bold text-slate-500 mb-1.5 uppercase">Location / Venue Property *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Clubhouse Party Hall"
                     value={fPropertyName}
                     onChange={(e) => setFPropertyName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold outline-none"
-                  >
-                    <option value="Clubhouse Party Hall">Clubhouse Party Hall</option>
-                    <option value="Terrace Garden Lounge">Terrace Garden Lounge</option>
-                    <option value="Society Pavilion Ground">Society Pavilion Ground</option>
-                  </select>
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
@@ -1090,7 +1098,84 @@ export default function AmenitiesSection({
           </div>
         </div>
       )}
+      {/* Exit Photo Modal */}
+      {showExitPhotoModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowExitPhotoModal(false)}></div>
+          <div className="relative bg-white rounded-3xl p-5 shadow-2xl w-full max-w-sm space-y-4">
+            <div className="text-center">
+              <h3 className="font-display font-black text-lg text-slate-800 tracking-tight">Checkout Verification</h3>
+              <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-1">
+                Please upload or capture a live picture of the property to verify your exit. (Max 10 mins old).
+              </p>
+            </div>
+            {exitPhotoTimeError && (
+              <div className="bg-red-50 text-red-700 p-2 rounded-xl text-[10px] font-bold border border-red-100 text-center">
+                Picture is older than 10 minutes. Please take a live photo.
+              </div>
+            )}
+            {gymTheatreError && (
+              <div className="bg-red-50 text-red-700 p-2 rounded-xl text-[10px] font-bold border border-red-100 text-center">
+                {gymTheatreError}
+              </div>
+            )}
+            
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center min-h-[140px]">
+              {exitPhotoBase64 ? (
+                <div className="relative">
+                  <img src={exitPhotoBase64} alt="Exit Verification" className="w-24 h-24 object-cover rounded-2xl border-4 border-white shadow-md" />
+                  <button
+                    onClick={() => handleExitPhotoChange(null as any)}
+                    className="absolute -top-2 -right-2 bg-slate-800 text-white p-1 rounded-full hover:bg-slate-700 shadow-sm"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center cursor-pointer w-full h-full text-indigo-600 hover:text-indigo-700 transition">
+                  <div className="bg-white p-3 rounded-full shadow-sm mb-2 border border-indigo-100">
+                    <Camera className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Tap to Capture/Upload</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleExitPhotoChange(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowExitPhotoModal(false)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-[10px] uppercase transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmCheckOut}
+                disabled={!exitPhotoBase64}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl text-[10px] uppercase transition shadow-md"
+              >
+                Confirm Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+
+
+
+
 

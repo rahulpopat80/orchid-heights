@@ -93,7 +93,7 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
     setLoading(true);
     try {
       const reportData = await fetchFilteredLogs();
-      generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`, true);
+      await generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`, true);
     } catch (e) {
       alert('Error fetching records for PDF.');
     } finally {

@@ -129,10 +129,12 @@ export interface AmenityBooking {
   dateFrom: string;
   dateTo: string;
   reason: string;
-  stuffNeeded: string;
-  parkingRequest: string;
-  approvedFlats: string[];
+  stuffNeeded?: string;
+  parkingRequest?: string;
+  status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
+  ipAddress?: string;
+  deviceImei?: string;
 }
 
 export interface GymTheatreLog {
@@ -144,6 +146,8 @@ export interface GymTheatreLog {
   exitPhotoUrl?: string;
   durationMinutes?: number;
   createdAt: string;
+  ipAddress?: string;
+  deviceImei?: string;
 }
 
 export interface DailyHelper {
@@ -164,3 +168,4 @@ export interface AbsenceLog {
   parcelRedirectFlat?: string;
   createdAt: string;
 }
+

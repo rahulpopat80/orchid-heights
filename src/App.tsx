@@ -198,22 +198,9 @@ export default function App() {
     if (session && (session.role === 'owner' || session.role === 'admin') && session.wing && session.flatNo) {
       const captureDevice = async () => {
         try {
-          // Get or create unique browser/device persistent id
           const flatKey = `${session.wing}_${session.flatNo}`;
-          let deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
-          if (!deviceId) {
-            deviceId = 'dev_' + Math.random().toString(36).substring(2, 15) + '_' + flatKey;
-            localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
-          }
-
-          // Get or create a virtual persistent IMEI number
-          let imei = localStorage.getItem(`orchid_device_imei_${flatKey}`);
-          if (!imei) {
-            imei = '358401' + Math.floor(100000 + Math.random() * 900000) + Math.floor(10 + Math.random() * 90);
-            localStorage.setItem(`orchid_device_imei_${flatKey}`, imei);
-          }
-
-          // Fetch public IP address using an online API, fallback if offline or failed
+          
+          // 1. Fetch public IP address using an online API, fallback if offline or failed
           let ipAddress = '127.0.0.1';
           try {
             const res = await fetch('https://api.ipify.org?format=json');
@@ -229,7 +216,19 @@ export default function App() {
             }
           }
 
-          // Parse OS and Browser details elegantly
+          // 2. Base deviceId firmly on IP address to prevent duplicating on storage clears
+          // We attach a hash of the flatKey so the same IP can log into multiple flats independently if needed,
+          // but for the same flat on the same IP, it's always strictly 1 device.
+          const deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
+          
+          // 3. Get or create a virtual persistent IMEI number mapped to this IP ID
+          let imei = localStorage.getItem(`orchid_imei_${deviceId}`);
+          if (!imei) {
+            imei = '358401' + Math.floor(100000 + Math.random() * 900000) + Math.floor(10 + Math.random() * 90);
+            localStorage.setItem(`orchid_imei_${deviceId}`, imei);
+          }
+
+          // 4. Parse OS and Browser details elegantly
           const ua = navigator.userAgent;
           let os = 'Other Device';
           if (/android/i.test(ua)) os = 'Android';
