@@ -50,7 +50,7 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
       rows.push([
         '"Sr."', '"Visitor Name"', '"Mobile Number"', '"Email"', '"Wing"', '"Flat No"',
         '"Visitor Type"', '"Reason"', '"Status"', '"Request Date"', '"Request Time"',
-        '"Response Time"', '"Approved / Rejected By"', '"Rejection Reason"'
+        '"Response Time"', '"Approved / Rejected By"', '"IP Address"', '"Device SN"', '"Rejection Reason"'
       ].join(','));
 
       reportData.forEach((v, idx) => {
@@ -63,7 +63,10 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
           `"${(v.status || '').toUpperCase()}"`,
           `"${reqDate.toLocaleDateString('en-IN')}"`, `"${reqDate.toLocaleTimeString('en-IN')}"`,
           `"${respDate ? respDate.toLocaleString('en-IN') : '-'}"`,
-          `"${(v.respondedBy || '-').replace(/"/g, '""')}"`, `"${(v.rejectReason || '-').replace(/"/g, '""')}"`
+          `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
+          `"${(v.ipAddress || 'N/A').replace(/"/g, '""')}"`,
+          `"${(v.deviceImei || 'N/A').replace(/"/g, '""')}"`,
+          `"${(v.rejectReason || '-').replace(/"/g, '""')}"`
         ].join(','));
       });
 
@@ -90,7 +93,7 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
     setLoading(true);
     try {
       const reportData = await fetchFilteredLogs();
-      generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`);
+      generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`, true);
     } catch (e) {
       alert('Error fetching records for PDF.');
     } finally {
@@ -103,10 +106,10 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <button
           onClick={onBack}
-          className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
+          className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Menu</span>
+          <span className="text-xl leading-none -mt-0.5">◀</span>
+          <span className="uppercase tracking-widest text-[10px]">Back to Home</span>
         </button>
         <div className="flex items-center space-x-1 text-indigo-600">
           <ShieldCheck className="w-4 h-4" />

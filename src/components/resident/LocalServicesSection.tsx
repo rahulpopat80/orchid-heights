@@ -60,7 +60,7 @@ export default function LocalServicesSection({
 
   const [helperName, setHelperName] = useState('');
   const [helperPhone, setHelperPhone] = useState('');
-  const [helperRole, setHelperRole] = useState<'Maid' | 'Milkman' | 'Car Cleaner' | 'Newspaper Guy' | 'Other'>('Maid');
+  const [helperRole, setHelperRole] = useState<'Maid' | 'Milkman' | 'Car Cleaner' | 'Newspaper Guy' | 'Care Taker' | 'Cook' | 'Other'>('Maid');
 
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -196,10 +196,10 @@ export default function LocalServicesSection({
                 navigateToRoute('/services', 'menu');
                 setShowAddForm(false);
               }}
-              className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Menu</span>
+              <span className="text-xl leading-none -mt-0.5">?</span>
+              <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <button
               onClick={handleOpenAdd}
@@ -277,9 +277,11 @@ export default function LocalServicesSection({
                   >
                     <option value="Maid">Sweep & Maid (🧹)</option>
                     <option value="Milkman">Milkman (🥛)</option>
-                    <option value="Car Cleaner">Vehicle Cleaner (🧽)</option>
+                    <option value="Car Cleaner">Vehicle Cleaner (🚗)</option>
                     <option value="Newspaper Guy">Newspaper Guy (📰)</option>
-                    <option value="Other">Other helper (🔧)</option>
+                    <option value="Care Taker">Care Taker (🧑‍⚕️)</option>
+                    <option value="Cook">Cook (👨‍🍳)</option>
+                    <option value="Other">Other helper (🛠)</option>
                   </select>
                 </div>
               </div>
@@ -306,7 +308,7 @@ export default function LocalServicesSection({
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <span className="text-xl bg-white border border-slate-100 p-2 rounded-xl shrink-0 shadow-xs">
-                        {helper.role === 'Maid' ? '🧹' : helper.role === 'Milkman' ? '🥛' : helper.role === 'Car Cleaner' ? '🧽' : helper.role === 'Newspaper Guy' ? '📰' : '🔧'}
+                        {helper.role === 'Maid' ? '🧹' : helper.role === 'Milkman' ? '🥛' : helper.role === 'Car Cleaner' ? '🚗' : helper.role === 'Newspaper Guy' ? '📰' : helper.role === 'Care Taker' ? '🧑‍⚕️' : helper.role === 'Cook' ? '👨‍🍳' : '🛠'}
                       </span>
                       <div className="min-w-0">
                         <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
@@ -382,10 +384,10 @@ export default function LocalServicesSection({
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex items-center justify-between">
             <button
               onClick={() => navigateToRoute('/services', 'menu')}
-              className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Menu</span>
+              <span className="text-xl leading-none -mt-0.5">?</span>
+              <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">
               View Only Mode
@@ -398,3 +400,4 @@ export default function LocalServicesSection({
     </div>
   );
 }
+

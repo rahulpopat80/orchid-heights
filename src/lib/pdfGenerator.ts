@@ -1,7 +1,13 @@
 import jsPDF from 'jspdf';
 import { Visitor } from '../types';
 
-export const generateVisitorPDF = (logs: Visitor[], title: string, subtitle: string) => {
+const sanitizeText = (str: string) => {
+  if (!str) return '';
+  const clean = str.replace(/[^\x00-\x7F]/g, '').trim();
+  return clean || '[Local Name]';
+};
+
+export const generateVisitorPDF = (logs: Visitor[], title: string, subtitle: string, isAdmin: boolean = false) => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -95,7 +101,7 @@ export const generateVisitorPDF = (logs: Visitor[], title: string, subtitle: str
       doc.setTextColor(15, 23, 42); // Slate 900
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text(log.fullName.toUpperCase(), textX, currY);
+      doc.text(sanitizeText(log.fullName).toUpperCase(), textX, currY);
 
       currY += 7;
       doc.setTextColor(71, 85, 105); // Slate 600
@@ -104,10 +110,10 @@ export const generateVisitorPDF = (logs: Visitor[], title: string, subtitle: str
       doc.text(`Mobile: ${log.mobileNumber}`, textX, currY);
       
       currY += 6;
-      doc.text(`Type: ${log.guestType.toUpperCase()}`, textX, currY);
+      doc.text(`Type: ${sanitizeText(log.guestType).toUpperCase()}`, textX, currY);
       
       currY += 6;
-      doc.text(`Target: Flat ${log.wing}-${log.flatNo} (${log.flatOwnerName || 'Unknown'})`, textX, currY);
+      doc.text(`Target: Flat ${log.wing}-${log.flatNo} (${sanitizeText(log.flatOwnerName) || 'Unknown'})`, textX, currY);
 
       // Text Section 2: Visit Timestamps & Status
       const rightX = pageWidth - margin - 5;
@@ -159,6 +165,14 @@ export const generateVisitorPDF = (logs: Visitor[], title: string, subtitle: str
       doc.text(log.respondedTime ? new Date(log.respondedTime).toLocaleString('en-IN', {
         dateStyle: 'short', timeStyle: 'short'
       }) : 'Waiting...', rightX, currY, { align: 'right' });
+
+      if (isAdmin && (log.ipAddress || log.deviceImei)) {
+        currY += 7;
+        doc.setTextColor(100, 116, 139);
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`IP: ${log.ipAddress || 'N/A'} | SN: ${log.deviceImei || 'N/A'}`, rightX, currY, { align: 'right' });
+      }
 
       startY += cardHeight + cardSpacing;
       currentLogIndex++;

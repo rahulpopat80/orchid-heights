@@ -52,6 +52,8 @@ export interface Visitor {
   respondedBy?: string; // name of who approved/rejected
   rejectReason?: string; // optional reason if rejected
   deletedByResident?: boolean; // soft deletion tracker
+  ipAddress?: string; // Device IP that created the log
+  deviceImei?: string; // Device SN/IMEI that created the log
 }
 
 export type UserRole = 'security' | 'owner' | 'admin';

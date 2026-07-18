@@ -256,10 +256,10 @@ export default function HelpDeskSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
-              className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Menu</span>
+              <span className="text-xl leading-none -mt-0.5">?</span>
+              <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
               Notices ({filteredNotices.length})
@@ -577,10 +577,10 @@ export default function HelpDeskSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
-              className="flex items-center space-x-1 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Menu</span>
+              <span className="text-xl leading-none -mt-0.5">?</span>
+              <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
               Ledger Statements ({financials.length})
@@ -659,3 +659,4 @@ export default function HelpDeskSection({
     </div>
   );
 }
+

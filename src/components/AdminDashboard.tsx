@@ -1161,13 +1161,13 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
       {/* Global Back Button for inner views (except visitors which has its own) */}
       {activeTab !== 'home' && activeTab !== 'visitors' && (
-        <div className="mb-6">
+        <div className="mb-4">
           <button
             onClick={() => setActiveTab('home')}
-            className="flex items-center space-x-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer transition select-none bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm"
+            className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm w-max active:scale-95"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span className="text-xl leading-none -mt-0.5">◀</span>
+            <span className="uppercase tracking-widest text-[10px]">Back to Home</span>
           </button>
         </div>
       )}

@@ -60,9 +60,19 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
   const [email, setEmail] = useState<string>('');
   const [wing, setWing] = useState<'A' | 'B'>('A');
   const [flatNo, setFlatNo] = useState<number>(101);
-  const [reason, setReason] = useState<string>('');
+  const [reason, setReason] = useState<string>('To deliver products');
   const [guestType, setGuestType] = useState<string>('Delivery');
   const [photoUrl, setPhotoUrl] = useState<string>('');
+
+  useEffect(() => {
+    switch(guestType) {
+      case 'Delivery': setReason('To deliver products'); break;
+      case 'Electrician': setReason('Electrical maintenance & repair'); break;
+      case 'Guest': setReason('General Visit'); break;
+      case 'Cabinet': setReason('Interior work & carpentry'); break;
+      default: setReason('General Visit'); break;
+    }
+  }, [guestType]);
   const [visitorCount, setVisitorCount] = useState<number>(1);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string>('');
@@ -77,6 +87,26 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const [absenceLogs, setAbsenceLogs] = useState<any[]>([]);
+
+  // IP and IMEI tracking
+  const [deviceIp, setDeviceIp] = useState<string>('');
+  const [deviceImei, setDeviceImei] = useState<string>('');
+
+  useEffect(() => {
+    // Fetch public IP securely using ipify API
+    fetch('https://api.ipify.org?format=json')
+      .then(r => r.json())
+      .then(data => setDeviceIp(data.ip))
+      .catch(() => setDeviceIp('Unknown IP'));
+
+    // Generate/Retrieve persistent Device Serial Number (IMEI Mock) for browser
+    let storedImei = localStorage.getItem('sec_device_imei');
+    if (!storedImei) {
+      storedImei = 'SN-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+      localStorage.setItem('sec_device_imei', storedImei);
+    }
+    setDeviceImei(storedImei);
+  }, []);
 
   useEffect(() => {
     const unsubscribeHelpers = onSnapshot(collection(db, 'daily_helpers'), (snapshot) => {
@@ -180,13 +210,15 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
     }
   };
 
-  const isDailyHelperType = ['Milkman', 'Maid', 'Vehicle Cleaner', 'Newspaper'].includes(guestType);
+  const isDailyHelperType = ['Milkman', 'Maid', 'Vehicle Cleaner', 'Newspaper', 'Care Taker', 'Cook'].includes(guestType);
 
   const mappedHelpers = dailyHelpers.filter((h) => {
     if (guestType === 'Maid') return h.role === 'Maid';
     if (guestType === 'Milkman') return h.role === 'Milkman';
     if (guestType === 'Vehicle Cleaner') return h.role === 'Car Cleaner';
     if (guestType === 'Newspaper') return h.role === 'Newspaper Guy';
+    if (guestType === 'Care Taker') return h.role === 'Care Taker';
+    if (guestType === 'Cook') return h.role === 'Cook';
     return false;
   });
 
@@ -255,7 +287,9 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
           status: statusVal,
           requestTime: new Date().toISOString(),
           flatOwnerName: ownerName,
-          visitorCount: isDailyHelperType ? 1 : visitorCount
+          visitorCount: isDailyHelperType ? 1 : visitorCount,
+          ipAddress: deviceIp,
+          deviceImei: deviceImei
         };
 
         let redirectAlert = '';
@@ -504,7 +538,6 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                   required
                   placeholder="મુલાકાતીનું આખું નામ લખો"
                   value={fullName}
-                  disabled={!!(selectedHelperId && selectedHelperId !== 'new')}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl py-3 px-4 text-lg font-bold"
                 />
@@ -517,7 +550,6 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                   required
                   placeholder="૧૦-અંકનો મોબાઇલ નંબર લખો"
                   value={mobileNumber}
-                  disabled={!!(selectedHelperId && selectedHelperId !== 'new')}
                   onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl py-3 px-4 text-lg font-bold"
                 />

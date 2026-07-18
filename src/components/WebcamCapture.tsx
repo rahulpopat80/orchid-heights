@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, RefreshCw, Check, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Camera, RefreshCw, Check, AlertCircle, Image as ImageIcon, FlipHorizontal } from 'lucide-react';
 
 interface WebcamCaptureProps {
   onPhotoCaptured: (base64: string) => void;
@@ -24,13 +24,14 @@ const PRESETS: Record<string, { label: string; svgColor: string; iconLetter: str
 };
 
 export default function WebcamCapture({ onPhotoCaptured, value, guestType }: WebcamCaptureProps) {
-  const [mode, setMode] = useState<'preset' | 'camera' | 'upload'>('preset');
+  const [mode, setMode] = useState<'preset' | 'camera'>('preset');
   const [photo, setPhoto] = useState<string>(value || '');
   const [selectedPreset, setSelectedPreset] = useState<string>('other');
   
   // Camera states
   const [cameraActive, setCameraActive] = useState<boolean>(false);
   const [cameraError, setCameraError] = useState<string>('');
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -117,7 +118,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
     }
   }, [value]);
 
-  const startCamera = async () => {
+  const startCamera = async (currentFacingMode = facingMode) => {
     setCameraError('');
     setCameraActive(false);
     try {
@@ -126,7 +127,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 400, height: 300, facingMode: 'user' },
+        video: { width: 400, height: 300, facingMode: currentFacingMode },
         audio: false
       });
 
@@ -137,8 +138,14 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
       }
     } catch (err: any) {
       console.error('Camera access error:', err);
-      setCameraError('Could not access camera. Please make sure camera permissions are allowed or use the file upload or preset options.');
+      setCameraError('Could not access camera. Please make sure camera permissions are allowed.');
     }
+  };
+
+  const flipCamera = () => {
+    const newFacingMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newFacingMode);
+    startCamera(newFacingMode);
   };
 
   const stopCamera = () => {
@@ -196,18 +203,20 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
           </button>
           <button
             type="button"
-            onClick={() => { setMode('camera'); startCamera(); }}
+            onClick={() => { setMode('camera'); startCamera(facingMode); }}
             className={`px-2.5 py-1 rounded-md transition ${mode === 'camera' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
           >
             Webcam
           </button>
-          <button
-            type="button"
-            onClick={() => { setMode('upload'); stopCamera(); }}
-            className={`px-2.5 py-1 rounded-md transition ${mode === 'upload' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
-          >
-            Upload File
-          </button>
+          {mode === 'camera' && (
+            <button
+              type="button"
+              onClick={flipCamera}
+              className="px-2.5 py-1 rounded-md transition text-indigo-600 bg-indigo-50 hover:bg-indigo-100 flex items-center gap-1 ml-1"
+            >
+              <FlipHorizontal className="w-3 h-3" /> Flip
+            </button>
+          )}
         </div>
       </div>
 
@@ -273,7 +282,8 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
                     ref={videoRef}
                     autoPlay
                     playsInline
-                    className="w-full h-full object-cover scale-x-[-1]"
+                    className="w-full h-full object-cover transform"
+                    style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                   />
                   {!cameraActive && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 text-white text-xs font-medium">
@@ -303,25 +313,6 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
                     <span>Retry Camera</span>
                   </button>
                 )}
-              </div>
-            </div>
-          )}
-
-          {mode === 'upload' && (
-            <div>
-              <p className="text-[11px] text-slate-500 mb-2">
-                Upload or drop any picture from your device:
-              </p>
-              <div className="relative border-2 border-dashed border-slate-300 rounded-xl bg-white p-4 hover:border-slate-400 transition text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <Upload className="w-5 h-5 text-slate-400 mx-auto mb-1" />
-                <p className="text-xs font-medium text-slate-600">Click to upload image</p>
-                <p className="text-[10px] text-slate-400">Supports JPG, PNG, WebP</p>
               </div>
             </div>
           )}
