@@ -19,6 +19,7 @@ export interface DeviceInfo {
   os: string;
   browser: string;
   lastLogin: string;
+  phoneNumber?: string;
 }
 
 export interface FlatOwner {

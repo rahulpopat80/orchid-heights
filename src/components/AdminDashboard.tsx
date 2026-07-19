@@ -1146,31 +1146,6 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
   return (
     <div className="space-y-6 text-left pb-16">
-      
-      {/* Admin Panel Header Banner */}
-      <div className="bg-gradient-to-tr from-slate-900 to-indigo-950 p-6 rounded-2xl text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
-        <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-white border border-slate-700 flex items-center justify-center p-1">
-            <img 
-              src="https://i.ibb.co/zT5tpcdY/1000296229-1.png" 
-              alt="Orchid Heights Logo" 
-              className="w-full h-full object-contain rounded-xl"
-              referrerPolicy="no-referrer"
-            /></div>
-          <div>
-            <h2 className="font-display font-black text-xl tracking-tight">Orchid Heights Admin Suite</h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Private administrative master panel. Add notices, review all complaints, audit devices, view deleted visitor data, and download reports.
-            </p></div></div>
-        {onLogoutAdmin && (
-          <button
-            onClick={onLogoutAdmin}
-            className="bg-red-600/25 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/30 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 self-start md:self-center"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Exit Admin</span>
-          </button>
-        )}</div>
 
       {/* Admin Home Blocks */}
       {activeTab === 'home' && (

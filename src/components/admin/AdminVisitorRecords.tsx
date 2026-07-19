@@ -66,7 +66,7 @@ export default function AdminVisitorRecords({ onBack, owners = [] }: AdminVisito
           `"${(v.status || '').toUpperCase()}"`,
           `"${reqDate.toLocaleDateString('en-IN')}"`, `"${reqDate.toLocaleTimeString('en-IN')}"`,
           `"${respDate ? respDate.toLocaleString('en-IN') : '-'}"`,
-          `"${(v.respondedBy || '-').replace(/"/g, '""')}"`,
+          `"${(v.respondedBy || '-').toUpperCase().replace(/"/g, '""')}"`,
           `"${(v.ipAddress || 'N/A').replace(/"/g, '""')}"`,
           `"${(v.deviceImei || 'N/A').replace(/"/g, '""')}"`,
           `"${(v.rejectReason || '-').replace(/"/g, '""')}"`
@@ -96,7 +96,7 @@ export default function AdminVisitorRecords({ onBack, owners = [] }: AdminVisito
     setLoading(true);
     try {
       const reportData = await fetchFilteredLogs();
-      await generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`, true);
+      await generateVisitorPDF(reportData, "MASTER ADMIN GATE REPORT", `Filter: ${filterTime.toUpperCase()} | Flat: ${filterWing === 'ALL' ? 'ALL' : filterWing + '-' + filterFlatNo}`, true, owners);
     } catch (e) {
       alert('Error fetching records for PDF.');
     } finally {

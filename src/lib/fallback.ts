@@ -441,7 +441,10 @@ export function registerUserDeviceLocal(wing: string, flatNo: number, device: De
   if (idx > -1) {
     const ownerData = owners[idx];
     const currentDevices = ownerData.devices || [];
-    const filteredDevices = currentDevices.filter(d => d.ipAddress !== device.ipAddress && d.deviceId !== device.deviceId);
+    const filteredDevices = currentDevices.filter(d => 
+        d.deviceId !== device.deviceId && 
+        !(d.phoneNumber && device.phoneNumber && d.phoneNumber === device.phoneNumber)
+      );
     
     const newDevice = { ...device, lastLogin: new Date().toISOString() };
     filteredDevices.push(newDevice);

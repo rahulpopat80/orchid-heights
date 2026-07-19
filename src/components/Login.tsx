@@ -97,6 +97,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           imei,
           os,
           browser,
+          phoneNumber,
           lastLogin: new Date().toISOString()
         };
       }

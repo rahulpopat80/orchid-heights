@@ -802,9 +802,12 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
       const ownerData = ownerSnap.data() as FlatOwner;
       const currentDevices = ownerData.devices || [];
       
-      // Strict matching by IP Address as requested by user (1 IP = 1 Device)
-      // Filter out ALL existing entries with the same IP or deviceId to clean up any past duplicates
-      const filteredDevices = currentDevices.filter(d => d.ipAddress !== device.ipAddress && d.deviceId !== device.deviceId);
+      // Strict matching by Phone Number as requested by user (1 Number = 1 Device)
+      // Filter out ALL existing entries with the same phoneNumber or deviceId to clean up any past duplicates
+      const filteredDevices = currentDevices.filter(d => 
+        d.deviceId !== device.deviceId && 
+        !(d.phoneNumber && device.phoneNumber && d.phoneNumber === device.phoneNumber)
+      );
       
       const newDevice = { ...device, lastLogin: new Date().toISOString() };
       filteredDevices.push(newDevice);
