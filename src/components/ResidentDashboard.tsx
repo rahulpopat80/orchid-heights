@@ -2104,19 +2104,13 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
         </button>
       </div>
 
-      {/* Notifications Modal Center Overlay */}
+{/* Notifications Modal Center Overlay */}
       {isNotificationsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity cursor-pointer"
             onClick={() => {
-              // Auto-dismiss all society notifications and announcements when closing
-              const notifIds = societyNotifications.map(n => n.id);
-              const annIds = announcements.map(a => a.id);
-              const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
-              setDismissedNotifIds(allIds);
-              localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
               setIsNotificationsOpen(false);
             }}
           />
@@ -2131,11 +2125,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
               </div>
               <button
                 onClick={() => {
-                  const notifIds = societyNotifications.map(n => n.id);
-                  const annIds = announcements.map(a => a.id);
-                  const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
-                  setDismissedNotifIds(allIds);
-                  localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
                   setIsNotificationsOpen(false);
                 }}
                 className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition cursor-pointer"
@@ -2287,12 +2276,6 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
             <div className="p-4 border-t border-slate-100 bg-slate-50 text-center">
               <button
                 onClick={() => {
-                  // Auto-dismiss all society notifications and announcements when closing
-                  const notifIds = societyNotifications.map(n => n.id);
-                  const annIds = announcements.map(a => a.id);
-                  const allIds = Array.from(new Set([...notifIds, ...annIds, ...dismissedNotifIds]));
-                  setDismissedNotifIds(allIds);
-                  localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
                   setIsNotificationsOpen(false);
                 }}
                 className="text-indigo-600 hover:text-indigo-700 font-sans font-extrabold text-xs uppercase tracking-wider transition cursor-pointer select-none"

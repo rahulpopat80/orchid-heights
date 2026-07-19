@@ -64,10 +64,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         }
 
         // Strict IP-based Device ID
-        let deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
+        let deviceId = localStorage.getItem(`orchid_device_uuid`);
         if (!deviceId) {
-          deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
-          localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
+          deviceId = `dev_${Math.random().toString(36).substring(2, 11)}_${Date.now()}`;
+          localStorage.setItem(`orchid_device_uuid`, deviceId);
         }
 
         let imei = localStorage.getItem(`orchid_device_imei_${flatKey}`);

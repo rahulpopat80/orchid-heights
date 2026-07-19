@@ -278,8 +278,15 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Flat: ${log.flatId} (${sanitizeText(displayName)})`, textX, currY);
+      doc.text(`Flat: ${log.flatId} (${sanitizeText(ownerName)})`, textX, currY);
       
+      if (log.memberName) {
+        currY += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Member: ${sanitizeText(log.memberName)}`, textX, currY);
+        doc.setFont('helvetica', 'normal');
+      }
+
       currY += 6;
       doc.text(`Duration: ${log.durationMinutes ? log.durationMinutes + ' mins' : 'In Progress'}`, textX, currY);
 

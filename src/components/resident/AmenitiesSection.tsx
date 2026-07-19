@@ -501,8 +501,13 @@ export default function AmenitiesSection({
                   <div key={log.id} className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-[11px] gap-3">
                     <div className="text-left min-w-0 flex-1">
                       <p className="font-bold text-slate-800 uppercase text-[10px] truncate">
-                        {log.amenity === 'Gym' ? '🏋️ Gym' : '🎭 Theatre'} ({log.flatId}) {log.memberName && <span className="text-indigo-600 ml-1 font-black">[{log.memberName}]</span>}
+                        {log.amenity === 'Gym' ? '🏋️ Gym' : '🎭 Theatre'} ({log.flatId})
                       </p>
+                      {log.memberName && (
+                        <p className="text-[10px] font-bold text-indigo-700 mt-0.5">
+                          Member: {log.memberName}
+                        </p>
+                      )}
                       {log.memberPhone && (
                         <p className="text-[9px] text-indigo-600 font-bold truncate">
                           Phone: {log.memberPhone}

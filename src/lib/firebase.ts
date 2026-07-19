@@ -809,10 +809,7 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
       
       // Strict matching by Phone Number as requested by user (1 Number = 1 Device)
       // Filter out ALL existing entries with the same phoneNumber or deviceId to clean up any past duplicates
-      const filteredDevices = currentDevices.filter(d => 
-        d.deviceId !== device.deviceId && 
-        !(d.phoneNumber && device.phoneNumber && d.phoneNumber === device.phoneNumber)
-      );
+      const filteredDevices = currentDevices.filter(d => d.deviceId !== device.deviceId);
       
       const newDevice = { ...device, lastLogin: new Date().toISOString() };
       filteredDevices.push(newDevice);
@@ -1352,7 +1349,11 @@ export function subscribeToAnnouncements(wing: 'A' | 'B', flatNo: number, onUpda
 export function subscribeToSocietyNotifications(wing: string, flatNo: number, onUpdate: (notifications: any[]) => void) {
   const getFiltered = () => {
     const list = fallback.getLocalSocietyNotifications();
-    const filtered = list.filter(data => data.type !== 'visitor' || (data.wing.toUpperCase() === wing.toUpperCase() && Number(data.flatNo) === Number(flatNo)));
+    const filtered = list.filter(data => {
+      const isGlobal = !data.wing || Number(data.flatNo) === 0;
+      const isMine = data.wing && data.flatNo && data.wing.toUpperCase() === wing.toUpperCase() && Number(data.flatNo) === Number(flatNo);
+      return isGlobal || isMine;
+    });
     filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     return filtered;
   };
@@ -1368,7 +1369,9 @@ export function subscribeToSocietyNotifications(wing: string, flatNo: number, on
       const list: any[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        if (data.type !== 'visitor' || (data.wing.toUpperCase() === wing.toUpperCase() && Number(data.flatNo) === Number(flatNo))) {
+        const isGlobal = !data.wing || Number(data.flatNo) === 0;
+        const isMine = data.wing && data.flatNo && data.wing.toUpperCase() === wing.toUpperCase() && Number(data.flatNo) === Number(flatNo);
+        if (isGlobal || isMine) {
           list.push(data);
         }
       });
