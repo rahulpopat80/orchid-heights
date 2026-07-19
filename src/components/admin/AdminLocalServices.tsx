@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from '../../lib/firebase';
 import { DailyHelper } from '../../types';
 import { Plus, X, Edit2, Trash2, Camera, Search, User } from 'lucide-react';
-import { compressImage } from '../../lib/imageUtils';
+import { compressImage } from '../../lib/imageCompressor';
 
 export default function AdminLocalServices() {
   const [helpers, setHelpers] = useState<DailyHelper[]>([]);

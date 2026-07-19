@@ -14,7 +14,8 @@ import { FlatOwner, Announcement, Complaint, FinancialReport, EssentialContact, 
 import { api } from '../lib/api';
 import { db, collection, doc, query, onSnapshot, orderBy, updateDoc, deleteDoc } from '../lib/firebase';
 import AdminVisitorRecords from './admin/AdminVisitorRecords';
-import { generateGymTheatrePDF } from '../lib/pdfGenerator';
+import { generateGymTheatrePDF, generateAmenityPDF } from '../lib/pdfGenerator';
+import AdminLocalServices from './admin/AdminLocalServices';
 
 interface AdminDashboardProps {
   owners: FlatOwner[];
@@ -558,6 +559,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     } catch (err) {
       alert('Error checking out resident.');
     }
+  };
+
+  const handleDownloadAmenitiesPDF = async () => {
+    if (amenityBookings.length === 0) {
+      alert('No amenities logs to export.');
+      return;
+    }
+    await generateAmenityPDF(amenityBookings, "SOCIETY AMENITIES AUDIT", "All Function Hall Booking Records", true);
   };
 
   const handleDownloadGymTheatreLogsCSV = () => {
@@ -1173,7 +1182,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             { id: 'finance', label: 'Financial Ledger', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
             { id: 'amenities', label: 'Amenities', icon: Sparkles, color: 'text-purple-600', bg: 'bg-purple-50' },
             { id: 'system', label: 'System Utils', icon: Database, color: 'text-slate-600', bg: 'bg-slate-50' },
-            { id: 'visitors', label: 'Visitor Gate Records', icon: ShieldCheck, color: 'text-teal-600', bg: 'bg-teal-50' }
+            { id: 'visitors', label: 'Visitor Gate Records', icon: ShieldCheck, color: 'text-teal-600', bg: 'bg-teal-50' },
+            { id: 'local-services', label: 'Local Services', icon: Grid, color: 'text-amber-600', bg: 'bg-amber-50' }
           ].map((block) => {
             const Icon = block.icon;
             return (
@@ -1240,55 +1250,57 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
               {/* Inline Owner Editor Dialog (inside directory) */}
               {editOwner && (
-                <div className="mb-6 bg-indigo-50/50 border border-indigo-200 p-4 md:p-5 rounded-2xl space-y-4">
-                  <div className="flex justify-between items-center border-b border-indigo-100 pb-2">
-                    <h4 className="font-display font-bold text-sm text-indigo-900">
-                      ✏️ Edit Owner details: {editOwner.wing}-{editOwner.flatNo}
-                    </h4>
-                    <button onClick={() => setEditOwner(null)} className="text-slate-400 hover:text-slate-600 p-1">
-                      <X className="w-4 h-4" />
-                    </button></div>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+                  <div className="mb-6 bg-indigo-50/50 border border-indigo-200 p-4 md:p-5 rounded-2xl space-y-4 w-full max-w-lg shadow-xl relative animate-fadeIn">
+                    <div className="flex justify-between items-center border-b border-indigo-100 pb-2">
+                      <h4 className="font-display font-bold text-sm text-indigo-900">
+                        ✏️ Edit Owner details: {editOwner.wing}-{editOwner.flatNo}
+                      </h4>
+                      <button onClick={() => setEditOwner(null)} className="text-slate-400 hover:text-slate-600 p-1">
+                        <X className="w-5 h-5" />
+                      </button></div>
 
-                  {editError && <p className="bg-red-50 text-red-700 p-2 rounded text-xs">{editError}</p>}
-                  {editSuccess && <p className="bg-emerald-50 text-emerald-700 p-2 rounded text-xs">{editSuccess}</p>}
+                    {editError && <p className="bg-red-50 text-red-700 p-2 rounded text-xs">{editError}</p>}
+                    {editSuccess && <p className="bg-emerald-50 text-emerald-700 p-2 rounded text-xs">{editSuccess}</p>}
 
-                  <form onSubmit={handleSaveOwnerEdit} className="space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (English)</label>
-                        <input
-                          type="text" required placeholder="Owner English Name"
-                          value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500 uppercase"
-                        /></div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (Gujarati)</label>
-                        <input
-                          type="text" placeholder="નામ ગુજરાતીમાં"
-                          value={editNameGu} onChange={(e) => setEditNameGu(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        /></div></div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Phone</label>
-                        <input
-                          type="tel" placeholder="10-digit primary"
-                          value={editPhone} onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        /></div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alt Contact</label>
-                        <input
-                          type="tel" placeholder="Alternate phone"
-                          value={editSecondary} onChange={(e) => setEditSecondary(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        /></div></div>
-                    <div className="flex gap-2 justify-end pt-2">
-                      <button type="submit" disabled={editLoading} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">
-                        {editLoading ? 'Saving...' : 'Save Owner'}
-                      </button>
-                      <button type="button" onClick={() => setEditOwner(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button></div>
-                  </form></div>
+                    <form onSubmit={handleSaveOwnerEdit} className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (English)</label>
+                          <input
+                            type="text" required placeholder="Owner English Name"
+                            value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500 uppercase"
+                          /></div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (Gujarati)</label>
+                          <input
+                            type="text" placeholder="નામ ગુજરાતીમાં"
+                            value={editNameGu} onChange={(e) => setEditNameGu(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
+                          /></div></div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Phone</label>
+                          <input
+                            type="tel" placeholder="10-digit primary"
+                            value={editPhone} onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
+                          /></div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alt Contact</label>
+                          <input
+                            type="tel" placeholder="Alternate phone"
+                            value={editSecondary} onChange={(e) => setEditSecondary(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
+                          /></div></div>
+                      <div className="flex gap-2 justify-end pt-2 border-t border-indigo-100">
+                        <button type="submit" disabled={editLoading} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">
+                          {editLoading ? 'Saving...' : 'Save Owner'}
+                        </button>
+                        <button type="button" onClick={() => setEditOwner(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button></div>
+                    </form></div>
+                </div>
               )}
 
               {/* Master directory table */}
@@ -1562,7 +1574,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
             {noticeSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>{noticeSuccess}</span></div>
             )}
 
@@ -2450,13 +2462,23 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   <h3 className="font-display font-black text-base text-slate-800">Amenities & Bookings Master Auditor</h3>
                   <p className="text-xs text-slate-400">Force approve function halls, audit live Gym / Theatre entries, and download audit sheets.</p></div></div>
 
-              <button
-                onClick={handleDownloadGymTheatreLogsCSV}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow transition cursor-pointer self-start md:self-auto shrink-0 animate-fadeIn"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export Gym & Theatre Logs (CSV)</span>
-              </button></div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDownloadAmenitiesPDF}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow transition cursor-pointer self-start md:self-auto shrink-0 animate-fadeIn"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Amenities Logs (PDF)</span>
+                </button>
+                <button
+                  onClick={handleDownloadGymTheatreLogsCSV}
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow transition cursor-pointer self-start md:self-auto shrink-0 animate-fadeIn"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Gym & Theatre Logs (CSV)</span>
+                </button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               

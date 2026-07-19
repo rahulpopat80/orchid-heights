@@ -784,15 +784,13 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
     if (ownerSnap.exists()) {
       const ownerData = ownerSnap.data() as FlatOwner;
       const currentDevices = ownerData.devices || [];
-      let existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
       
-      // Fallback matching by fingerprint to avoid duplicate clutter on Incognito logins
+      // Strict matching by IP Address as requested by user (1 IP = 1 Device)
+      let existingIdx = currentDevices.findIndex((d) => d.ipAddress === device.ipAddress);
+      
+      // Fallback matching by deviceId if IP somehow doesn't exist
       if (existingIdx === -1) {
-        existingIdx = currentDevices.findIndex((d) => 
-          d.os === device.os && 
-          d.browser === device.browser && 
-          d.userAgent === device.userAgent
-        );
+        existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
       }
 
       if (existingIdx > -1) {
