@@ -356,6 +356,15 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             status: 'pending'
           });
 
+          // Dispatch society-wide notification log for auditing
+          api.createSocietyNotification({
+            type: 'visitor_request',
+            title: `🛡️ Gate Entry Request: ${guestType}`,
+            message: `${fullName} requested entry to Flat ${targetWing}-${targetFlatNo}. Awaiting approval.`,
+            wing: targetWing,
+            flatNo: targetFlatNo
+          }).catch(err => console.warn('Failed to log visitor society notification:', err));
+
           // 🔔 Send FCM push to ALL devices of this flat immediately
           // This is what makes notification arrive even when app is closed
           sendFCMPushToFlat(targetWing, targetFlatNo, {

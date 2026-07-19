@@ -387,8 +387,8 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
             const isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
 
             // Check if phone number is already active elsewhere
-            if (payload.phoneNumber && !isRegistered) {
-              const isPhoneActiveElsewhere = currentDevices.some((d) => d.phoneNumber === payload.phoneNumber);
+            if (payload.phoneNumber) {
+              const isPhoneActiveElsewhere = currentDevices.some((d) => d.phoneNumber === payload.phoneNumber && d.deviceId !== device.deviceId);
               if (isPhoneActiveElsewhere) {
                 return {
                   success: false,

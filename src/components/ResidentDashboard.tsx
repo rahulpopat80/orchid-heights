@@ -768,9 +768,18 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           const targetWing = parts[0];
           const targetFlatNo = parseInt(parts[1], 10);
           if (targetWing && !isNaN(targetFlatNo)) {
+            api.createSocietyNotification({
+              type: 'absence_redirection',
+              title: `📦 Delivery Redirection Assigned`,
+              message: `Flat ${flatId} has assigned your flat for delivery redirection from ${absDateFrom} to ${absDateTo}.`,
+              wing: targetWing,
+              flatNo: targetFlatNo
+            }).catch(err => console.warn('Failed to push absence redirect notif:', err));
+
             sendFCMPushToFlat(targetWing, targetFlatNo, {
               title: `📦 Delivery Redirection Assigned`,
               body: `Flat ${flatId} has assigned your flat (${formattedTarget}) for delivery redirection from ${absDateFrom} to ${absDateTo}.`,
+              icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
               data: { type: 'absence_redirection', fromFlat: flatId }
             }).catch((err) => console.warn('Failed to send redirection notification:', err));
           }
@@ -1793,20 +1802,19 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                     </div>
 
                     {(() => {
-                      const twoWeeksAgo = new Date();
-                      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+                      const fifteenDaysAgo = new Date();
+                      fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
 
                       const filteredNotifs = societyNotifications.filter((n) => {
-                        if (dismissedNotifIds.includes(n.id)) return false;
                         const notifTime = n.timestamp ? new Date(n.timestamp).getTime() : Date.now();
-                        return notifTime >= twoWeeksAgo.getTime();
+                        return notifTime >= fifteenDaysAgo.getTime();
                       });
 
                       if (filteredNotifs.length === 0) {
                         return (
                           <div className="py-12 border border-dashed border-slate-200 rounded-2xl text-center text-slate-400 bg-slate-50/20">
                             <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2 animate-pulse" />
-                            <p className="text-xs font-bold text-slate-500">No notifications registered in the last 14 days.</p>
+                            <p className="text-xs font-bold text-slate-500">No notifications registered in the last 15 days.</p>
                           </div>
                         );
                       }

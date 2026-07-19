@@ -233,6 +233,7 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       const log = logs[currentLogIndex];
       const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.flatId);
       const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
+      const displayName = log.memberName ? `${ownerName} [${log.memberName}]` : ownerName;
 
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(226, 232, 240);
@@ -277,7 +278,7 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Flat: ${log.flatId} (${sanitizeText(ownerName)})`, textX, currY);
+      doc.text(`Flat: ${log.flatId} (${sanitizeText(displayName)})`, textX, currY);
       
       currY += 6;
       doc.text(`Duration: ${log.durationMinutes ? log.durationMinutes + ' mins' : 'In Progress'}`, textX, currY);

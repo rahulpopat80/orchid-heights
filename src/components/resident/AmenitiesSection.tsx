@@ -501,11 +501,11 @@ export default function AmenitiesSection({
                   <div key={log.id} className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-[11px] gap-3">
                     <div className="text-left min-w-0 flex-1">
                       <p className="font-bold text-slate-800 uppercase text-[10px] truncate">
-                        {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'} ({log.flatId})
+                        {log.amenity === 'Gym' ? '🏋️ Gym' : '🎭 Theatre'} ({log.flatId}) {log.memberName && <span className="text-indigo-600 ml-1 font-black">[{log.memberName}]</span>}
                       </p>
-                      {(log.memberName || log.memberPhone) && (
+                      {log.memberPhone && (
                         <p className="text-[9px] text-indigo-600 font-bold truncate">
-                          {log.memberName || 'Member'} • {log.memberPhone}
+                          Phone: {log.memberPhone}
                         </p>
                       )}
                       <p className="text-[8px] text-slate-400 font-mono mt-0.5">
@@ -555,17 +555,6 @@ export default function AmenitiesSection({
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <div className="flex items-center gap-2">
-              {role === 'admin' && (
-                <>
-                  <button
-                    onClick={handleDownloadMoviesPDF}
-                    className="px-2.5 py-1 border border-rose-200 hover:border-rose-300 rounded-xl text-[9px] font-black uppercase text-rose-600 transition flex items-center gap-1 cursor-pointer select-none bg-rose-50"
-                  >
-                    <FileText className="w-3 h-3" />
-                    <span>PDF</span>
-                  </button>
-                </>
-              )}
               <button
                 onClick={() => setShowAddMovieForm(!showAddMovieForm)}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase transition flex items-center gap-1 cursor-pointer select-none shadow-xs"

@@ -254,7 +254,7 @@ export default function HelpDeskSection({
 
       {/* ==================== SCREEN: SOCIETY NOTICES ==================== */}
       {activeSub === 'notices' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+        <motion.div key="notices" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
@@ -354,7 +354,7 @@ export default function HelpDeskSection({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: RESOLUTION TICKET BOARD ==================== */}
@@ -500,7 +500,7 @@ export default function HelpDeskSection({
 
               {loadingComplaints ? (
                 <div className="py-8 text-center text-slate-400">Loading tickets...</div>
-              ) : complaints.filter(c => c.wing === wing && c.flatNo === flatNo).length === 0 ? (
+              ) : complaints.filter(c => c.wing?.toUpperCase() === wing?.toString().toUpperCase() && c.flatNo == flatNo).length === 0 ? (
                 <div className="py-12 text-center text-slate-400 border border-dashed rounded-xl bg-slate-50/20">
                   <ClipboardList className="w-8 h-8 text-slate-200 mx-auto mb-2" />
                   <p className="text-xs">You have not filed any tickets yet.</p>
@@ -508,7 +508,7 @@ export default function HelpDeskSection({
               ) : (
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 text-xs">
                   {complaints
-                    .filter((c) => c.wing === wing && c.flatNo === flatNo)
+                    .filter((c) => c.wing?.toUpperCase() === wing?.toString().toUpperCase() && c.flatNo == flatNo)
                     .map((item) => (
                       <div key={item.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-slate-50 transition space-y-3">
                         <div className="flex justify-between items-start">
@@ -575,7 +575,7 @@ export default function HelpDeskSection({
 
       {/* ==================== SCREEN: FINANCIAL STATEMENT LEDGER ==================== */}
       {activeSub === 'financials' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+        <motion.div key="financials" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
@@ -656,7 +656,7 @@ export default function HelpDeskSection({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
       </AnimatePresence>
     </div>
