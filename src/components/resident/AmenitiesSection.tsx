@@ -298,30 +298,6 @@ export default function AmenitiesSection({
     }
   };
 
-  const handleDownloadMoviesCSV = () => {
-    if (movies.length === 0) {
-      alert('No movie screening schedules available.');
-      return;
-    }
-    let csvContent = `Orchid Heights Mini Theatre - Movie Schedule Report\r\n`;
-    csvContent += `Generated On,${new Date().toLocaleString('en-IN')}\r\n\r\n`;
-    csvContent += `"Movie Name","Rating","Genre","Day","Date","Timing","Length / Duration","Synopsis","Trailer Link"\r\n`;
-
-    movies.forEach((movie) => {
-      const synopsisClean = (movie.synopsis || '').replace(/"/g, '""');
-      csvContent += `"${movie.title}","${movie.rating}","${movie.genre}","${movie.day}","${movie.date}","${movie.timing}","${movie.length || 'N/A'}","${synopsisClean}","${movie.trailerUrl || 'N/A'}"\r\n`;
-    });
-
-    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `Mini_Theatre_Movie_Schedule_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   // Find if currently checked in to Gym or Theatre
   const activeGym = gymTheatreLogs.find(l => l.flatId === myFlatId && l.amenity === 'Gym' && !l.checkOutTime);
   const activeTheatre = gymTheatreLogs.find(l => l.flatId === myFlatId && l.amenity === 'Theatre' && !l.checkOutTime);
@@ -332,12 +308,12 @@ export default function AmenitiesSection({
 
   const filteredBookings = amenityBookings.filter(b => {
     const dateLimit = b.createdAt ? new Date(b.createdAt) : new Date();
-    return dateLimit.getTime() >= oneMonthAgo.getTime();
+    return b.flatId === myFlatId && dateLimit.getTime() >= oneMonthAgo.getTime();
   });
 
   const filteredLogs = gymTheatreLogs.filter(l => {
     const dateLimit = l.createdAt ? new Date(l.createdAt) : new Date();
-    return dateLimit.getTime() >= oneMonthAgo.getTime();
+    return l.flatId === myFlatId && dateLimit.getTime() >= oneMonthAgo.getTime();
   });
 
   return (
@@ -527,6 +503,11 @@ export default function AmenitiesSection({
                       <p className="font-bold text-slate-800 uppercase text-[10px] truncate">
                         {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'} ({log.flatId})
                       </p>
+                      {(log.memberName || log.memberPhone) && (
+                        <p className="text-[9px] text-indigo-600 font-bold truncate">
+                          {log.memberName || 'Member'} • {log.memberPhone}
+                        </p>
+                      )}
                       <p className="text-[8px] text-slate-400 font-mono mt-0.5">
                         In: {new Date(log.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} 
                         {log.checkOutTime && ` • Out: ${new Date(log.checkOutTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`}
@@ -576,13 +557,6 @@ export default function AmenitiesSection({
             <div className="flex items-center gap-2">
               {role === 'admin' && (
                 <>
-                  <button
-                    onClick={handleDownloadMoviesCSV}
-                    className="px-2.5 py-1 border border-slate-200 hover:border-slate-300 rounded-xl text-[9px] font-black uppercase text-slate-600 transition flex items-center gap-1 cursor-pointer select-none bg-white"
-                  >
-                    <Download className="w-3 h-3" />
-                    <span>CSV</span>
-                  </button>
                   <button
                     onClick={handleDownloadMoviesPDF}
                     className="px-2.5 py-1 border border-rose-200 hover:border-rose-300 rounded-xl text-[9px] font-black uppercase text-rose-600 transition flex items-center gap-1 cursor-pointer select-none bg-rose-50"

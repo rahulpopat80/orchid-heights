@@ -384,16 +384,7 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
           const currentDevices = ownerData.devices || [];
           const device = payload.device;
           if (device && device.deviceId) {
-            let isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
-            
-            // Match by fingerprint too to prevent duplicate blocks for same browser/IP
-            if (!isRegistered) {
-              isRegistered = currentDevices.some((d) => 
-                d.os === device.os && 
-                d.browser === device.browser && 
-                d.userAgent === device.userAgent
-              );
-            }
+            const isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
 
             // Check if phone number is already active elsewhere
             if (payload.phoneNumber && !isRegistered) {
@@ -408,7 +399,7 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
               }
             }
 
-            const maxDevices = Math.min(5, 1 + (ownerData.members?.length || 0));
+            const maxDevices = 1 + (ownerData.members?.length || 0);
             if (!isRegistered && currentDevices.length >= maxDevices) {
               return {
                 success: false,

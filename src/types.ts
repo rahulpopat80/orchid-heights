@@ -143,6 +143,8 @@ export interface GymTheatreLog {
   id: string;
   flatId: string;
   amenity: 'Gym' | 'Theatre';
+  memberName?: string;
+  memberPhone?: string;
   checkInTime: string;
   checkOutTime?: string;
   exitPhotoUrl?: string;

@@ -315,8 +315,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     const qBookings = query(collection(db, 'amenities_bookings'), orderBy('createdAt', 'desc'));
     const unsubBookings = onSnapshot(qBookings, (snapshot) => {
       const list: AmenityBooking[] = [];
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      
       snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() } as AmenityBooking);
+        const data = doc.data() as AmenityBooking;
+        if (new Date(data.createdAt || data.dateFrom || new Date().toISOString()) >= oneMonthAgo) {
+          list.push({ id: doc.id, ...data });
+        }
       });
       setAmenityBookings(list);
     }, (error) => console.error('Error listening to bookings:', error));
@@ -325,8 +331,14 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     const qLogs = query(collection(db, 'gym_theatre_logs'), orderBy('createdAt', 'desc'));
     const unsubLogs = onSnapshot(qLogs, (snapshot) => {
       const list: GymTheatreLog[] = [];
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      
       snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() } as GymTheatreLog);
+        const data = doc.data() as GymTheatreLog;
+        if (new Date(data.createdAt || data.checkInTime || new Date().toISOString()) >= oneMonthAgo) {
+          list.push({ id: doc.id, ...data });
+        }
       });
       setGymTheatreLogs(list);
     }, (error) => console.error('Error listening to logs:', error));
@@ -582,6 +594,8 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     const payload: Omit<GymTheatreLog, 'id'> = {
       flatId,
       amenity,
+      memberName: session.ownerName,
+      memberPhone: session.phone,
       checkInTime: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };

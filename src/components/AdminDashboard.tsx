@@ -75,8 +75,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     const qBookings = query(collection(db, 'amenities_bookings'), orderBy('createdAt', 'desc'));
     const unsubBookings = onSnapshot(qBookings, (snapshot) => {
       const list: AmenityBooking[] = [];
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      
       snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() } as AmenityBooking);
+        const data = doc.data() as AmenityBooking;
+        if (new Date(data.createdAt || data.dateFrom || new Date().toISOString()) >= threeMonthsAgo) {
+          list.push({ id: doc.id, ...data });
+        }
       });
       setAmenityBookings(list);
     }, (error) => console.error('Admin listening bookings error:', error));
@@ -84,8 +90,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     const qLogs = query(collection(db, 'gym_theatre_logs'), orderBy('createdAt', 'desc'));
     const unsubLogs = onSnapshot(qLogs, (snapshot) => {
       const list: GymTheatreLog[] = [];
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      
       snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() } as GymTheatreLog);
+        const data = doc.data() as GymTheatreLog;
+        if (new Date(data.createdAt || data.checkInTime || new Date().toISOString()) >= threeMonthsAgo) {
+          list.push({ id: doc.id, ...data });
+        }
       });
       setGymTheatreLogs(list);
     }, (error) => console.error('Admin listening logs error:', error));
@@ -93,8 +105,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     const qMovies = query(collection(db, 'movies_schedule'), orderBy('createdAt', 'desc'));
     const unsubMovies = onSnapshot(qMovies, (snapshot) => {
       const list: any[] = [];
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      
       snapshot.forEach((doc) => {
-        list.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        if (new Date(data.createdAt || data.date || new Date().toISOString()) >= threeMonthsAgo) {
+          list.push({ id: doc.id, ...data });
+        }
       });
       setMoviesSchedule(list);
     }, (error) => console.error('Admin listening movies error:', error));
@@ -2561,6 +2579,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'}
                             </p>
                             <p className="font-semibold text-slate-700">Flat: {log.flatId}</p>
+                            {(log.memberName || log.memberPhone) && (
+                              <p className="text-[10px] text-indigo-700 font-bold">
+                                {log.memberName || 'Member'} • {log.memberPhone}
+                              </p>
+                            )}
                             <p className="text-[10px] text-slate-400 font-mono">In: {new Date(log.checkInTime).toLocaleTimeString('en-IN')}</p></div>
                           <button
                             onClick={() => handleAdminCheckOutLog(log.id)}
@@ -2589,6 +2612,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <p className="font-bold text-slate-800 uppercase">
                               {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'} ({log.flatId})
                             </p>
+                            {(log.memberName || log.memberPhone) && (
+                              <p className="text-[10px] text-indigo-600 font-bold truncate">
+                                {log.memberName || 'Member'} • {log.memberPhone}
+                              </p>
+                            )}
                             <p className="text-[9px] text-slate-400 font-mono">
                               In: {new Date(log.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • Out: {new Date(log.checkOutTime!).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                             </p>
@@ -2629,33 +2657,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         <Download className="w-3 h-3" />
                         <span>Export PDF</span>
                       </button>
-                      <button
-                        onClick={() => {
-                          if (moviesSchedule.length === 0) {
-                            alert('No movies posted.');
-                            return;
-                          }
-                          let csvContent = `Orchid Heights - Movie Screenings Report\r\n`;
-                          csvContent += `Generated On,${new Date().toLocaleString('en-IN')}\r\n\r\n`;
-                          csvContent += `"Movie Name","Date","Day","Timing","Length","Trailer Link"\r\n`;
-                          moviesSchedule.forEach((movie) => {
-                            csvContent += `"${movie.title}","${movie.date}","${movie.day}","${movie.timing}","${movie.length || 'N/A'}","${movie.trailerUrl || 'N/A'}"\r\n`;
-                          });
-                          const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-                          const url = URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.setAttribute('href', url);
-                          link.setAttribute('download', `Movie_Schedule_${new Date().toISOString().slice(0,10)}.csv`);
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                        }}
-                        className="text-[10px] text-indigo-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
-                      >
-                        <Download className="w-3 h-3" />
-                        <span>Export CSV</span>
-                      </button>
-                    </div></div>
+                      </div></div>
 
                   {moviesSchedule.length === 0 ? (
                     <div className="py-8 text-center text-slate-400 italic text-xs font-semibold">
