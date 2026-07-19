@@ -85,7 +85,7 @@ export default function AdminLocalServices() {
     }
   };
 
-  const filtered = helpers.filter(h => h.name.toLowerCase().includes(search.toLowerCase()) || h.phone.includes(search) || h.role.toLowerCase().includes(search.toLowerCase()));
+  const filtered = helpers.filter(h => (h.name || '').toLowerCase().includes(search.toLowerCase()) || (h.phone || '').includes(search) || (h.role || '').toLowerCase().includes(search.toLowerCase()));
 
   if (loading) return <div className="p-8 text-center text-slate-500 font-bold">Loading Providers...</div>;
 
@@ -232,3 +232,4 @@ export default function AdminLocalServices() {
     </div>
   );
 }
+

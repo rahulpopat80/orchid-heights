@@ -14,7 +14,7 @@ import { FlatOwner, Announcement, Complaint, FinancialReport, EssentialContact, 
 import { api } from '../lib/api';
 import { db, collection, doc, query, onSnapshot, orderBy, updateDoc, deleteDoc } from '../lib/firebase';
 import AdminVisitorRecords from './admin/AdminVisitorRecords';
-import { generateGymTheatrePDF } from '../lib/pdfGenerator';
+import { generateGymTheatrePDF, generateAmenityPDF, generateMoviePDF } from '../lib/pdfGenerator';
 
 interface AdminDashboardProps {
   owners: FlatOwner[];
@@ -4409,6 +4409,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     </div>
   );
 }
+
+
 
 
 

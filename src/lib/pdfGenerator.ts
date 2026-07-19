@@ -497,3 +497,4 @@ export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, 
 
   doc.save(`Orchid_Heights_Amenities_${new Date().getTime()}.pdf`);
 };
+

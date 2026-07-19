@@ -4,11 +4,14 @@ import { api } from '../../lib/api';
 import { generateVisitorPDF } from '../../lib/pdfGenerator';
 import { Visitor } from '../../types';
 
+import { FlatOwner } from '../../types';
+
 interface AdminVisitorRecordsProps {
   onBack: () => void;
+  owners?: FlatOwner[];
 }
 
-export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps) {
+export default function AdminVisitorRecords({ onBack, owners = [] }: AdminVisitorRecordsProps) {
   const [filterTime, setFilterTime] = useState<'today' | '1m' | '2m' | 'all'>('today');
   const [filterWing, setFilterWing] = useState<'ALL' | 'A' | 'B'>('ALL');
   const [filterFlatNo, setFilterFlatNo] = useState<string>('');
@@ -191,3 +194,4 @@ export default function AdminVisitorRecords({ onBack }: AdminVisitorRecordsProps
     </div>
   );
 }
+

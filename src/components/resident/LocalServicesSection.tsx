@@ -293,7 +293,7 @@ export default function LocalServicesSection({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1">
             {dailyHelpers.map((helper) => {
               const isAssigned = helper.flats?.includes(myFlatId) || false;
-              const cleanName = helper.name.replace(/\s*\([^)]*\)\s*/gi, '').trim();
+              const cleanName = (helper.name || '').replace(/\s*\([^)]*\)\s*/gi, '').trim();
 
               return (
                 <div
@@ -395,5 +395,6 @@ export default function LocalServicesSection({
     </div>
   );
 }
+
 
 
