@@ -11,6 +11,8 @@ import {
   LogOut, Mail, Clock, ShieldAlert, FileSpreadsheet, Dumbbell, Sparkles, Film, CheckSquare, Calendar, ArrowLeft, Grid
 } from 'lucide-react';
 import { FlatOwner, Announcement, Complaint, FinancialReport, EssentialContact, Visitor, AmenityBooking, GymTheatreLog } from '../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../lib/api';
 import { db, collection, doc, query, onSnapshot, orderBy, updateDoc, deleteDoc } from '../lib/firebase';
 import AdminVisitorRecords from './admin/AdminVisitorRecords';
@@ -1198,6 +1200,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
       )}
 
       {/* TAB CONTENT GRID */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab + (localSubTab || '')}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 10 }}
+          transition={{ duration: 0.2 }}
+        >
       <div>
 
         {/* 1. FLATS & DEVICES DIRECTORY TAB */}
@@ -1496,24 +1506,33 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         </h4>
                         {selectedFlat.devices && selectedFlat.devices.length > 0 ? (
                           <div className="space-y-2">
-                            {selectedFlat.devices.map((device, index) => (
-                              <div key={device.deviceId || index} className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 flex justify-between items-start gap-4">
-                                <div className="text-xs text-slate-600 space-y-1 font-medium">
-                                  <p className="font-bold text-slate-800 flex items-center">
-                                    <span className="text-base mr-1">{device.os === 'Android' || device.os === 'iOS' ? '📱' : '💻'}</span>
-                                    <span>{device.os} • {device.browser}</span>
-                                  </p>
-                                  <p className="font-mono text-[10px]"><span className="text-slate-400">{(device.os === 'Android' || device.os === 'iOS') ? 'IMEI' : 'S/N'}:</span> {device.imei}</p>
-                                  <p className="font-mono text-[10px]"><span className="text-slate-400">IP:</span> {device.ipAddress}</p>
-                                  <p className="text-[10px] text-slate-400">Login: {new Date(device.lastLogin).toLocaleString('en-IN')}</p></div>
-                                <button
-                                  onClick={() => handleRemoteLogout(selectedFlat.wing, selectedFlat.flatNo, device.deviceId)}
-                                  className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border border-slate-200 hover:border-red-200 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-                                >
-                                  <LogOut className="w-3 h-3" />
-                                  <span>Log Out</span>
-                                </button></div>
-                            ))}</div>
+                            {selectedFlat.devices.map((device, index) => {
+                              const matchMember = selectedFlat.members?.find(m => m.phone === device.phoneNumber);
+                              const displayName = matchMember ? matchMember.name : (selectedFlat.phone === device.phoneNumber ? selectedFlat.nameEn : 'Unknown User');
+                              return (
+                                <div key={device.deviceId || index} className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 flex justify-between items-start gap-4">
+                                  <div className="text-xs text-slate-600 space-y-1 font-medium">
+                                    <p className="font-bold text-slate-800 flex items-center">
+                                      <span className="text-base mr-1">{device.os === 'Android' || device.os === 'iOS' ? '📱' : '💻'}</span>
+                                      <span>{displayName} <span className="text-slate-400 font-normal">({device.phoneNumber || 'No Number'})</span></span>
+                                    </p>
+                                    <p className="font-semibold text-[10px] text-indigo-600">
+                                      {device.os} • {device.browser}
+                                    </p>
+                                    <p className="font-mono text-[10px]"><span className="text-slate-400">{(device.os === 'Android' || device.os === 'iOS') ? 'IMEI' : 'S/N'}:</span> {device.imei}</p>
+                                    <p className="font-mono text-[10px]"><span className="text-slate-400">IP:</span> {device.ipAddress}</p>
+                                    <p className="text-[10px] text-slate-400">Login: {new Date(device.lastLogin).toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => handleRemoteLogout(selectedFlat.wing, selectedFlat.flatNo, device.deviceId)}
+                                    className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border border-slate-200 hover:border-red-200 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <LogOut className="w-3 h-3" />
+                                    <span>Log Out</span>
+                                  </button>
+                                </div>
+                              );
+                            })}</div>
                         ) : (
                           <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50 text-slate-400">
                             <p className="text-xs">No active devices registered for this flat.</p></div>
@@ -3043,6 +3062,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
         {activeTab === 'visitors' && (
           <AdminVisitorRecords onBack={() => window.location.hash = 'home'} owners={owners} />
         )}</div>
+        </motion.div>
+      </AnimatePresence>
 
     </div>
   );

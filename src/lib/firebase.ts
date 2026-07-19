@@ -395,6 +395,19 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
               );
             }
 
+            // Check if phone number is already active elsewhere
+            if (payload.phoneNumber && !isRegistered) {
+              const isPhoneActiveElsewhere = currentDevices.some((d) => d.phoneNumber === payload.phoneNumber);
+              if (isPhoneActiveElsewhere) {
+                return {
+                  success: false,
+                  code: 'DEVICE_LIMIT_EXCEEDED',
+                  devices: currentDevices,
+                  message: `The phone number ${payload.phoneNumber} is already logged in on another device. You must log out of the other device first.`
+                };
+              }
+            }
+
             const maxDevices = Math.min(5, 1 + (ownerData.members?.length || 0));
             if (!isRegistered && currentDevices.length >= maxDevices) {
               return {

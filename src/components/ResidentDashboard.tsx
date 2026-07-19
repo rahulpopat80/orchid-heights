@@ -6,6 +6,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, ShieldAlert, Check, X, Users, Car, Phone, Lock, Eye, EyeOff, ClipboardList, AlertCircle, Trash2, Plus, Clock, RefreshCw, Megaphone, FileText, Download, Search, Wrench, CheckCircle, Upload, Calendar, Home, User, Dumbbell, Film, Sparkles, BookOpen, MapPin, CheckSquare, PlusCircle, ChevronRight, ArrowLeft } from 'lucide-react';
 import { FlatOwner, Visitor, Vehicle, UserSession, Announcement, AmenityBooking, GymTheatreLog, DailyHelper, AbsenceLog, EssentialContact } from '../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { api, detectServerEnvironment } from '../lib/api';
 import { db, collection, doc, setDoc, addDoc, getDocs, onSnapshot, updateDoc, deleteDoc, query, where, orderBy, sendFCMPushToFlat } from '../lib/firebase';
 import { compressImage } from '../lib/imageCompressor';
@@ -126,6 +128,8 @@ interface ResidentDashboardProps {
 }
 
 export default function ResidentDashboard({ session, owners, onRefreshOwners }: ResidentDashboardProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { wing = 'A', flatNo = 101 } = session;
 
   // Active visitor request state
@@ -272,40 +276,34 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
   // Sync URL Path with activeSubSection and modal states
   useEffect(() => {
-    const handleLocationSync = () => {
-      const path = window.location.pathname;
+    const path = location.pathname;
 
-      if (path === '/gate-visitors') {
-        setActiveSubSection('visitors');
-      } else if (path === '/complaints') {
-        setActiveSubSection('complaints');
-      } else if (path === '/directory') {
-        setActiveSubSection('directory');
-      } else if (path === '/amenities' || path === '/amenities/gym-theatre' || path === '/amenities/movie' || path === '/amenities/booking') {
-        setActiveSubSection('amenity');
-      } else if (path === '/services' || path === '/services/local-services' || path === '/services/building-services') {
-        setActiveSubSection('services');
-      } else if (path === '/help-desk' || path === '/help-desk/noticies' || path === '/help-desk/financial-ledger') {
-        setActiveSubSection('helpdesk');
-      } else if (path === '/notifications-center') {
-        setActiveSubSection('notifications');
-      } else if (path === '/home' || path === '/') {
-        setActiveMainTab('community');
-        setActiveSubSection(null);
-      } else if (path === '/me') {
-        setActiveMainTab('personal');
-        setActiveSubSection(null);
-      }
-    };
-
-    handleLocationSync();
-    window.addEventListener('popstate', handleLocationSync);
-    return () => window.removeEventListener('popstate', handleLocationSync);
-  }, []);
+    if (path === '/gate-visitors') {
+      setActiveSubSection('visitors');
+    } else if (path === '/complaints') {
+      setActiveSubSection('complaints');
+    } else if (path === '/directory') {
+      setActiveSubSection('directory');
+    } else if (path === '/amenities' || path === '/amenities/gym-theatre' || path === '/amenities/movie' || path === '/amenities/booking') {
+      setActiveSubSection('amenity');
+    } else if (path === '/services' || path === '/services/local-services' || path === '/services/building-services') {
+      setActiveSubSection('services');
+    } else if (path === '/help-desk' || path === '/help-desk/noticies' || path === '/help-desk/financial-ledger') {
+      setActiveSubSection('helpdesk');
+    } else if (path === '/notifications-center') {
+      setActiveSubSection('notifications');
+    } else if (path === '/home' || path === '/') {
+      setActiveMainTab('community');
+      setActiveSubSection(null);
+    } else if (path === '/me') {
+      setActiveMainTab('personal');
+      setActiveSubSection(null);
+    }
+  }, [location.pathname]);
 
   const navigateToRoute = (path: string, subSec: string | null) => {
     setActiveSubSection(subSec);
-    window.history.pushState(null, '', path);
+    navigate(path);
   };
 
   // Load real-time persistent data for Amenities, Helpers, and Absences
@@ -1327,704 +1325,714 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
       )}
 
       {/* --- Main Routing --- */}
-      {activeMainTab === 'community' ? (
-        activeSubSection === null ? (
-          /* 6-Tile Bento Grid Dashboard matching the reference image layout */
-          <div className="space-y-6">
-            
-            {/* Active SOS Alerts Emergency Panel */}
-            {activeSosAlerts.length > 0 && (
-              <div className="bg-red-600 text-white p-5 rounded-3xl space-y-3 shadow-lg animate-pulse border-2 border-red-400 text-left">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <ShieldAlert className="w-5 h-5 animate-bounce shrink-0" />
-                    <h4 className="font-sans font-black text-sm uppercase tracking-wider">🚨 ACTIVE SOCIETY EMERGENCY (SOS)!</h4>
-                  </div>
-                  <button
-                    onClick={() => stopHighFrequencyAlarm()}
-                    className="bg-white/20 hover:bg-white/30 text-white font-sans font-extrabold px-3 py-1 rounded-xl text-[10px] uppercase select-none transition cursor-pointer"
-                  >
-                    Mute Sound
-                  </button>
-                </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeMainTab + (activeSubSection || 'main')}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {activeMainTab === 'community' ? (
+            activeSubSection === null ? (
+              /* 6-Tile Bento Grid Dashboard matching the reference image layout */
+              <div className="space-y-6">
                 
-                <div className="space-y-2.5">
-                  {activeSosAlerts.map((sos) => {
-                    const isMySos = sos.flatId === `${wing}-${flatNo}`;
-                    return (
-                      <div key={sos.id} className="bg-black/20 p-3 rounded-2xl flex items-center justify-between text-xs font-semibold">
-                        <div className="pr-2">
-                          <p className="text-white font-bold leading-normal">
-                            <span className="underline font-black">{sos.triggeredBy}</span> of Flat <span className="bg-white/20 px-1.5 py-0.5 rounded font-mono font-black">{sos.flatId}</span> is requesting immediate assistance!
-                          </p>
-                          <p className="text-[10px] text-white/75 mt-0.5 font-mono">
-                            Triggered: {new Date(sos.triggeredAt).toLocaleTimeString()}
-                          </p>
-                        </div>
-                        
-                        {isMySos ? (
-                          <button
-                            onClick={async () => {
-                              if (confirm("Are you sure you want to resolve and clear your SOS emergency alert?")) {
-                                try {
-                                  await updateDoc(doc(db, 'sos_alerts', sos.id), { status: 'resolved' });
-                                } catch (e) {
-                                  console.error('Failed to resolve SOS:', e);
-                                }
-                              }
-                            }}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-sans font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider transition-all select-none shrink-0"
-                          >
-                            I'm Safe
-                          </button>
-                        ) : (
-                          <a
-                            href="tel:+919999900000"
-                            className="bg-white text-red-600 hover:bg-red-50 font-sans font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider transition-all select-none shrink-0 text-center"
-                          >
-                            Call Guard
-                          </a>
-                        )}
+                {/* Active SOS Alerts Emergency Panel */}
+                {activeSosAlerts.length > 0 && (
+                  <div className="bg-red-600 text-white p-5 rounded-3xl space-y-3 shadow-lg animate-pulse border-2 border-red-400 text-left">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <ShieldAlert className="w-5 h-5 animate-bounce shrink-0" />
+                        <h4 className="font-sans font-black text-sm uppercase tracking-wider">🚨 ACTIVE SOCIETY EMERGENCY (SOS)!</h4>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            
-            {/* Active visitor alarm ringing banner */}
-            {isAlarmActive && (
-              <div className="bg-red-600 text-white p-4 rounded-2xl flex items-center justify-between animate-pulse shadow-md">
-                <p className="text-xs font-bold">🚨 ACTIVE VISITOR AWAITING ENTRY APPROVAL!</p>
-                <button
-                  onClick={() => stopHighFrequencyAlarm()}
-                  className="bg-white text-red-600 font-black px-4 py-1.5 rounded-xl text-[10px]"
-                >
-                  Silence Alarm
-                </button>
-              </div>
-            )}
-
-            {/* Quick alert bar for waiting visitors */}
-            {activePoll.length > 0 && (
-              <div className="bg-amber-500 text-slate-950 p-4 rounded-2xl flex items-center justify-between font-bold text-xs shadow-sm border border-amber-400">
-                <p>🚪 {activePoll.length} visitor(s) are waiting at the main security gate right now!</p>
-                <button
-                  onClick={() => setActiveSubSection('visitors')}
-                  className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider"
-                >
-                  Approve Entry
-                </button>
-              </div>
-            )}
-
-            {/* Grid of blocks formatted in responsive columns */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              
-              {/* Block 1: Gate Visitors */}
-              <div
-                id="block-visitors"
-                onClick={() => {
-                  setLastVisitedSubSection('visitors');
-                  navigateToRoute('/gate-visitors', 'visitors');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'visitors' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <Users className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Gate Visitors
-                </h4>
-              </div>
-
-              {/* Block 2: Complaint Box */}
-              <div
-                id="block-complaints"
-                onClick={() => {
-                  setLastVisitedSubSection('complaints');
-                  navigateToRoute('/complaints', 'complaints');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'complaints' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#EC4899] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <ClipboardList className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Complaint Box
-                </h4>
-              </div>
-
-              {/* Block 3: Resident Directory */}
-              <div
-                id="block-directory"
-                onClick={() => {
-                  setLastVisitedSubSection('directory');
-                  navigateToRoute('/directory', 'directory');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'directory' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <BookOpen className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Resident Directory
-                </h4>
-              </div>
-
-              {/* Block 4: Amenities Bookings */}
-              <div
-                id="block-amenity"
-                onClick={() => {
-                  setLastVisitedSubSection('amenity');
-                  navigateToRoute('/amenities', 'amenity');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'amenity' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <Sparkles className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Amenities Bookings
-                </h4>
-              </div>
-
-              {/* Block 5: Local Services */}
-              <div
-                id="block-services"
-                onClick={() => {
-                  setLastVisitedSubSection('services');
-                  navigateToRoute('/services', 'services');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'services' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#DB2777] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <Wrench className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Local Services
-                </h4>
-              </div>
-
-              {/* Block 6: Help & Financial */}
-              <div
-                id="block-helpdesk"
-                onClick={() => {
-                  setLastVisitedSubSection('helpdesk');
-                  navigateToRoute('/help-desk', 'helpdesk');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'helpdesk' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <FileText className="w-7 h-7" />
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Help & Financial
-                </h4>
-              </div>
-
-              {/* Block 7: Society Alerts & Logs */}
-              <div
-                id="block-notifications"
-                onClick={() => {
-                  setLastVisitedSubSection('notifications');
-                  navigateToRoute('/notifications-center', 'notifications');
-                }}
-                className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'notifications' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
-                }`}
-              >
-                <div className="w-14 h-14 rounded-none bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-sm relative mb-3 group-hover:scale-105 transition-transform duration-300">
-                  <Bell className="w-7 h-7" />
-                  {societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length > 0 && (
-                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-2 border-white bg-rose-600 rounded-none animate-ping" />
-                  )}
-                </div>
-                <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
-                  Society Alerts & Logs
-                </h4>
-              </div>
-
-            </div>
-          </div>
-        ) : (
-          /* Sub-section Detail Screen Pane with BACK button */
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => {
-                  setActiveSubSection(null);
-                  window.history.pushState(null, '', '/home');
-                }}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition cursor-pointer select-none border border-slate-200 shadow-sm"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to Dashboard</span>
-              </button>
-
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider hidden sm:block">Orchid Heights</span>
-                <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 shadow-xs flex items-center justify-center bg-white p-0.5">
-                  <img 
-                    src="https://i.ibb.co/zT5tpcdY/1000296229-1.png" 
-                    alt="Orchid Heights Logo" 
-                    className="w-full h-full object-contain"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {activeSubSection === 'visitors' && (
-              <VisitorsSection
-                wing={wing}
-                flatNo={flatNo}
-                activePoll={activePoll}
-                guestHistory={guestHistory}
-                loadingHistory={loadingHistory}
-                rejectingId={rejectingId}
-                setRejectingId={setRejectingId}
-                rejectReasonText={rejectReasonText}
-                setRejectReasonText={setRejectReasonText}
-                handleRespond={handleRespond}
-                handleDeleteHistoryRecord={handleDeleteHistoryRecord}
-                handleDownloadVisitorReport={handleDownloadVisitorReport}
-                isAlarmActive={isAlarmActive}
-                stopAlarm={stopHighFrequencyAlarm}
-              />
-            )}
-
-            {activeSubSection === 'directory' && (
-              <DirectorySection
-                owners={owners}
-                session={session}
-                directorySearch={directorySearch}
-                setDirectorySearch={setDirectorySearch}
-                dailyHelpers={dailyHelpers}
-                absenceLogs={absenceLogs}
-              />
-            )}
-
-            {activeSubSection === 'amenity' && (
-              <AmenitiesSection
-                wing={wing}
-                flatNo={flatNo}
-                amenityBookings={amenityBookings}
-                gymTheatreLogs={gymTheatreLogs}
-                handleAddAmenityBooking={handleAddAmenityBooking}
-                handleVoteAmenityBooking={handleVoteAmenityBooking}
-                handleCheckInGymTheatre={handleCheckInGymTheatre}
-                handleCheckOutGymTheatreFlow={handleCheckOutGymTheatreFlow}
-                showExitPhotoModal={showExitPhotoModal}
-                setShowExitPhotoModal={setShowExitPhotoModal}
-                exitPhotoBase64={exitPhotoBase64}
-                handleExitPhotoChange={handleExitPhotoChange}
-                handleConfirmCheckOut={handleConfirmCheckOut}
-                exitPhotoTimeError={exitPhotoTimeError}
-                gymTheatreSuccess={gymTheatreSuccess}
-                gymTheatreError={gymTheatreError}
-                amenityBookingSuccess={amenityBookingSuccess}
-                amenityBookingError={amenityBookingError}
-                fPropertyName={fPropertyName}
-                setFPropertyName={setFPropertyName}
-                fDateFrom={fDateFrom}
-                setFDateFrom={setFDateFrom}
-                fDateTo={fDateTo}
-                setFDateTo={setFDateTo}
-                fReason={fReason}
-                setFReason={setFReason}
-                fStuffNeeded={fStuffNeeded}
-                setFStuffNeeded={setFStuffNeeded}
-                fParkingRequest={fParkingRequest}
-                setFParkingRequest={setFParkingRequest}
-                activeCheckInLog={activeCheckInLog}
-                role={session.role}
-              />
-            )}
-
-            {activeSubSection === 'services' && (
-              <LocalServicesSection
-                wing={wing}
-                flatNo={flatNo}
-                dailyHelpers={dailyHelpers}
-                handleToggleHelperMapping={handleToggleHelperMapping}
-                essentialContacts={essentialContacts}
-              />
-            )}
-
-            {activeSubSection === 'helpdesk' && (
-              <HelpDeskSection
-                wing={wing}
-                flatNo={flatNo}
-                complaints={complaints}
-                loadingComplaints={loadingComplaints}
-                financials={financials}
-                loadingFinancials={loadingFinancials}
-                onRefreshComplaints={fetchComplaints}
-                announcements={announcements}
-                viewMode="helpdesk"
-                compTitle={compTitle}
-                setCompTitle={setCompTitle}
-                compDesc={compDesc}
-                setCompDesc={setCompDesc}
-                compMedia={compMedia}
-                setCompMedia={setCompMedia}
-                compMediaName={compMediaName}
-                setCompMediaName={setCompMediaName}
-                compMediaType={compMediaType}
-                setCompMediaType={setCompMediaType}
-                compSuccess={compSuccess}
-                setCompSuccess={setCompSuccess}
-                compError={compError}
-                setCompError={setCompError}
-                handleFileChange={handleFileChange}
-              />
-            )}
-
-            {activeSubSection === 'complaints' && (
-              <HelpDeskSection
-                wing={wing}
-                flatNo={flatNo}
-                complaints={complaints}
-                loadingComplaints={loadingComplaints}
-                financials={financials}
-                loadingFinancials={loadingFinancials}
-                onRefreshComplaints={fetchComplaints}
-                announcements={announcements}
-                viewMode="complaints"
-                compTitle={compTitle}
-                setCompTitle={setCompTitle}
-                compDesc={compDesc}
-                setCompDesc={setCompDesc}
-                compMedia={compMedia}
-                setCompMedia={setCompMedia}
-                compMediaName={compMediaName}
-                setCompMediaName={setCompMediaName}
-                compMediaType={compMediaType}
-                setCompMediaType={setCompMediaType}
-                compSuccess={compSuccess}
-                setCompSuccess={setCompSuccess}
-                compError={compError}
-                setCompError={setCompError}
-                handleFileChange={handleFileChange}
-              />
-            )}
-
-            {activeSubSection === 'notifications' && (
-              <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-5 text-left">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3 font-mono">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                    Society Alert Center
-                  </span>
-                  <span className="text-[9px] bg-red-50 text-red-700 px-2 py-0.5 rounded font-bold">
-                    14-Day Limit History
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1 text-left">
-                    <h3 className="font-display font-black text-slate-800 text-base">Alerts & Logs</h3>
-                    <p className="text-[10.5px] text-slate-400 font-medium leading-normal font-sans">
-                      Real-time safety broadcasts, visitor check-ins, scheduled movie reminders, and complaint updates.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const allIds = societyNotifications.map((n) => n.id);
-                      const updated = Array.from(new Set([...dismissedNotifIds, ...allIds]));
-                      setDismissedNotifIds(updated);
-                      localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(updated));
-                    }}
-                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg shrink-0"
-                  >
-                    Clear All
-                  </button>
-                </div>
-
-                {(() => {
-                  const twoWeeksAgo = new Date();
-                  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-                  const filteredNotifs = societyNotifications.filter((n) => {
-                    if (dismissedNotifIds.includes(n.id)) return false;
-                    const notifTime = n.timestamp ? new Date(n.timestamp).getTime() : Date.now();
-                    return notifTime >= twoWeeksAgo.getTime();
-                  });
-
-                  if (filteredNotifs.length === 0) {
-                    return (
-                      <div className="py-12 border border-dashed border-slate-200 rounded-2xl text-center text-slate-400 bg-slate-50/20">
-                        <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2 animate-pulse" />
-                        <p className="text-xs font-bold text-slate-500">No notifications registered in the last 14 days.</p>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-                      {filteredNotifs.map((notif) => {
-                        const isDismissed = dismissedNotifIds.includes(notif.id);
-                        
-                        // Determine background, border, text and badge colors based on notification type and status
-                        let colorClasses = 'bg-slate-50/70 border-slate-200 text-slate-500';
-                        let badgeText = 'Alert';
-                        let badgeColor = 'bg-slate-100 text-slate-600';
-
-                        if (!isDismissed) {
-                          switch (notif.type) {
-                            case 'notice':
-                              colorClasses = 'bg-blue-50/40 border-blue-100 text-slate-800 ring-1 ring-blue-50/30';
-                              badgeText = 'Notice';
-                              badgeColor = 'bg-blue-100 text-blue-700 font-bold';
-                              break;
-                            case 'financial':
-                              colorClasses = 'bg-emerald-50/40 border-emerald-100 text-slate-800 ring-1 ring-emerald-50/30';
-                              badgeText = 'Financial';
-                              badgeColor = 'bg-emerald-100 text-emerald-700 font-bold';
-                              break;
-                            case 'complaint':
-                              colorClasses = 'bg-rose-50/40 border-rose-100 text-slate-800 ring-1 ring-rose-50/30';
-                              badgeText = 'Complaint';
-                              badgeColor = 'bg-rose-100 text-rose-700 font-bold';
-                              break;
-                            case 'movie_schedule':
-                              colorClasses = 'bg-purple-50/40 border-purple-100 text-slate-800 ring-1 ring-purple-50/30';
-                              badgeText = 'Theatre';
-                              badgeColor = 'bg-purple-100 text-purple-700 font-bold';
-                              break;
-                            case 'visitor':
-                              const status = notif.status || notif.metadata?.status || 'pending';
-                              if (status === 'approved') {
-                                colorClasses = 'bg-emerald-50/60 border-emerald-200 text-slate-800 ring-1 ring-emerald-50 shadow-xs';
-                                badgeText = 'Visitor (Approved)';
-                                badgeColor = 'bg-emerald-100 text-emerald-800 font-bold';
-                              } else if (status === 'rejected') {
-                                colorClasses = 'bg-rose-50/60 border-rose-200 text-slate-800 ring-1 ring-rose-50 shadow-xs';
-                                badgeText = 'Visitor (Rejected)';
-                                badgeColor = 'bg-rose-100 text-rose-800 font-bold';
-                              } else {
-                                colorClasses = 'bg-amber-50/60 border-amber-200 text-slate-800 ring-1 ring-amber-50 shadow-xs';
-                                badgeText = 'Visitor (Pending)';
-                                badgeColor = 'bg-amber-100 text-amber-800 font-bold';
-                              }
-                              break;
-                            default:
-                              colorClasses = 'bg-white border-slate-200 text-slate-800';
-                              badgeText = 'System';
-                              badgeColor = 'bg-slate-100 text-slate-700';
-                          }
-                        }
-
+                      <button
+                        onClick={() => stopHighFrequencyAlarm()}
+                        className="bg-white/20 hover:bg-white/30 text-white font-sans font-extrabold px-3 py-1 rounded-xl text-[10px] uppercase select-none transition cursor-pointer"
+                      >
+                        Mute Sound
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-2.5">
+                      {activeSosAlerts.map((sos) => {
+                        const isMySos = sos.flatId === `${wing}-${flatNo}`;
                         return (
-                          <div 
-                            key={notif.id} 
-                            className={`p-4 rounded-2xl border transition flex items-start gap-3 justify-between ${colorClasses}`}
-                          >
-                            <div className="space-y-1.5 text-left min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-black text-xs uppercase tracking-tight">
-                                  {notif.title}
-                                </span>
-                                <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${badgeColor}`}>
-                                  {badgeText}
-                                </span>
-                                {!isDismissed && (
-                                  <span className="w-1.5 h-1.5 bg-rose-600 rounded-full shrink-0" />
-                                )}
-                              </div>
-                              <p className="text-[11.5px] leading-relaxed font-medium font-sans">
-                                {notif.message}
+                          <div key={sos.id} className="bg-black/20 p-3 rounded-2xl flex items-center justify-between text-xs font-semibold">
+                            <div className="pr-2">
+                              <p className="text-white font-bold leading-normal">
+                                <span className="underline font-black">{sos.triggeredBy}</span> of Flat <span className="bg-white/20 px-1.5 py-0.5 rounded font-mono font-black">{sos.flatId}</span> is requesting immediate assistance!
                               </p>
-
-                              {/* Display visitor photo if present in metadata */}
-                              {notif.type === 'visitor' && notif.metadata?.photoUrl && (
-                                <div className="mt-2 flex items-center gap-3 bg-white/60 p-2 rounded-xl border border-slate-100 max-w-sm">
-                                  <img 
-                                    src={notif.metadata.photoUrl} 
-                                    alt="Visitor Photo" 
-                                    className="w-10 h-10 rounded-lg object-cover border bg-slate-100 shrink-0" 
-                                    referrerPolicy="no-referrer"
-                                  />
-                                  <div className="text-[10px]">
-                                    <p className="font-bold text-slate-800 uppercase">{notif.metadata.fullName}</p>
-                                    <p className="text-slate-500 font-mono">{notif.metadata.mobileNumber} • {notif.metadata.visitorCount || 1} guest(s)</p>
-                                  </div>
-                                </div>
-                              )}
-
-                              <p className="text-[9px] text-slate-400 font-mono mt-1">
-                                {new Date(notif.timestamp).toLocaleString('en-IN', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
+                              <p className="text-[10px] text-white/75 mt-0.5 font-mono">
+                                Triggered: {new Date(sos.triggeredAt).toLocaleTimeString()}
                               </p>
                             </div>
-
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              {notif.type === 'movie_schedule' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setLastVisitedSubSection('amenity');
-                                    setActiveSubSection('amenity');
-                                    localStorage.setItem('orchid_deep_redirect', 'movies');
-                                    setTimeout(() => window.dispatchEvent(new Event('orchid_amenities_redirect')), 100);
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
-                                >
-                                  Open Movies
-                                </button>
-                              )}
-
-                              {notif.type === 'complaint' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setLastVisitedSubSection('complaints');
-                                    setActiveSubSection('complaints');
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer"
-                                >
-                                  Open Ticket
-                                </button>
-                              )}
-
-                              {notif.type === 'notice' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setActiveSubSection('helpdesk');
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-lg cursor-pointer"
-                                >
-                                  View Notice
-                                </button>
-                              )}
-
-                              {notif.type === 'financial' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setActiveSubSection('helpdesk');
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-lg cursor-pointer"
-                                >
-                                  View Ledger
-                                </button>
-                              )}
-
-                              {notif.type === 'amenity_request' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setLastVisitedSubSection('amenity');
-                                    setActiveSubSection('amenity');
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 px-2 py-1 rounded-lg cursor-pointer"
-                                >
-                                  View Bookings
-                                </button>
-                              )}
-
-                              {notif.type === 'visitor' && (
-                                <button
-                                  onClick={() => {
-                                    setIsNotificationsOpen(false);
-                                    setActiveSubSection('visitors');
-                                  }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-100 px-2 py-1 rounded-lg cursor-pointer"
-                                >
-                                  View Visitors
-                                </button>
-                              )}
-
-                              {!isDismissed ? (
-                                <button
-                                  onClick={() => handleDismissNotification(notif.id)}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer"
-                                >
-                                  Dismiss
-                                </button>
-                              ) : (
-                                <span className="text-[8px] font-mono font-bold text-slate-400 uppercase">
-                                  Archived
-                                </span>
-                              )}
-                            </div>
+                            
+                            {isMySos ? (
+                              <button
+                                onClick={async () => {
+                                  if (confirm("Are you sure you want to resolve and clear your SOS emergency alert?")) {
+                                    try {
+                                      await updateDoc(doc(db, 'sos_alerts', sos.id), { status: 'resolved' });
+                                    } catch (e) {
+                                      console.error('Failed to resolve SOS:', e);
+                                    }
+                                  }
+                                }}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white font-sans font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider transition-all select-none shrink-0"
+                              >
+                                I'm Safe
+                              </button>
+                            ) : (
+                              <a
+                                href="tel:+919999900000"
+                                className="bg-white text-red-600 hover:bg-red-50 font-sans font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-wider transition-all select-none shrink-0 text-center"
+                              >
+                                Call Guard
+                              </a>
+                            )}
                           </div>
                         );
                       })}
                     </div>
-                  );
-                })()}
+                  </div>
+                )}
+                
+                {/* Active visitor alarm ringing banner */}
+                {isAlarmActive && (
+                  <div className="bg-red-600 text-white p-4 rounded-2xl flex items-center justify-between animate-pulse shadow-md">
+                    <p className="text-xs font-bold">🚨 ACTIVE VISITOR AWAITING ENTRY APPROVAL!</p>
+                    <button
+                      onClick={() => stopHighFrequencyAlarm()}
+                      className="bg-white text-red-600 font-black px-4 py-1.5 rounded-xl text-[10px]"
+                    >
+                      Silence Alarm
+                    </button>
+                  </div>
+                )}
+
+                {/* Quick alert bar for waiting visitors */}
+                {activePoll.length > 0 && (
+                  <div className="bg-amber-500 text-slate-950 p-4 rounded-2xl flex items-center justify-between font-bold text-xs shadow-sm border border-amber-400">
+                    <p>🚪 {activePoll.length} visitor(s) are waiting at the main security gate right now!</p>
+                    <button
+                      onClick={() => setActiveSubSection('visitors')}
+                      className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider"
+                    >
+                      Approve Entry
+                    </button>
+                  </div>
+                )}
+
+                {/* Grid of blocks formatted in responsive columns */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  
+                  {/* Block 1: Gate Visitors */}
+                  <div
+                    id="block-visitors"
+                    onClick={() => {
+                      setLastVisitedSubSection('visitors');
+                      navigateToRoute('/gate-visitors', 'visitors');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'visitors' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <Users className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Gate Visitors
+                    </h4>
+                  </div>
+
+                  {/* Block 2: Complaint Box */}
+                  <div
+                    id="block-complaints"
+                    onClick={() => {
+                      setLastVisitedSubSection('complaints');
+                      navigateToRoute('/complaints', 'complaints');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'complaints' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#EC4899] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <ClipboardList className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Complaint Box
+                    </h4>
+                  </div>
+
+                  {/* Block 3: Resident Directory */}
+                  <div
+                    id="block-directory"
+                    onClick={() => {
+                      setLastVisitedSubSection('directory');
+                      navigateToRoute('/directory', 'directory');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'directory' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <BookOpen className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Resident Directory
+                    </h4>
+                  </div>
+
+                  {/* Block 4: Amenities Bookings */}
+                  <div
+                    id="block-amenity"
+                    onClick={() => {
+                      setLastVisitedSubSection('amenity');
+                      navigateToRoute('/amenities', 'amenity');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'amenity' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <Sparkles className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Amenities Bookings
+                    </h4>
+                  </div>
+
+                  {/* Block 5: Local Services */}
+                  <div
+                    id="block-services"
+                    onClick={() => {
+                      setLastVisitedSubSection('services');
+                      navigateToRoute('/services', 'services');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'services' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#DB2777] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <Wrench className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Local Services
+                    </h4>
+                  </div>
+
+                  {/* Block 6: Help & Financial */}
+                  <div
+                    id="block-helpdesk"
+                    onClick={() => {
+                      setLastVisitedSubSection('helpdesk');
+                      navigateToRoute('/help-desk', 'helpdesk');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'helpdesk' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <FileText className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Help & Financial
+                    </h4>
+                  </div>
+
+                  {/* Block 7: Society Alerts & Logs */}
+                  <div
+                    id="block-notifications"
+                    onClick={() => {
+                      setLastVisitedSubSection('notifications');
+                      navigateToRoute('/notifications-center', 'notifications');
+                    }}
+                    className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
+                      highlightBlock === 'notifications' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-none bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-sm relative mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <Bell className="w-7 h-7" />
+                      {societyNotifications.filter((n) => !dismissedNotifIds.includes(n.id)).length > 0 && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-2 border-white bg-rose-600 rounded-none animate-ping" />
+                      )}
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Society Alerts & Logs
+                    </h4>
+                  </div>
+
+                </div>
               </div>
-            )}
-          </div>
-        )
-      ) : (
-        /* Master "You" Profile Section */
-        <ProfileSection
-          wing={wing}
-          flatNo={flatNo}
-          myOwnerData={myOwnerData || null}
-          savingSettings={savingSettings}
-          settingsSuccess={settingsSuccess}
-          settingsError={settingsError}
-          newMember={newMember}
-          setNewMember={setNewMember}
-          newMemberPhone={newMemberPhone}
-          setNewMemberPhone={setNewMemberPhone}
-          handleAddMember={handleAddMember}
-          handleRemoveMember={handleRemoveMember}
-          vType={vType}
-          setVType={setVType}
-          vPlate={vPlate}
-          setVPlate={setVPlate}
-          vModel={vModel}
-          setVModel={setVModel}
-          vParkingPlot={vParkingPlot}
-          setVParkingPlot={setVParkingPlot}
-          handleAddVehicle={handleAddVehicle}
-          handleRemoveVehicle={handleRemoveVehicle}
-          altContact={altContact}
-          setAltContact={setAltContact}
-          showPass={showPass}
-          setShowPass={setShowPass}
-          newPassword={newPassword}
-          setNewPassword={setNewPassword}
-          handleSaveGeneral={handleSaveGeneral}
-          absenceLogs={absenceLogs}
-          dailyHelpers={dailyHelpers}
-          absDateFrom={absDateFrom}
-          setAbsDateFrom={setAbsDateFrom}
-          absDateTo={absDateTo}
-          setAbsDateTo={setAbsDateTo}
-          absMilkRedirect={absMilkRedirect}
-          setAbsMilkRedirect={setAbsMilkRedirect}
-          absNewspaperRedirect={absNewspaperRedirect}
-          setAbsNewspaperRedirect={setAbsNewspaperRedirect}
-          absParcelRedirect={absParcelRedirect}
-          setAbsParcelRedirect={setAbsParcelRedirect}
-          absenceSuccess={absenceSuccess}
-          absenceError={absenceError}
-          handleSaveAbsence={handleSaveAbsence}
-          handleCancelAbsence={handleCancelAbsence}
-        />
-      )}
+            ) : (
+              /* Sub-section Detail Screen Pane with BACK button */
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      setActiveSubSection(null);
+                      navigate('/home');
+                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition cursor-pointer select-none border border-slate-200 shadow-sm"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to Dashboard</span>
+                  </button>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider hidden sm:block">Orchid Heights</span>
+                    <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 shadow-xs flex items-center justify-center bg-white p-0.5">
+                      <img 
+                        src="https://i.ibb.co/zT5tpcdY/1000296229-1.png" 
+                        alt="Orchid Heights Logo" 
+                        className="w-full h-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {activeSubSection === 'visitors' && (
+                  <VisitorsSection
+                    wing={wing}
+                    flatNo={flatNo}
+                    activePoll={activePoll}
+                    guestHistory={guestHistory}
+                    loadingHistory={loadingHistory}
+                    rejectingId={rejectingId}
+                    setRejectingId={setRejectingId}
+                    rejectReasonText={rejectReasonText}
+                    setRejectReasonText={setRejectReasonText}
+                    handleRespond={handleRespond}
+                    handleDeleteHistoryRecord={handleDeleteHistoryRecord}
+                    handleDownloadVisitorReport={handleDownloadVisitorReport}
+                    isAlarmActive={isAlarmActive}
+                    stopAlarm={stopHighFrequencyAlarm}
+                  />
+                )}
+
+                {activeSubSection === 'directory' && (
+                  <DirectorySection
+                    owners={owners}
+                    session={session}
+                    directorySearch={directorySearch}
+                    setDirectorySearch={setDirectorySearch}
+                    dailyHelpers={dailyHelpers}
+                    absenceLogs={absenceLogs}
+                  />
+                )}
+
+                {activeSubSection === 'amenity' && (
+                  <AmenitiesSection
+                    wing={wing}
+                    flatNo={flatNo}
+                    amenityBookings={amenityBookings}
+                    gymTheatreLogs={gymTheatreLogs}
+                    handleAddAmenityBooking={handleAddAmenityBooking}
+                    handleVoteAmenityBooking={handleVoteAmenityBooking}
+                    handleCheckInGymTheatre={handleCheckInGymTheatre}
+                    handleCheckOutGymTheatreFlow={handleCheckOutGymTheatreFlow}
+                    showExitPhotoModal={showExitPhotoModal}
+                    setShowExitPhotoModal={setShowExitPhotoModal}
+                    exitPhotoBase64={exitPhotoBase64}
+                    handleExitPhotoChange={handleExitPhotoChange}
+                    handleConfirmCheckOut={handleConfirmCheckOut}
+                    exitPhotoTimeError={exitPhotoTimeError}
+                    gymTheatreSuccess={gymTheatreSuccess}
+                    gymTheatreError={gymTheatreError}
+                    amenityBookingSuccess={amenityBookingSuccess}
+                    amenityBookingError={amenityBookingError}
+                    fPropertyName={fPropertyName}
+                    setFPropertyName={setFPropertyName}
+                    fDateFrom={fDateFrom}
+                    setFDateFrom={setFDateFrom}
+                    fDateTo={fDateTo}
+                    setFDateTo={setFDateTo}
+                    fReason={fReason}
+                    setFReason={setFReason}
+                    fStuffNeeded={fStuffNeeded}
+                    setFStuffNeeded={setFStuffNeeded}
+                    fParkingRequest={fParkingRequest}
+                    setFParkingRequest={setFParkingRequest}
+                    activeCheckInLog={activeCheckInLog}
+                    role={session.role}
+                  />
+                )}
+
+                {activeSubSection === 'services' && (
+                  <LocalServicesSection
+                    wing={wing}
+                    flatNo={flatNo}
+                    dailyHelpers={dailyHelpers}
+                    handleToggleHelperMapping={handleToggleHelperMapping}
+                    essentialContacts={essentialContacts}
+                  />
+                )}
+
+                {activeSubSection === 'helpdesk' && (
+                  <HelpDeskSection
+                    wing={wing}
+                    flatNo={flatNo}
+                    complaints={complaints}
+                    loadingComplaints={loadingComplaints}
+                    financials={financials}
+                    loadingFinancials={loadingFinancials}
+                    onRefreshComplaints={fetchComplaints}
+                    announcements={announcements}
+                    viewMode="helpdesk"
+                    compTitle={compTitle}
+                    setCompTitle={setCompTitle}
+                    compDesc={compDesc}
+                    setCompDesc={setCompDesc}
+                    compMedia={compMedia}
+                    setCompMedia={setCompMedia}
+                    compMediaName={compMediaName}
+                    setCompMediaName={setCompMediaName}
+                    compMediaType={compMediaType}
+                    setCompMediaType={setCompMediaType}
+                    compSuccess={compSuccess}
+                    setCompSuccess={setCompSuccess}
+                    compError={compError}
+                    setCompError={setCompError}
+                    handleFileChange={handleFileChange}
+                  />
+                )}
+
+                {activeSubSection === 'complaints' && (
+                  <HelpDeskSection
+                    wing={wing}
+                    flatNo={flatNo}
+                    complaints={complaints}
+                    loadingComplaints={loadingComplaints}
+                    financials={financials}
+                    loadingFinancials={loadingFinancials}
+                    onRefreshComplaints={fetchComplaints}
+                    announcements={announcements}
+                    viewMode="complaints"
+                    compTitle={compTitle}
+                    setCompTitle={setCompTitle}
+                    compDesc={compDesc}
+                    setCompDesc={setCompDesc}
+                    compMedia={compMedia}
+                    setCompMedia={setCompMedia}
+                    compMediaName={compMediaName}
+                    setCompMediaName={setCompMediaName}
+                    compMediaType={compMediaType}
+                    setCompMediaType={setCompMediaType}
+                    compSuccess={compSuccess}
+                    setCompSuccess={setCompSuccess}
+                    compError={compError}
+                    setCompError={setCompError}
+                    handleFileChange={handleFileChange}
+                  />
+                )}
+
+                {activeSubSection === 'notifications' && (
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-5 text-left">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3 font-mono">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                        Society Alert Center
+                      </span>
+                      <span className="text-[9px] bg-red-50 text-red-700 px-2 py-0.5 rounded font-bold">
+                        14-Day Limit History
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1 text-left">
+                        <h3 className="font-display font-black text-slate-800 text-base">Alerts & Logs</h3>
+                        <p className="text-[10.5px] text-slate-400 font-medium leading-normal font-sans">
+                          Real-time safety broadcasts, visitor check-ins, scheduled movie reminders, and complaint updates.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const allIds = societyNotifications.map((n) => n.id);
+                          const updated = Array.from(new Set([...dismissedNotifIds, ...allIds]));
+                          setDismissedNotifIds(updated);
+                          localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(updated));
+                        }}
+                        className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg shrink-0"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+
+                    {(() => {
+                      const twoWeeksAgo = new Date();
+                      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+                      const filteredNotifs = societyNotifications.filter((n) => {
+                        if (dismissedNotifIds.includes(n.id)) return false;
+                        const notifTime = n.timestamp ? new Date(n.timestamp).getTime() : Date.now();
+                        return notifTime >= twoWeeksAgo.getTime();
+                      });
+
+                      if (filteredNotifs.length === 0) {
+                        return (
+                          <div className="py-12 border border-dashed border-slate-200 rounded-2xl text-center text-slate-400 bg-slate-50/20">
+                            <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2 animate-pulse" />
+                            <p className="text-xs font-bold text-slate-500">No notifications registered in the last 14 days.</p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                          {filteredNotifs.map((notif) => {
+                            const isDismissed = dismissedNotifIds.includes(notif.id);
+                            
+                            // Determine background, border, text and badge colors based on notification type and status
+                            let colorClasses = 'bg-slate-50/70 border-slate-200 text-slate-500';
+                            let badgeText = 'Alert';
+                            let badgeColor = 'bg-slate-100 text-slate-600';
+
+                            if (!isDismissed) {
+                              switch (notif.type) {
+                                case 'notice':
+                                  colorClasses = 'bg-blue-50/40 border-blue-100 text-slate-800 ring-1 ring-blue-50/30';
+                                  badgeText = 'Notice';
+                                  badgeColor = 'bg-blue-100 text-blue-700 font-bold';
+                                  break;
+                                case 'financial':
+                                  colorClasses = 'bg-emerald-50/40 border-emerald-100 text-slate-800 ring-1 ring-emerald-50/30';
+                                  badgeText = 'Financial';
+                                  badgeColor = 'bg-emerald-100 text-emerald-700 font-bold';
+                                  break;
+                                case 'complaint':
+                                  colorClasses = 'bg-rose-50/40 border-rose-100 text-slate-800 ring-1 ring-rose-50/30';
+                                  badgeText = 'Complaint';
+                                  badgeColor = 'bg-rose-100 text-rose-700 font-bold';
+                                  break;
+                                case 'movie_schedule':
+                                  colorClasses = 'bg-purple-50/40 border-purple-100 text-slate-800 ring-1 ring-purple-50/30';
+                                  badgeText = 'Theatre';
+                                  badgeColor = 'bg-purple-100 text-purple-700 font-bold';
+                                  break;
+                                case 'visitor':
+                                  const status = notif.status || notif.metadata?.status || 'pending';
+                                  if (status === 'approved') {
+                                    colorClasses = 'bg-emerald-50/60 border-emerald-200 text-slate-800 ring-1 ring-emerald-50 shadow-xs';
+                                    badgeText = 'Visitor (Approved)';
+                                    badgeColor = 'bg-emerald-100 text-emerald-800 font-bold';
+                                  } else if (status === 'rejected') {
+                                    colorClasses = 'bg-rose-50/60 border-rose-200 text-slate-800 ring-1 ring-rose-50 shadow-xs';
+                                    badgeText = 'Visitor (Rejected)';
+                                    badgeColor = 'bg-rose-100 text-rose-800 font-bold';
+                                  } else {
+                                    colorClasses = 'bg-amber-50/60 border-amber-200 text-slate-800 ring-1 ring-amber-50 shadow-xs';
+                                    badgeText = 'Visitor (Pending)';
+                                    badgeColor = 'bg-amber-100 text-amber-800 font-bold';
+                                  }
+                                  break;
+                                default:
+                                  colorClasses = 'bg-white border-slate-200 text-slate-800';
+                                  badgeText = 'System';
+                                  badgeColor = 'bg-slate-100 text-slate-700';
+                              }
+                            }
+
+                            return (
+                              <div 
+                                key={notif.id} 
+                                className={`p-4 rounded-2xl border transition flex items-start gap-3 justify-between ${colorClasses}`}
+                              >
+                                <div className="space-y-1.5 text-left min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="font-black text-xs uppercase tracking-tight">
+                                      {notif.title}
+                                    </span>
+                                    <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${badgeColor}`}>
+                                      {badgeText}
+                                    </span>
+                                    {!isDismissed && (
+                                      <span className="w-1.5 h-1.5 bg-rose-600 rounded-full shrink-0" />
+                                    )}
+                                  </div>
+                                  <p className="text-[11.5px] leading-relaxed font-medium font-sans">
+                                    {notif.message}
+                                  </p>
+
+                                  {/* Display visitor photo if present in metadata */}
+                                  {notif.type === 'visitor' && notif.metadata?.photoUrl && (
+                                    <div className="mt-2 flex items-center gap-3 bg-white/60 p-2 rounded-xl border border-slate-100 max-w-sm">
+                                      <img 
+                                        src={notif.metadata.photoUrl} 
+                                        alt="Visitor Photo" 
+                                        className="w-10 h-10 rounded-lg object-cover border bg-slate-100 shrink-0" 
+                                        referrerPolicy="no-referrer"
+                                      />
+                                      <div className="text-[10px]">
+                                        <p className="font-bold text-slate-800 uppercase">{notif.metadata.fullName}</p>
+                                        <p className="text-slate-500 font-mono">{notif.metadata.mobileNumber} • {notif.metadata.visitorCount || 1} guest(s)</p>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  <p className="text-[9px] text-slate-400 font-mono mt-1">
+                                    {new Date(notif.timestamp).toLocaleString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </p>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {notif.type === 'movie_schedule' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setLastVisitedSubSection('amenity');
+                                        setActiveSubSection('amenity');
+                                        localStorage.setItem('orchid_deep_redirect', 'movies');
+                                        setTimeout(() => window.dispatchEvent(new Event('orchid_amenities_redirect')), 100);
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
+                                    >
+                                      Open Movies
+                                    </button>
+                                  )}
+
+                                  {notif.type === 'complaint' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setLastVisitedSubSection('complaints');
+                                        setActiveSubSection('complaints');
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      Open Ticket
+                                    </button>
+                                  )}
+
+                                  {notif.type === 'notice' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setActiveSubSection('helpdesk');
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      View Notice
+                                    </button>
+                                  )}
+
+                                  {notif.type === 'financial' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setActiveSubSection('helpdesk');
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      View Ledger
+                                    </button>
+                                  )}
+
+                                  {notif.type === 'amenity_request' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setLastVisitedSubSection('amenity');
+                                        setActiveSubSection('amenity');
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-100 px-2 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      View Bookings
+                                    </button>
+                                  )}
+
+                                  {notif.type === 'visitor' && (
+                                    <button
+                                      onClick={() => {
+                                        setIsNotificationsOpen(false);
+                                        setActiveSubSection('visitors');
+                                      }}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-100 px-2 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      View Visitors
+                                    </button>
+                                  )}
+
+                                  {!isDismissed ? (
+                                    <button
+                                      onClick={() => handleDismissNotification(notif.id)}
+                                      className="text-[9px] font-black uppercase tracking-tight bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg cursor-pointer"
+                                    >
+                                      Dismiss
+                                    </button>
+                                  ) : (
+                                    <span className="text-[8px] font-mono font-bold text-slate-400 uppercase">
+                                      Archived
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            )
+          ) : (
+            /* Master "You" Profile Section */
+            <ProfileSection
+              wing={wing}
+              flatNo={flatNo}
+              myOwnerData={myOwnerData || null}
+              savingSettings={savingSettings}
+              settingsSuccess={settingsSuccess}
+              settingsError={settingsError}
+              newMember={newMember}
+              setNewMember={setNewMember}
+              newMemberPhone={newMemberPhone}
+              setNewMemberPhone={setNewMemberPhone}
+              handleAddMember={handleAddMember}
+              handleRemoveMember={handleRemoveMember}
+              vType={vType}
+              setVType={setVType}
+              vPlate={vPlate}
+              setVPlate={setVPlate}
+              vModel={vModel}
+              setVModel={setVModel}
+              vParkingPlot={vParkingPlot}
+              setVParkingPlot={setVParkingPlot}
+              handleAddVehicle={handleAddVehicle}
+              handleRemoveVehicle={handleRemoveVehicle}
+              altContact={altContact}
+              setAltContact={setAltContact}
+              showPass={showPass}
+              setShowPass={setShowPass}
+              newPassword={newPassword}
+              setNewPassword={setNewPassword}
+              handleSaveGeneral={handleSaveGeneral}
+              absenceLogs={absenceLogs}
+              dailyHelpers={dailyHelpers}
+              absDateFrom={absDateFrom}
+              setAbsDateFrom={setAbsDateFrom}
+              absDateTo={absDateTo}
+              setAbsDateTo={setAbsDateTo}
+              absMilkRedirect={absMilkRedirect}
+              setAbsMilkRedirect={setAbsMilkRedirect}
+              absNewspaperRedirect={absNewspaperRedirect}
+              setAbsNewspaperRedirect={setAbsNewspaperRedirect}
+              absParcelRedirect={absParcelRedirect}
+              setAbsParcelRedirect={setAbsParcelRedirect}
+              absenceSuccess={absenceSuccess}
+              absenceError={absenceError}
+              handleSaveAbsence={handleSaveAbsence}
+              handleCancelAbsence={handleCancelAbsence}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Floating Bottom Navigation Bar */}
       <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 py-3.5 px-6 flex items-center justify-around z-40 shadow-xl max-w-md mx-auto rounded-t-3xl">
@@ -2032,7 +2040,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           onClick={() => {
             setActiveMainTab('community');
             setActiveSubSection(null);
-            window.history.pushState(null, '', '/home');
+            navigate('/home');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
             activeMainTab === 'community' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
@@ -2046,7 +2054,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
           onClick={() => {
             setActiveMainTab('personal');
             setActiveSubSection(null);
-            window.history.pushState(null, '', '/me');
+            navigate('/me');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
             activeMainTab === 'personal' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
