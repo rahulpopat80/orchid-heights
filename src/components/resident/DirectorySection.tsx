@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Users, Car, Phone, BookOpen, AlertCircle, Building, User, HelpCircle, Languages, Smartphone } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Users, Car, Phone, BookOpen, AlertCircle, Building, User, HelpCircle, Languages, Smartphone , ArrowLeft} from 'lucide-react';
 import { FlatOwner, DailyHelper, AbsenceLog, UserSession } from '../../types';
 
 interface DirectorySectionProps {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Users, Car, Phone, Lock, Eye, EyeOff, Calendar, AlertCircle, Trash2, Plus, ShieldCheck, HelpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Users, Car, Phone, Lock, Eye, EyeOff, Calendar, AlertCircle, Trash2, Plus, ShieldCheck, HelpCircle , ArrowLeft} from 'lucide-react';
 import { FlatOwner, Vehicle, AbsenceLog, DailyHelper } from '../../types';
 
 interface ProfileSectionProps {

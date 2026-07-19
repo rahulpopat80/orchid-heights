@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Key, Star, Wrench, Shield, Phone, ChevronRight, CheckCircle2, MoreVertical, Search, Edit2, Camera, UserPlus, X, Heart, User, AlertCircle, Check, ShieldCheck, Edit3, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Briefcase, Key, Star, Wrench, Shield, Phone, ChevronRight, CheckCircle2, MoreVertical, Search, Edit2, Camera, UserPlus, X, Heart, User, AlertCircle, Check, ShieldCheck, Edit3, Trash2 , ArrowLeft} from 'lucide-react';
 import { DailyHelper, EssentialContact } from '../../types';
 import { db, setDoc, doc, deleteDoc, updateDoc } from '../../lib/firebase';
 import BuildingServicesSection from './BuildingServicesSection';
@@ -147,8 +148,9 @@ export default function LocalServicesSection({
   return (
     <div className="space-y-4 text-left">
       {/* ==================== VIEW 1: MENU OF SUB-BLOCKS ==================== */}
+      <AnimatePresence mode="wait">
       {activeSub === 'menu' && (
-        <div className="space-y-4">
+        <motion.div key="menu" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
             <Wrench className="w-4 h-4 text-indigo-600" />
             <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600">
@@ -183,7 +185,7 @@ export default function LocalServicesSection({
               </h4>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== VIEW 2: LOCAL HELPERS (CRUD) ==================== */}
@@ -197,7 +199,7 @@ export default function LocalServicesSection({
               }}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <button
@@ -435,7 +437,7 @@ export default function LocalServicesSection({
               onClick={() => navigateToRoute('/services', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -446,6 +448,7 @@ export default function LocalServicesSection({
           <BuildingServicesSection contacts={essentialContacts} />
         </div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

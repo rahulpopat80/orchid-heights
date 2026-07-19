@@ -219,7 +219,11 @@ export default function App() {
           // 2. Base deviceId firmly on IP address to prevent duplicating on storage clears
           // We attach a hash of the flatKey so the same IP can log into multiple flats independently if needed,
           // but for the same flat on the same IP, it's always strictly 1 device.
-          const deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
+          let deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
+          if (!deviceId) {
+            deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
+            localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
+          }
           
           // 3. Get or create a virtual persistent IMEI number mapped to this IP ID
           let imei = localStorage.getItem(`orchid_imei_${deviceId}`);
@@ -340,8 +344,8 @@ export default function App() {
               const isDeviceRegistered = registeredDevices.some((d: any) => d.deviceId === deviceId);
               
               if (!isDeviceRegistered) {
-                console.warn('[Session Security] This device has been signed out remotely by Admin.');
-                alert('🚫 This device has been signed out / removed from this flat by the administrator.');
+                console.warn('[Session Security] This device has been signed out.');
+                alert('Your session has expired or this device was signed out. Please log in again.');
                 handleLogout();
               }
             }

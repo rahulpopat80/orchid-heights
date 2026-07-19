@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Key, Edit3, Trash2, Database, AlertTriangle, ShieldCheck, Check, 
   RefreshCw, X, Search, Phone, Megaphone, Plus, Smartphone, FileText, 
@@ -1507,8 +1508,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {selectedFlat.devices && selectedFlat.devices.length > 0 ? (
                           <div className="space-y-2">
                             {selectedFlat.devices.map((device, index) => {
-                              const matchMember = selectedFlat.members?.find(m => m.phone === device.phoneNumber);
-                              const displayName = matchMember ? matchMember.name : (selectedFlat.phone === device.phoneNumber ? selectedFlat.nameEn : 'Unknown User');
+                              const matchMember = selectedFlat.members?.find(m => m.includes(device.phoneNumber || ''));
+                              const displayName = matchMember ? matchMember.split('(')[0].trim() : (selectedFlat.phone === device.phoneNumber ? selectedFlat.nameEn : 'Unknown User');
                               return (
                                 <div key={device.deviceId || index} className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 flex justify-between items-start gap-4">
                                   <div className="text-xs text-slate-600 space-y-1 font-medium">

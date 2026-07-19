@@ -594,7 +594,7 @@ export async function registerVisitor(payload: any): Promise<Visitor> {
     
     // Send FCM push notification to all devices of the target flat (instant wake-up)
     await sendFCMPushToFlat(wing, parseInt(flatNo, 10), {
-      title: `🚪 ગેટ પર મુલાકાતી: ${fullName}`,
+      title: `🚨 Visitor Entry Request: ${fullName}`,
       body: `${guestType} - ${reason}\nMobile: ${mobileNumber}\nFlat ${wing}-${flatNo}`,
       icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
       data: {
@@ -1106,10 +1106,11 @@ async function triggerFCMPushForSocietyNotification(payload: {
     if (wing && flatNo > 0) {
       console.log(`[FCM Trigger] Direct push to flat: ${wing}-${flatNo}`);
       await sendFCMPushToFlat(wing, flatNo, {
-        title: payload.title,
-        body: payload.message,
-        data: { type: payload.type }
-      });
+          title: payload.title,
+          body: payload.message,
+          icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
+          data: { type: payload.type }
+        });
     } else {
       console.log(`[FCM Trigger] Broadcast push. Wing: ${wing || 'All'}`);
       let queryRef;
@@ -1597,6 +1598,47 @@ function getHardcodedServiceAccount(): { client_email: string; private_key: stri
   } catch (err) {
     console.error('[Hardcoded SA] Base64 decoding failed:', err);
     return { client_email: '', private_key: '' };
+  }
+}
+
+export async function sendFCMBroadcast(notification: { title: string; body: string; icon?: string; data?: Record<string, string> }): Promise<void> {
+  try {
+    const snap = await rawGetDocs(rawCollection(db, 'owners'));
+    const allTokens = [];
+    snap.forEach((docSnap) => {
+      const ownerData = docSnap.data();
+      const tokens = ownerData.fcmTokens || [];
+      tokens.forEach(tk => { if (tk && !allTokens.includes(tk)) allTokens.push(tk); });
+    });
+    if (allTokens.length === 0) return;
+    const serviceAccount = getHardcodedServiceAccount();
+    if (!serviceAccount.client_email) return;
+    const accessToken = await getGoogleAccessToken(serviceAccount.client_email, serviceAccount.private_key);
+    console.log(`[FCM Broadcast] Sending to ${allTokens.length} tokens`);
+    
+    const sendPromises = allTokens.map(async (token) => {
+      const payload = {
+        message: {
+          token: token,
+          notification: {
+            title: notification.title,
+            body: notification.body
+          },
+          data: notification.data || {}
+        }
+      };
+      return fetch(`https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+    });
+    await Promise.allSettled(sendPromises);
+  } catch (error) {
+    console.warn('[FCM Broadcast] Failed', error);
   }
 }
 

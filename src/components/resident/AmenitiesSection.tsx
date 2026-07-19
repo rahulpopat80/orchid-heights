@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, 
   Dumbbell, 
@@ -342,8 +343,9 @@ export default function AmenitiesSection({
   return (
     <div className="space-y-4 text-left">
       {/* ==================== VIEW 1: SUB-BLOCKS MENU ==================== */}
+      <AnimatePresence mode="wait">
       {activeSub === 'menu' && (
-        <div className="space-y-4">
+        <motion.div key="menu" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
             <Sparkles className="w-4 h-4 text-indigo-600" />
             <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600">
@@ -391,18 +393,18 @@ export default function AmenitiesSection({
               </h4>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: GYM & THEATRE GATE ACCESS ==================== */}
       {activeSub === 'gym_theatre' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-5">
+        <motion.div key="gym" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -557,18 +559,18 @@ export default function AmenitiesSection({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: MOVIE THEATRE SCHEDULE ==================== */}
       {activeSub === 'movies' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+        <motion.div key="movies" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <div className="flex items-center gap-2">
@@ -875,18 +877,18 @@ export default function AmenitiesSection({
               })}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: FUNCTION HALL BOOKINGS & DECISION ENGINE ==================== */}
       {activeSub === 'bookings' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-6">
+        <motion.div key="bookings" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -1097,7 +1099,7 @@ export default function AmenitiesSection({
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
       {/* Exit Photo Modal */}
       {showExitPhotoModal && (
@@ -1171,6 +1173,7 @@ export default function AmenitiesSection({
           </div>
         </div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

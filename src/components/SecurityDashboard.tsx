@@ -359,7 +359,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
           // 🔔 Send FCM push to ALL devices of this flat immediately
           // This is what makes notification arrive even when app is closed
           sendFCMPushToFlat(targetWing, targetFlatNo, {
-            title: `🚪 ગેટ પર મુલાકાતી: ${fullName.trim()}`,
+            title: `🚨 Visitor Entry Request: ${fullName.trim()}`,
             body: `${guestType} - ${defaultReason}\nMobile: ${mobileNumber.trim()}`,
             icon: photoUrl || 'https://i.ibb.co/zT5tpcdY/1000296229-1.png',
             data: {

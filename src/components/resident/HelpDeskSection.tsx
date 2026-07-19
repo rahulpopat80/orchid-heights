@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
   ClipboardList, 
@@ -211,8 +212,9 @@ export default function HelpDeskSection({
   return (
     <div className="space-y-4 text-left">
       {/* ==================== VIEW 1: SUB-BLOCKS MENU ==================== */}
+      <AnimatePresence mode="wait">
       {activeSub === 'menu' && (
-        <div className="space-y-4">
+        <motion.div key="menu" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
             <FileText className="w-4 h-4 text-indigo-600" />
             <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600">
@@ -247,7 +249,7 @@ export default function HelpDeskSection({
               </h4>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: SOCIETY NOTICES ==================== */}
@@ -258,7 +260,7 @@ export default function HelpDeskSection({
               onClick={() => navigateToRoute('/help-desk', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -357,7 +359,7 @@ export default function HelpDeskSection({
 
       {/* ==================== SCREEN: RESOLUTION TICKET BOARD ==================== */}
       {activeSub === 'complaints' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+        <motion.div key="complaints" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} transition={{duration:0.2}} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
           {viewMode !== 'complaints' && (
             <div className="border-b border-slate-100 pb-3">
               <button
@@ -568,7 +570,7 @@ export default function HelpDeskSection({
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ==================== SCREEN: FINANCIAL STATEMENT LEDGER ==================== */}
@@ -579,7 +581,7 @@ export default function HelpDeskSection({
               onClick={() => navigateToRoute('/help-desk', 'menu')}
               className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
-              <span className="text-xl leading-none -mt-0.5">?</span>
+              <ArrowLeft className="w-4 h-4 -ml-1" />
               <span className="uppercase tracking-widest text-[10px]">Back</span>
             </button>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -656,6 +658,7 @@ export default function HelpDeskSection({
           </div>
         </div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

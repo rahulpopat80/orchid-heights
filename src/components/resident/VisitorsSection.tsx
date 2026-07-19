@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bell, ShieldAlert, Check, X, ClipboardList, Clock, Trash2, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bell, ShieldAlert, Check, X, ClipboardList, Clock, Trash2, Download , ArrowLeft} from 'lucide-react';
 import { Visitor } from '../../types';
 
 interface VisitorsSectionProps {

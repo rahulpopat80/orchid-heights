@@ -1,5 +1,6 @@
 import React from 'react';
-import { Megaphone, Calendar, Clock, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Megaphone, Calendar, Clock, Bell , ArrowLeft} from 'lucide-react';
 
 interface NoticeSectionProps {
   wing: string;
