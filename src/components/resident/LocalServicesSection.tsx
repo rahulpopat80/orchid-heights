@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Key, Star, Wrench, Shield, Phone, ChevronRight, CheckCircle2, MoreVertical, Search, Edit2, Camera, UserPlus, X, Heart } from 'lucide-react';
+import { Briefcase, Key, Star, Wrench, Shield, Phone, ChevronRight, CheckCircle2, MoreVertical, Search, Edit2, Camera, UserPlus, X, Heart, User, AlertCircle, Check, ShieldCheck, Edit3, Trash2 } from 'lucide-react';
 import { DailyHelper, EssentialContact } from '../../types';
 import { db, setDoc, doc, deleteDoc, updateDoc } from '../../lib/firebase';
 import BuildingServicesSection from './BuildingServicesSection';
