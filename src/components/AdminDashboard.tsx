@@ -14,7 +14,7 @@ import { FlatOwner, Announcement, Complaint, FinancialReport, EssentialContact, 
 import { api } from '../lib/api';
 import { db, collection, doc, query, onSnapshot, orderBy, updateDoc, deleteDoc } from '../lib/firebase';
 import AdminVisitorRecords from './admin/AdminVisitorRecords';
-import { generateGymTheatrePDF, generateAmenityPDF, generateMoviePDF } from '../lib/pdfGenerator';
+import { generateGymTheatrePDF } from '../lib/pdfGenerator';
 
 interface AdminDashboardProps {
   owners: FlatOwner[];
@@ -26,6 +26,7 @@ type AdminTab = 'home' | 'flats' | 'notices' | 'complaints' | 'finance' | 'addre
 
 export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>('home');
+  const [localSubTab, setLocalSubTab] = useState<'menu' | 'local' | 'building'>('menu');
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -1146,30 +1147,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               alt="Orchid Heights Logo" 
               className="w-full h-full object-contain rounded-xl"
               referrerPolicy="no-referrer"
-            />
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+            /></div>
           <div>
             <h2 className="font-display font-black text-xl tracking-tight">Orchid Heights Admin Suite</h2>
             <p className="text-xs text-slate-400 mt-1">
               Private administrative master panel. Add notices, review all complaints, audit devices, view deleted visitor data, and download reports.
-            </p>
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+            </p></div></div>
         {onLogoutAdmin && (
           <button
             onClick={onLogoutAdmin}
@@ -1178,13 +1161,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             <LogOut className="w-3.5 h-3.5" />
             <span>Exit Admin</span>
           </button>
-        )}
-        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+        )}</div>
 
       {/* Admin Home Blocks */}
       {activeTab === 'home' && (
@@ -1194,7 +1171,6 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             { id: 'notices', label: 'Society Notices', icon: Megaphone, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { id: 'complaints', label: 'Complaints', icon: ClipboardList, color: 'text-rose-600', bg: 'bg-rose-50' },
             { id: 'finance', label: 'Financial Ledger', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            { id: 'address-book', label: 'Address Book', icon: BookOpen, color: 'text-amber-600', bg: 'bg-amber-50' },
             { id: 'amenities', label: 'Amenities', icon: Sparkles, color: 'text-purple-600', bg: 'bg-purple-50' },
             { id: 'system', label: 'System Utils', icon: Database, color: 'text-slate-600', bg: 'bg-slate-50' },
             { id: 'visitors', label: 'Visitor Gate Records', icon: ShieldCheck, color: 'text-teal-600', bg: 'bg-teal-50' }
@@ -1210,30 +1186,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
               >
                 <div className={`w-14 h-14 rounded-none ${block.bg} ${block.color} flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300`}>
-                  <Icon className="w-7 h-7" />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <Icon className="w-7 h-7" /></div>
                 <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
                   {block.label}
-                </h4>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                </h4></div>
             );
-          })}
-          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+          })}</div>
       )}
 
       {/* Global Back Button for inner views (except visitors which has its own) */}
@@ -1245,25 +1203,13 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
           >
             <span className="text-xl leading-none -mt-0.5">◀</span>
             <span className="uppercase tracking-widest text-[10px]">Back to Home</span>
-          </button>
-          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+          </button></div>
       )}
 
       {/* Loading bar indicators */}
       {loading && (
         <div className="w-full bg-slate-100 h-1 overflow-hidden rounded-full">
-          <div className="bg-indigo-600 h-full animate-pulse w-1/2 rounded-full"></div>
-          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+          <div className="bg-indigo-600 h-full animate-pulse w-1/2 rounded-full"></div></div>
       )}
 
       {/* TAB CONTENT GRID */}
@@ -1274,47 +1220,23 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Flat List Panel */}
-            <div className={`bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm ${selectedFlat ? 'lg:col-span-6' : 'lg:col-span-12'}`}>
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm lg:col-span-12">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3 mb-4">
                 <div>
                   <h3 className="font-display font-bold text-base text-slate-800">Flat Registers & Credentials</h3>
-                  <p className="text-xs text-slate-400">Total 96 Apartments. Audit device logouts and retrieve flatowner passwords.</p>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <p className="text-xs text-slate-400">Total 96 Apartments. Audit device logouts and retrieve flatowner passwords.</p></div>
                 
                 {/* Search */}
                 <div className="relative w-full sm:max-w-xs">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Search className="w-3.5 h-3.5" />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <Search className="w-3.5 h-3.5" /></div>
                   <input
                     type="text"
                     placeholder="Search flat, occupant name, phone..."
                     value={adminSearch}
                     onChange={(e) => setAdminSearch(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl py-1.5 pl-8 pr-3 text-xs outline-none focus:bg-white"
-                  />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  /></div></div>
 
               {/* Inline Owner Editor Dialog (inside directory) */}
               {editOwner && (
@@ -1325,13 +1247,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     </h4>
                     <button onClick={() => setEditOwner(null)} className="text-slate-400 hover:text-slate-600 p-1">
                       <X className="w-4 h-4" />
-                    </button>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </button></div>
 
                   {editError && <p className="bg-red-50 text-red-700 p-2 rounded text-xs">{editError}</p>}
                   {editSuccess && <p className="bg-emerald-50 text-emerald-700 p-2 rounded text-xs">{editSuccess}</p>}
@@ -1344,32 +1260,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           type="text" required placeholder="Owner English Name"
                           value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500 uppercase"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        /></div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (Gujarati)</label>
                         <input
                           type="text" placeholder="નામ ગુજરાતીમાં"
                           value={editNameGu} onChange={(e) => setEditNameGu(e.target.value)}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        /></div></div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Phone</label>
@@ -1377,50 +1275,20 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           type="tel" placeholder="10-digit primary"
                           value={editPhone} onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        /></div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alt Contact</label>
                         <input
                           type="tel" placeholder="Alternate phone"
                           value={editSecondary} onChange={(e) => setEditSecondary(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none font-semibold focus:border-indigo-500"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        /></div></div>
                     <div className="flex gap-2 justify-end pt-2">
                       <button type="submit" disabled={editLoading} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">
                         {editLoading ? 'Saving...' : 'Save Owner'}
                       </button>
-                      <button type="button" onClick={() => setEditOwner(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  </form>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      <button type="button" onClick={() => setEditOwner(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button></div>
+                  </form></div>
               )}
 
               {/* Master directory table */}
@@ -1452,13 +1320,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
                             <div>
                               <p className="font-bold text-slate-800 text-xs uppercase leading-tight truncate max-w-[150px]">{owner.nameEn}</p>
-                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">{owner.phone ? `+91 ${owner.phone}` : 'No primary phone'}</p>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">{owner.phone ? `+91 ${owner.phone}` : 'No primary phone'}</p></div>
                           </td>
                           <td className="py-3 px-3 text-center" onClick={(e) => e.stopPropagation()}>
                             {hasDevices ? (
@@ -1477,13 +1339,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 className="text-slate-400 hover:text-slate-600 transition p-0.5"
                               >
                                 {isPassVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                              </button>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              </button></div>
                           </td>
                           <td className="py-3 px-3 text-center" onClick={(e) => e.stopPropagation()}>
                             <div className="inline-flex items-center gap-1.5">
@@ -1499,492 +1355,185 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 className="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 px-2 py-1 rounded-lg text-[10px] font-bold"
                               >
                                 Review Flat
-                              </button>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              </button></div>
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
-                </table>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                </table></div></div>
 
-      </div>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* Flat Inspection Sub-Panel */}
-            {selectedFlat && (
-              <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm space-y-6">
-                
-                {/* Selected Title */}
-                <div className="flex justify-between items-start border-b border-slate-100 pb-3">
-                  <div className="text-left">
-                    <span className="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase">Inspecting Flat</span>
-                    <h3 className="font-display font-black text-lg text-slate-800 mt-1">{selectedFlat.wing}-{selectedFlat.flatNo}</h3>
-                    <p className="text-xs text-slate-400 font-medium">Full registered device logs, household members, and visitor logs override.</p>
-                    
-                    {/* Flat occupant overview */}
-                    <div className="mt-2.5 p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs space-y-1">
-                      <p className="font-bold text-slate-850 uppercase">Owner: {selectedFlat.nameEn} {selectedFlat.nameGu ? `(${selectedFlat.nameGu})` : ''}</p>
-                      <p className="text-slate-600 font-mono">📞 Primary: {selectedFlat.phone ? `+91 ${selectedFlat.phone}` : 'No phone'}</p>
-                      {selectedFlat.secondaryContact && (
-                        <p className="text-slate-600 font-mono">📞 Alternate: +91 {selectedFlat.secondaryContact}</p>
-                      )}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  <button onClick={() => setSelectedFlat(null)} className="text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-xl transition">
-                    <X className="w-4 h-4" />
-                  </button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* Sub-section 1: Household Members & Vehicles */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  
-                  {/* Household Members with admin CRUD */}
-                  <div className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4 text-left">
-                    <div className="flex justify-between items-center border-b border-slate-150 pb-1.5">
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Household Members</h4>
-                      <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">
-                        {selectedFlat.members?.length || 0}
-                      </span>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                    {selectedFlat.members && selectedFlat.members.length > 0 ? (
-                      <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
-                        {selectedFlat.members.map((m, idx) => (
-                          <div key={idx} className="flex justify-between items-center bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold uppercase text-slate-800">
-                            <span>👤 {m}</span>
-                            <button
-                              onClick={() => handleDeleteMemberFromFlat(selectedFlat.wing, selectedFlat.flatNo, idx)}
-                              className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition cursor-pointer"
-                              title="Delete Member"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        ))}
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    ) : (
-                      <p className="text-xs text-slate-400 italic py-4 text-center">No co-residents registered.</p>
-                    )}
-
-                    {/* Admin Add Member Form */}
-                    <div className="bg-white border border-slate-200 p-2.5 rounded-lg space-y-2">
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Add Co-resident</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs font-medium">
-                        <input
-                          type="text"
-                          placeholder="Name (e.g. Amit Patel)"
-                          value={adminNewMember}
-                          onChange={(e) => setAdminNewMember(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
-                        />
-                        <input
-                          type="tel"
-                          placeholder="Phone (Optional)"
-                          value={adminNewMemberPhone}
-                          onChange={(e) => setAdminNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                          className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      <button
-                        onClick={() => handleAddMemberToFlat(selectedFlat.wing, selectedFlat.flatNo)}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase cursor-pointer"
-                      >
-                        Add Member
-                      </button>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                  {/* Registered Vehicles with admin CRUD */}
-                  <div className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4 text-left">
-                    <div className="flex justify-between items-center border-b border-slate-150 pb-1.5">
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Vehicles Registered</h4>
-                      <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">
-                        {selectedFlat.vehicles?.length || 0}
-                      </span>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                    {selectedFlat.vehicles && selectedFlat.vehicles.length > 0 ? (
-                      <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
-                        {selectedFlat.vehicles.map((v) => (
-                          <div key={v.id} className="flex justify-between items-center bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold text-slate-800">
-                            <div className="flex flex-col text-left">
-                              <span className="font-bold uppercase">{v.type === 'twowheeler' ? '🏍️' : '🚗'} {v.brandModel}</span>
-                              <span className="font-mono text-[10px] text-slate-500 font-bold">{v.plateNumber}</span>
-                              {v.parkingPlot && (
-                                <span className="text-[9px] text-indigo-600 font-bold">🅿️ Plot: {v.parkingPlot}</span>
-                              )}
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                            <button
-                              onClick={() => handleDeleteVehicleFromFlat(selectedFlat.wing, selectedFlat.flatNo, v.id)}
-                              className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition cursor-pointer"
-                              title="Delete Vehicle"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        ))}
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    ) : (
-                      <p className="text-xs text-slate-400 italic py-4 text-center">No vehicles registered.</p>
-                    )}
-
-                    {/* Admin Add Vehicle Form */}
-                    <div className="bg-white border border-slate-200 p-2.5 rounded-lg space-y-2">
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Register Vehicle</p>
-                      
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setAdminNewVehicleType('twowheeler')}
-                          className={`flex-1 py-1 rounded text-[9px] font-bold border transition cursor-pointer ${
-                            adminNewVehicleType === 'twowheeler' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200'
-                          }`}
-                        >
-                          🏍️ 2W
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAdminNewVehicleType('fourwheeler')}
-                          className={`flex-1 py-1 rounded text-[9px] font-bold border transition cursor-pointer ${
-                            adminNewVehicleType === 'fourwheeler' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200'
-                          }`}
-                        >
-                          🚗 4W
-                        </button>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                      <div className="grid grid-cols-2 gap-1.5 text-xs font-medium">
-                        <input
-                          type="text"
-                          placeholder="PLATE (GJ01AB1234)"
-                          value={adminNewVehiclePlate}
-                          onChange={(e) => setAdminNewVehiclePlate(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
-                        />
-                        <input
-                          type="text"
-                          placeholder="MODEL (e.g. Swift)"
-                          value={adminNewVehicleModel}
-                          onChange={(e) => setAdminNewVehicleModel(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
-                        />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                      <input
-                        type="text"
-                        placeholder="Parking Plot (e.g. B-1 Basement)"
-                        value={adminNewVehicleParking}
-                        onChange={(e) => setAdminNewVehicleParking(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px] font-medium"
-                      />
-
-                      <button
-                        onClick={() => handleAddVehicleToFlat(selectedFlat.wing, selectedFlat.flatNo)}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase cursor-pointer"
-                      >
-                        Register Vehicle
-                      </button>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* Sub-section 2: Logged in Devices Audit with Remote Logout */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                    <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Logged in Devices ({selectedFlat.devices?.length || 0})</span>
-                  </h4>
-                  {selectedFlat.devices && selectedFlat.devices.length > 0 ? (
-                    <div className="space-y-2">
-                      {selectedFlat.devices.map((device, index) => (
-                        <div key={device.deviceId || index} className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 flex justify-between items-start gap-4">
-                          <div className="text-xs text-slate-600 space-y-1 font-medium">
-                            <p className="font-bold text-slate-800 flex items-center">
-                              <span className="text-base mr-1">{device.os === 'Android' || device.os === 'iOS' ? '📱' : '💻'}</span>
-                              <span>{device.os} • {device.browser}</span>
-                            </p>
-                            <p className="font-mono text-[10px]"><span className="text-slate-400">IMEI:</span> {device.imei}</p>
-                            <p className="font-mono text-[10px]"><span className="text-slate-400">IP:</span> {device.ipAddress}</p>
-                            <p className="text-[10px] text-slate-400">Login: {new Date(device.lastLogin).toLocaleString('en-IN')}</p>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          <button
-                            onClick={() => handleRemoteLogout(selectedFlat.wing, selectedFlat.flatNo, device.deviceId)}
-                            className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border border-slate-200 hover:border-red-200 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-                          >
-                            <LogOut className="w-3 h-3" />
-                            <span>Log Out</span>
-                          </button>
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      ))}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  ) : (
-                    <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50 text-slate-400">
-                      <p className="text-xs">No active devices registered for this flat.</p>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* Sub-section 3: Visitor logs OVERRIDE (Includes Deleted!) */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                      <User className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Flat Visitor Logs Override</span>
-                    </h4>
-                    <button
-                      onClick={() => handleDownload3MonthsReport(selectedFlat, selectedFlatVisitors)}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] transition flex items-center gap-1 cursor-pointer"
-                    >
-                      <Download className="w-3 h-3" />
-                      <span>Download 3-Month Report</span>
+              {/* Flat Inspection Sub-Panel Modal */}
+              {selectedFlat && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-xl space-y-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto animate-fadeIn">
+                    <button onClick={() => setSelectedFlat(null)} className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600 transition">
+                      <X className="w-5 h-5" />
                     </button>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                    {/* Selected Title */}
+                    <div className="flex justify-between items-start border-b border-slate-100 pb-3 pr-10">
+                      <div className="text-left">
+                        <span className="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase">Inspecting Flat</span>
+                        <h3 className="font-display font-black text-lg text-slate-800 mt-1">{selectedFlat.wing}-{selectedFlat.flatNo}</h3>
+                        <p className="text-xs text-slate-400 font-medium">Full registered device logs, household members, and visitor logs override.</p>
+                        
+                        {/* Flat occupant overview */}
+                        <div className="mt-2 text-xs font-medium text-slate-600 space-y-0.5">
+                          <p>Name: <span className="text-slate-800 uppercase font-bold">{selectedFlat.nameEn}</span> / {selectedFlat.nameGu}</p>
+                          <p>Phone: {selectedFlat.phone ? `+91 ${selectedFlat.phone}` : 'N/A'}</p>
+                          {selectedFlat.secondaryContact && <p>Alt Phone: +91 {selectedFlat.secondaryContact}</p>}</div></div>
+                      
+                      <button
+                        onClick={() => handleOpenEditOwner(selectedFlat)}
+                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit Owner</span>
+                      </button></div>
 
-      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                      {/* Sub-section 1: Household Members & Vehicles */}
+                      <div className="space-y-4">
+                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                          <User className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Household Members ({selectedFlat.members?.length || 0})</span>
+                        </h4>
+                        {selectedFlat.members && selectedFlat.members.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedFlat.members.map((m, index) => (
+                              <div key={index} className="flex justify-between items-center border border-slate-200 rounded-xl p-2 bg-slate-50/50">
+                                <span className="text-xs font-bold text-slate-700 uppercase px-1">{m}</span>
+                                <button
+                                  onClick={() => handleDeleteMemberFromFlat(selectedFlat.wing, selectedFlat.flatNo, index)}
+                                  className="text-slate-400 hover:text-red-600 p-1 rounded-md transition cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button></div>
+                            ))}</div>
+                        ) : (
+                          <p className="text-[10px] text-slate-400 font-medium bg-slate-50 border border-slate-150 p-2 rounded-lg inline-block">No registered members</p>
+                        )}
 
-                  {loadingVisitors ? (
-                    <div className="text-center py-10 space-y-2">
-                      <div className="inline-block border-2 border-indigo-600 border-t-transparent rounded-full w-6 h-6 animate-spin"></div>
-                      <p className="text-[10px] text-slate-400">Fetching comprehensive logs...</p>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Add Member Name"
+                            value={adminNewMember}
+                            onChange={(e) => setAdminNewMember(e.target.value)}
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
+                          />
+                          <input
+                            type="tel"
+                            placeholder="Phone (opt)"
+                            value={adminNewMemberPhone}
+                            onChange={(e) => setAdminNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-24 bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
+                          />
+                          <button
+                            onClick={() => handleAddMemberToFlat(selectedFlat.wing, selectedFlat.flatNo)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 rounded text-[10px] font-bold uppercase transition cursor-pointer"
+                          >
+                            Add
+                          </button></div>
 
-      </div>
-                  ) : selectedFlatVisitors.length > 0 ? (
-                    <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
-                      {selectedFlatVisitors.map((visitor) => (
-                        <div key={visitor.id} className={`border p-3 rounded-xl text-xs space-y-2 font-medium relative ${visitor.deletedByResident ? 'border-red-200 bg-red-50/15' : 'border-slate-200 bg-slate-50/30'}`}>
-                          {visitor.deletedByResident && (
-                            <span className="absolute top-3 right-3 text-[9px] font-black bg-red-100 text-red-700 px-1.5 py-0.5 rounded border border-red-200 uppercase flex items-center gap-0.5">
-                              <ShieldAlert className="w-2.5 h-2.5" />
-                              <span>Deleted by Owner</span>
-                            </span>
+                        {/* Vehicles */}
+                        <div className="pt-2 border-t border-slate-100 space-y-3">
+                          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                            <Key className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>Registered Vehicles ({selectedFlat.vehicles?.length || 0})</span>
+                          </h4>
+                          {selectedFlat.vehicles && selectedFlat.vehicles.length > 0 ? (
+                            <div className="space-y-2">
+                              {selectedFlat.vehicles.map((v) => (
+                                <div key={v.id} className="border border-slate-200 rounded-xl p-2.5 bg-slate-50/50 flex justify-between items-center text-xs">
+                                  <div className="text-left font-medium">
+                                    <p className="font-bold text-slate-800 uppercase">{v.plateNumber}</p>
+                                    <p className="text-[10px] text-slate-500">{v.brandModel} • {v.type === 'twowheeler' ? '2-Wheeler' : '4-Wheeler'}</p>
+                                    {v.parkingPlot && <p className="text-[10px] text-indigo-600 font-bold mt-0.5">Plot: {v.parkingPlot}</p>}</div>
+                                  <button
+                                    onClick={() => handleDeleteVehicleFromFlat(selectedFlat.wing, selectedFlat.flatNo, v.id)}
+                                    className="text-slate-400 hover:text-red-600 p-1 rounded-md transition cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button></div>
+                              ))}</div>
+                          ) : (
+                            <p className="text-[10px] text-slate-400 font-medium bg-slate-50 border border-slate-150 p-2 rounded-lg inline-block">No registered vehicles</p>
                           )}
-                          <div className="flex gap-3 items-start text-left">
-                            {visitor.photoUrl ? (
-                              <div className="w-12 h-12 bg-slate-100 border rounded-lg overflow-hidden shrink-0 shadow-sm">
-                                <img src={visitor.photoUrl} alt="Visitor" className="w-full h-full object-cover" />
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
 
-      </div>
-                            ) : (
-                              <div className="w-12 h-12 bg-slate-200 rounded-lg flex items-center justify-center text-slate-400 shrink-0 border text-base">👤</div>
-                            )}
-                            <div className="space-y-0.5 min-w-0 flex-1">
-                              <p className="font-bold text-slate-800 text-sm leading-tight truncate uppercase">{visitor.fullName}</p>
-                              <p className="text-slate-500 font-semibold">{visitor.mobileNumber} • {visitor.guestType}</p>
-                              <p className="text-slate-400 text-[10px]">Reason: {visitor.reason}</p>
-                              <p className="text-slate-400 text-[10px] flex items-center gap-1">
-                                <Clock className="w-2.5 h-2.5" />
-                                <span>{new Date(visitor.requestTime).toLocaleString('en-IN')}</span>
-                              </p>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <select
+                                value={adminNewVehicleType}
+                                onChange={(e: any) => setAdminNewVehicleType(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px] font-bold"
+                              >
+                                <option value="twowheeler">2-Wheel</option>
+                                <option value="fourwheeler">4-Wheel</option>
+                              </select>
+                              <input
+                                type="text"
+                                placeholder="PLATE (e.g. GJ05AB1234)"
+                                value={adminNewVehiclePlate}
+                                onChange={(e) => setAdminNewVehiclePlate(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
+                              />
+                              <input
+                                type="text"
+                                placeholder="MODEL (e.g. Swift)"
+                                value={adminNewVehicleModel}
+                                onChange={(e) => setAdminNewVehicleModel(e.target.value)}
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
+                              /></div>
 
-      </div>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                            <input
+                              type="text"
+                              placeholder="Parking Plot (e.g. B-1 Basement)"
+                              value={adminNewVehicleParking}
+                              onChange={(e) => setAdminNewVehicleParking(e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px] font-medium"
+                            />
 
-      </div>
-                          
-                          <div className="flex justify-between items-center border-t border-slate-100 pt-1.5 text-[10px]">
-                            <span className="font-bold">
-                              Status: <span className={`uppercase font-extrabold ${visitor.status === 'approved' ? 'text-emerald-600' : visitor.status === 'rejected' ? 'text-red-600' : 'text-slate-500'}`}>{visitor.status}</span>
-                            </span>
-                            {visitor.respondedBy && <span className="text-slate-400">Responded By: {visitor.respondedBy}</span>}
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                            <button
+                              onClick={() => handleAddVehicleToFlat(selectedFlat.wing, selectedFlat.flatNo)}
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase cursor-pointer"
+                            >
+                              Register Vehicle
+                            </button></div></div></div>
 
-      </div>
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      ))}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  ) : (
-                    <div className="text-center py-10 border border-dashed border-slate-200 rounded-xl bg-slate-50 text-slate-400 text-xs">
-                      No visitor records recorded for this apartment.
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-            )}
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      {/* Sub-section 2: Logged in Devices Audit with Remote Logout */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                          <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Logged in Devices ({selectedFlat.devices?.length || 0})</span>
+                        </h4>
+                        {selectedFlat.devices && selectedFlat.devices.length > 0 ? (
+                          <div className="space-y-2">
+                            {selectedFlat.devices.map((device, index) => (
+                              <div key={device.deviceId || index} className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 flex justify-between items-start gap-4">
+                                <div className="text-xs text-slate-600 space-y-1 font-medium">
+                                  <p className="font-bold text-slate-800 flex items-center">
+                                    <span className="text-base mr-1">{device.os === 'Android' || device.os === 'iOS' ? '📱' : '💻'}</span>
+                                    <span>{device.os} • {device.browser}</span>
+                                  </p>
+                                  <p className="font-mono text-[10px]"><span className="text-slate-400">IMEI:</span> {device.imei}</p>
+                                  <p className="font-mono text-[10px]"><span className="text-slate-400">IP:</span> {device.ipAddress}</p>
+                                  <p className="text-[10px] text-slate-400">Login: {new Date(device.lastLogin).toLocaleString('en-IN')}</p></div>
+                                <button
+                                  onClick={() => handleRemoteLogout(selectedFlat.wing, selectedFlat.flatNo, device.deviceId)}
+                                  className="bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border border-slate-200 hover:border-red-200 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                                >
+                                  <LogOut className="w-3 h-3" />
+                                  <span>Log Out</span>
+                                </button></div>
+                            ))}</div>
+                        ) : (
+                          <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50 text-slate-400">
+                            <p className="text-xs">No active devices registered for this flat.</p></div>
+                        )}</div></div>
+                  </div>
+                </div>
+              )}</div>
         )}
 
         {/* 2. SOCIETY NOTICES MANAGEMENT TAB */}
@@ -1995,13 +1544,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <h3 className="font-display font-bold text-base text-slate-800">Notice Board Publisher</h3>
-                <p className="text-xs text-slate-400">Add, edit or delete targeted society notices. Residents get push alerts instantly.</p>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <p className="text-xs text-slate-400">Add, edit or delete targeted society notices. Residents get push alerts instantly.</p></div>
               <button
                 onClick={() => {
                   setEditingAnnouncement(null);
@@ -2015,24 +1558,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               >
                 {showNoticeForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showNoticeForm ? 'Cancel Form' : 'Publish New Notice'}</span>
-              </button>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+              </button></div>
 
             {noticeSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>{noticeSuccess}</span>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <span>{noticeSuccess}</span></div>
             )}
 
             {/* Notice Creation / Editing Form */}
@@ -2053,13 +1584,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <option value="all">Orchid Heights (All Flats)</option>
                       <option value="wing">Specific Wing (A or B)</option>
                       <option value="flat">Specific Apartment (e.g. B-1104)</option>
-                    </select>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </select></div>
 
                   {noticeTarget !== 'all' && (
                     <div>
@@ -2071,13 +1596,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       >
                         <option value="A">Wing A</option>
                         <option value="B">Wing B</option>
-                      </select>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </select></div>
                   )}
 
                   {noticeTarget === 'flat' && (
@@ -2091,20 +1610,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {flats.map((f) => (
                           <option key={f} value={f}>{f}</option>
                         ))}
-                      </select>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </select></div>
+                  )}</div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Notice Message Content</label>
@@ -2114,13 +1621,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     value={noticeText}
                     onChange={(e) => setNoticeText(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-medium resize-none focus:bg-white"
-                  />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  /></div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase">
@@ -2165,27 +1666,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     
                     <div className="space-y-1.5 py-1">
                       <div className="mx-auto w-8 h-8 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full flex items-center justify-center">
-                        <Upload className="w-4 h-4" />
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        <Upload className="w-4 h-4" /></div>
                       <p className="text-xs font-bold text-slate-700">Drag & Drop files or click to select multiple</p>
-                      <p className="text-[9px] text-slate-400">Supports PDF, MP4, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      <p className="text-[9px] text-slate-400">Supports PDF, MP4, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p></div></div>
 
                   {/* Multiple Attachments Selected Preview */}
                   {noticeAttachments.length > 0 && (
@@ -2204,19 +1687,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               )}
                               <div className="text-left truncate">
                                 <p className="font-bold text-slate-700 truncate max-w-[120px]">{att.name}</p>
-                                <p className="text-[8px] text-slate-400 uppercase font-mono">{att.type?.split('/')[1] || 'FILE'}</p>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <p className="text-[8px] text-slate-400 uppercase font-mono">{att.type?.split('/')[1] || 'FILE'}</p></div></div>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -2226,33 +1697,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition"
                             >
                               <X className="w-3.5 h-3.5" />
-                            </button>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        ))}
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            </button></div>
+                        ))}</div></div>
+                  )}</div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -2261,32 +1708,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       type="url" placeholder="https://example.com/image.jpg"
                       value={noticeImage} onChange={(e) => setNoticeImage(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alternative Attachment Video Link (Optional)</label>
                     <input
                       type="url" placeholder="https://example.com/video.mp4"
                       value={noticeVideo} onChange={(e) => setNoticeVideo(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div></div>
 
                 <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                   <button
@@ -2304,13 +1733,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer"
                   >
                     Cancel
-                  </button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  </button></div>
               </form>
             )}
 
@@ -2337,19 +1760,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        </button></div></div>
 
                     <p className="text-xs text-slate-400 font-mono">Notice ID: {ann.id}</p>
                     <p className="text-xs text-slate-700 leading-relaxed font-semibold whitespace-pre-line">{ann.text}</p>
@@ -2362,13 +1773,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           {/* Legacy image url fallback */}
                           {ann.imageUrl && !(ann.attachments && ann.attachments.some((a: any) => a.url === ann.imageUrl)) && (
                             <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 relative group max-h-[140px]">
-                              <img src={ann.imageUrl} alt="Attached legacy image" className="w-full h-full object-cover max-h-[140px]" />
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              <img src={ann.imageUrl} alt="Attached legacy image" className="w-full h-full object-cover max-h-[140px]" /></div>
                           )}
 
                           {/* Legacy PDF/document URL fallback */}
@@ -2376,20 +1781,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex items-center justify-between text-xs col-span-full">
                               <div className="flex items-center space-x-2 truncate">
                                 <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
-                                <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{ann.fileName || 'document.pdf'}</span>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                              <a href={ann.pdfUrl} download={ann.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{ann.fileName || 'document.pdf'}</span></div>
+                              <a href={ann.pdfUrl} download={ann.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                           )}
 
                           {/* Multi attachments list */}
@@ -2397,106 +1790,33 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <div key={idx} className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex flex-col gap-1.5 shadow-sm">
                               {att.type?.startsWith('image/') ? (
                                 <div className="rounded border overflow-hidden max-h-[100px] bg-slate-100">
-                                  <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" />
-                                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                  <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" /></div>
                               ) : att.type?.startsWith('video/') ? (
                                 <video src={att.url} controls className="max-h-[100px] w-full rounded border bg-black" />
                               ) : (
                                 <div className="flex items-center gap-1.5">
                                   <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
-                                  <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p>
-                                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                  <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                               )}
                               <div className="flex items-center justify-between text-[10px]">
                                 {!att.type?.startsWith('image/') && !att.type?.startsWith('video/') && (
                                   <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                                 )}
-                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          ))}
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    )}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                          ))}</div></div>
+                    )}</div>
 
                   <div className="border-t border-slate-100 pt-3 flex justify-between text-[10px] text-slate-400 font-mono">
                     <span>Sender: <strong>{ann.sender}</strong></span>
-                    <span>{new Date(ann.timestamp).toLocaleDateString('en-IN')}</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span>{new Date(ann.timestamp).toLocaleDateString('en-IN')}</span></div></div>
               ))}
 
               {announcements.length === 0 && (
                 <div className="col-span-full text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl text-slate-400">
                   <Megaphone className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                   <p className="text-sm font-bold">No Published Notices</p>
-                  <p className="text-xs text-slate-400">Notices published will show up here for residents.</p>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-              )}
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <p className="text-xs text-slate-400">Notices published will show up here for residents.</p></div>
+              )}</div></div>
         )}
 
         {/* 3. RESOLUTION BOARD (COMPLAINTS) TAB */}
@@ -2505,24 +1825,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-left">
               <h3 className="font-display font-bold text-base text-slate-800">Resolution Board Reviewer</h3>
-              <p className="text-xs text-slate-400">Review, update, change status, modify descriptions or delete complaints across all flats.</p>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+              <p className="text-xs text-slate-400">Review, update, change status, modify descriptions or delete complaints across all flats.</p></div>
 
             {complaintSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1">
                 <Check className="w-4 h-4 text-emerald-500" />
-                <span>{complaintSuccess}</span>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <span>{complaintSuccess}</span></div>
             )}
 
             {/* Editing Complaint Modal overlay or drawer */}
@@ -2530,13 +1838,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               <form onSubmit={handleSaveComplaintEdit} className="bg-indigo-50/40 border border-indigo-200 p-5 rounded-2xl shadow-sm space-y-4">
                 <div className="flex justify-between items-center border-b border-indigo-100 pb-2">
                   <h4 className="font-display font-bold text-sm text-indigo-900">✏️ Edit Complaint Details: {editingComplaint.id}</h4>
-                  <button type="button" onClick={() => setEditingComplaint(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <button type="button" onClick={() => setEditingComplaint(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button></div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -2546,13 +1848,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={editingComplaint.title}
                       onChange={(e) => setEditingComplaint({ ...editingComplaint, title: e.target.value })}
                       className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Resolution Status</label>
                     <select
@@ -2563,19 +1859,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <option value="open">Open (Unresolved)</option>
                       <option value="in-progress">In Progress</option>
                       <option value="resolved">Resolved (Completed)</option>
-                    </select>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </select></div></div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Detailed Description</label>
@@ -2584,13 +1868,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     value={editingComplaint.description}
                     onChange={(e) => setEditingComplaint({ ...editingComplaint, description: e.target.value })}
                     className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500 resize-none"
-                  />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  /></div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Attached Media Info / Download Link</label>
@@ -2606,22 +1884,10 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       >
                         <Download className="w-3 h-3" />
                         <span>Download</span>
-                      </a>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </a></div>
                   ) : (
                     <p className="text-[10px] text-slate-400 italic">No media attached by resident.</p>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  )}</div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Secretary Review / Process Done Notes</label>
@@ -2631,23 +1897,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     onChange={(e) => setEditingComplaint({ ...editingComplaint, processNotes: e.target.value })}
                     className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500 resize-none"
                     placeholder="Provide updates, actions taken, or resolution remarks..."
-                  />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  /></div>
 
                 <div className="flex justify-end gap-2 pt-2">
                   <button type="submit" className="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">Save Complaint</button>
-                  <button type="button" onClick={() => setEditingComplaint(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <button type="button" onClick={() => setEditingComplaint(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button></div>
               </form>
             )}
 
@@ -2672,29 +1926,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        </button></div></div>
 
                     <div>
                       <h4 className="font-bold text-slate-800 text-sm leading-tight uppercase">{comp.title}</h4>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">Complaint ID: {comp.id}</p>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">Complaint ID: {comp.id}</p></div>
 
                     <p className="text-xs text-slate-600 font-semibold leading-snug">{comp.description}</p>
                     
@@ -2708,20 +1944,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex items-center justify-between text-xs col-span-full shadow-sm">
                               <div className="flex items-center space-x-2 truncate">
                                 <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
-                                <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{comp.mediaName || 'Attachment'}</span>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                              <a href={comp.mediaUrl} download={comp.mediaName || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{comp.mediaName || 'Attachment'}</span></div>
+                              <a href={comp.mediaUrl} download={comp.mediaName || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                           )}
 
                           {/* Multi attachments */}
@@ -2729,75 +1953,27 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <div key={idx} className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex flex-col gap-1.5 shadow-sm">
                               {att.type?.startsWith('image/') ? (
                                 <div className="rounded border overflow-hidden max-h-[100px] bg-slate-100">
-                                  <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" />
-                                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                  <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" /></div>
                               ) : att.type?.startsWith('video/') ? (
                                 <video src={att.url} controls className="max-h-[100px] w-full rounded border bg-black" />
                               ) : (
                                 <div className="flex items-center gap-1.5">
                                   <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
-                                  <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p>
-                                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                  <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                               )}
                               <div className="flex items-center justify-between text-[10px]">
                                 {!att.type?.startsWith('image/') && !att.type?.startsWith('video/') && (
                                   <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                                 )}
-                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          ))}
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                          ))}</div></div>
                     )}
 
                     {comp.processNotes && (
                       <div className="bg-slate-50 border border-slate-150 rounded-xl p-2.5 text-[10px] text-slate-600 leading-normal">
                         <p className="font-bold text-slate-400 uppercase text-[9px] tracking-wider mb-0.5">Secretary Review & Actions Done:</p>
-                        <p className="font-medium whitespace-pre-line text-slate-700">{comp.processNotes}</p>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    )}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        <p className="font-medium whitespace-pre-line text-slate-700">{comp.processNotes}</p></div>
+                    )}</div>
 
                   <div className="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 font-mono">
                     <span className={`uppercase font-black border px-2 py-0.5 rounded-full ${
@@ -2806,46 +1982,15 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     }`}>
                       {comp.status}
                     </span>
-                    <span>Created: {new Date(comp.createdAt).toLocaleDateString('en-IN')}</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span>Created: {new Date(comp.createdAt).toLocaleDateString('en-IN')}</span></div></div>
               ))}
 
               {complaints.length === 0 && (
                 <div className="col-span-full text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl text-slate-400">
                   <ClipboardList className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                   <p className="text-sm font-bold">No complaints registered</p>
-                  <p className="text-xs text-slate-400">Active complaints will appear here.</p>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-              )}
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <p className="text-xs text-slate-400">Active complaints will appear here.</p></div>
+              )}</div></div>
         )}
 
         {/* 4. FINANCIAL LEDGER TAB & CSV IMPORTER */}
@@ -2855,37 +2000,19 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <h3 className="font-display font-bold text-base text-slate-800">Financial Reports & Ledger</h3>
-                <p className="text-xs text-slate-400">Upload reports, input expenses, and parse custom CSV tables directly into the ledger.</p>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <p className="text-xs text-slate-400">Upload reports, input expenses, and parse custom CSV tables directly into the ledger.</p></div>
               <button
                 onClick={() => setShowFinanceForm(!showFinanceForm)}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
               >
                 {showFinanceForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showFinanceForm ? 'Cancel Ledger Form' : 'Add Ledger Entry'}</span>
-              </button>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+              </button></div>
 
             {finSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1">
                 <Check className="w-4 h-4 text-emerald-500" />
-                <span>{finSuccess}</span>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <span>{finSuccess}</span></div>
             )}
 
             {/* Financial form + CSV Importer Panel */}
@@ -2907,13 +2034,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((m) => (
                           <option key={m} value={m}>{m}</option>
                         ))}
-                      </select>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </select></div>
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Year</label>
                       <input
@@ -2921,19 +2042,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         value={finYear}
                         onChange={(e) => setFinYear(parseInt(e.target.value, 10))}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:bg-white"
-                      />
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      /></div></div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Report/Ledger Title</label>
@@ -2942,13 +2051,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={finTitle}
                       onChange={(e) => setFinTitle(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Total Expenses (₹)</label>
@@ -2957,13 +2060,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={finExpense}
                       onChange={(e) => setFinExpense(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Ledger Statement Type</label>
@@ -2976,13 +2073,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <option value="welfare">Welfare Funds Collection Ledger</option>
                       <option value="statement">Financial & Audit Statement</option>
                       <option value="other">General Financial Record</option>
-                    </select>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </select></div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase">
@@ -3027,27 +2118,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       
                       <div className="space-y-1.5 py-1">
                         <div className="mx-auto w-8 h-8 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full flex items-center justify-center">
-                          <Upload className="w-4 h-4" />
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                          <Upload className="w-4 h-4" /></div>
                         <p className="text-xs font-bold text-slate-700">Drag & Drop files or click to select multiple</p>
-                        <p className="text-[9px] text-slate-400">Supports PDF, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        <p className="text-[9px] text-slate-400">Supports PDF, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p></div></div>
 
                     {/* Multiple Financial Attachments Selected Preview */}
                     {finAttachments.length > 0 && (
@@ -3064,19 +2137,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 )}
                                 <div className="text-left truncate">
                                   <p className="font-bold text-slate-700 truncate max-w-[150px]">{att.name}</p>
-                                  <p className="text-[8px] text-slate-400 uppercase font-mono">{att.type?.split('/')[1] || 'FILE'}</p>
-                                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                  <p className="text-[8px] text-slate-400 uppercase font-mono">{att.type?.split('/')[1] || 'FILE'}</p></div></div>
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -3086,33 +2147,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-lg transition"
                               >
                                 <X className="w-3.5 h-3.5" />
-                              </button>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          ))}
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    )}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              </button></div>
+                          ))}</div></div>
+                    )}</div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Description / Details Summary</label>
@@ -3121,13 +2158,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={finDesc}
                       onChange={(e) => setFinDesc(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-medium resize-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
 
                   <div className="flex flex-col gap-2">
                     <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer">
@@ -3151,13 +2182,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       >
                         Cancel Edit
                       </button>
-                    )}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    )}</div>
                 </form>
 
                 {/* CSV Importer Panel */}
@@ -3167,13 +2192,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                       <span>CSV Data Importer</span>
                     </h4>
-                    <span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200 uppercase">Optional Tool</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200 uppercase">Optional Tool</span></div>
 
                   <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
                     Paste raw spreadsheet lines (CSV formatted) to populate details. Format: <code className="bg-slate-200 px-1 rounded font-mono font-bold text-[10px]">Category, Description, Amount</code>.
@@ -3201,20 +2220,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Parse & Populate Form</span>
-                  </button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  </button></div></div>
             )}
 
             {/* List of Ledger Records */}
@@ -3237,13 +2243,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                            report.reportType === 'statement' ? 'Audit Statement' :
                            report.reportType === 'other' ? 'Other Record' :
                            'Expenses'}
-                        </span>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        </span></div>
                       
                       <div className="flex gap-1">
                         <button
@@ -3259,47 +2259,17 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                        </button></div></div>
 
                     <div>
                       <h4 className="font-bold text-slate-800 text-sm leading-tight uppercase">{report.title}</h4>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">Record ID: {report.id}</p>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">Record ID: {report.id}</p></div>
 
                     <p className="text-xs text-slate-600 leading-relaxed font-semibold whitespace-pre-line">{report.description}</p>
                     
                     <div className="bg-slate-50 border border-slate-150 p-3 rounded-xl flex items-center justify-between">
                       <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Expense / Ledger Amount:</span>
-                      <span className="text-sm font-black text-slate-900 font-mono">₹{report.totalExpense.toLocaleString('en-IN')}</span>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      <span className="text-sm font-black text-slate-900 font-mono">₹{report.totalExpense.toLocaleString('en-IN')}</span></div></div>
 
                   {/* Render financial report multiple attachments */}
                   {((report.attachments && report.attachments.length > 0) || report.pdfUrl) && (
@@ -3311,20 +2281,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex items-center justify-between text-xs col-span-full shadow-sm">
                             <div className="flex items-center space-x-2 truncate">
                               <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
-                              <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{report.fileName || 'document.pdf'}</span>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                            <a href={report.pdfUrl} download={report.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{report.fileName || 'document.pdf'}</span></div>
+                            <a href={report.pdfUrl} download={report.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                         )}
 
                         {/* Multi attachments list */}
@@ -3332,98 +2290,31 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           <div key={idx} className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex flex-col gap-1.5 shadow-sm text-left">
                             {att.type?.startsWith('image/') ? (
                               <div className="rounded border overflow-hidden max-h-[100px] bg-slate-100">
-                                <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" />
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" /></div>
                             ) : (
                               <div className="flex items-center gap-1.5">
                                 <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
-                                <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p>
-                                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                                <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                             )}
                             <div className="flex items-center justify-between text-[10px]">
                               {!att.type?.startsWith('image/') && (
                                 <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                               )}
-                              <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                        ))}
-                        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                        ))}</div></div>
                   )}
 
                   <div className="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 font-mono">
                     <span className="text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Month: {report.month} {report.year}</span>
-                    <span>Uploaded: {new Date(report.createdAt).toLocaleDateString('en-IN')}</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span>Uploaded: {new Date(report.createdAt).toLocaleDateString('en-IN')}</span></div></div>
               ))}
 
               {financialReports.length === 0 && (
                 <div className="col-span-full text-center py-16 bg-white border border-dashed border-slate-200 rounded-2xl text-slate-400">
                   <FileSpreadsheet className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                   <p className="text-sm font-bold">No financial logs recorded</p>
-                  <p className="text-xs text-slate-400">Ledger entries and imports will appear here.</p>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-              )}
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <p className="text-xs text-slate-400">Ledger entries and imports will appear here.</p></div>
+              )}</div></div>
         )}
 
         {/* 5. ADDRESS BOOK (ESSENTIAL CONTACTS) TAB */}
@@ -3433,13 +2324,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-left">
               <div>
                 <h3 className="font-display font-bold text-base text-slate-800">Essential Contacts Suite</h3>
-                <p className="text-xs text-slate-400">Add, edit, or delete plumbers, electricians, security desks, gardeners and society staff.</p>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <p className="text-xs text-slate-400">Add, edit, or delete plumbers, electricians, security desks, gardeners and society staff.</p></div>
               <button
                 onClick={() => {
                   setEditingContact(null);
@@ -3452,24 +2337,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               >
                 {showContactForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showContactForm ? 'Cancel Form' : 'Add New Contact'}</span>
-              </button>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+              </button></div>
 
             {contactSuccess && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1">
                 <Check className="w-4 h-4 text-emerald-500" />
-                <span>{contactSuccess}</span>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <span>{contactSuccess}</span></div>
             )}
 
             {/* Address Book Add / Edit Form */}
@@ -3487,13 +2360,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white uppercase"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Service Category</label>
                     <select
@@ -3507,13 +2374,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <option value="Manager">Society Manager</option>
                       <option value="Gardener">Gardener</option>
                       <option value="Other">Other Helper</option>
-                    </select>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </select></div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Mobile Number</label>
                     <input
@@ -3521,19 +2382,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div></div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alternate Number (Optional)</label>
@@ -3542,25 +2391,13 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     value={contactAltPhone}
                     onChange={(e) => setContactAltPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
-                  />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  /></div>
 
                 <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                   <button type="submit" className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs cursor-pointer shadow">
                     {editingContact ? 'Save Changes' : 'Register Contact'}
                   </button>
-                  <button type="button" onClick={() => setShowContactForm(false)} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancel</button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <button type="button" onClick={() => setShowContactForm(false)} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancel</button></div>
               </form>
             )}
 
@@ -3580,19 +2417,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       </p>
                       {c.alternatePhone && (
                         <p className="text-[10px] text-slate-400 font-mono font-medium ml-4">Alt: +91 {c.alternatePhone}</p>
-                      )}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      )}</div></div>
 
                   <div className="flex gap-1">
                     <button
@@ -3608,33 +2433,8 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-              ))}
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </button></div></div>
+              ))}</div></div>
         )}
 
         {/* AMENITIES & BOOKINGS OVERRIDE TAB */}
@@ -3645,28 +2445,10 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center space-x-3 text-left">
                 <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600 shrink-0">
-                  <Sparkles className="w-6 h-6" />
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <Sparkles className="w-6 h-6" /></div>
                 <div>
                   <h3 className="font-display font-black text-base text-slate-800">Amenities & Bookings Master Auditor</h3>
-                  <p className="text-xs text-slate-400">Force approve function halls, audit live Gym / Theatre entries, and download audit sheets.</p>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <p className="text-xs text-slate-400">Force approve function halls, audit live Gym / Theatre entries, and download audit sheets.</p></div></div>
 
               <button
                 onClick={handleDownloadGymTheatreLogsCSV}
@@ -3674,13 +2456,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               >
                 <Download className="w-4 h-4" />
                 <span>Export Gym & Theatre Logs (CSV)</span>
-              </button>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+              </button></div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
@@ -3690,23 +2466,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-indigo-600" />
                     <span>Function Hall Requests ({amenityBookings.length})</span>
-                  </h4>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  </h4></div>
 
                 {amenityBookings.length === 0 ? (
                   <div className="py-12 text-center text-slate-400 font-medium">
-                    <p className="text-xs">No function bookings logged in the system.</p>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <p className="text-xs">No function bookings logged in the system.</p></div>
                 ) : (
                   <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
                     {amenityBookings.map((booking) => {
@@ -3722,26 +2486,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               </span>
                               <h5 className="font-bold text-xs text-slate-800 mt-1 uppercase">
                                 {booking.propertyName}
-                              </h5>
-                              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                              </h5></div>
                             <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border uppercase ${
                               isCleared 
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                                 : 'bg-amber-50 text-amber-700 border-amber-200'
                             }`}>
                               {isCleared ? '✅ Cleared' : 'Pending approvals'}
-                            </span>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            </span></div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] text-slate-600 pt-2 border-t border-slate-100">
                             <p><span className="text-slate-400 font-bold uppercase text-[9px]">From:</span> {new Date(booking.dateFrom).toLocaleString('en-IN')}</p>
@@ -3749,13 +2501,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <p><span className="text-slate-400 font-bold uppercase text-[9px]">Purpose:</span> {booking.reason}</p>
                             <p><span className="text-slate-400 font-bold uppercase text-[9px]">Stuff needed:</span> {booking.stuffNeeded}</p>
                             {booking.parkingRequest && <p><span className="text-slate-400 font-bold uppercase text-[9px]">Parking:</span> {booking.parkingRequest}</p>}
-                            <p><span className="text-slate-400 font-bold uppercase text-[9px]">Votes:</span> {totalVotes} / 49</p>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            <p><span className="text-slate-400 font-bold uppercase text-[9px]">Votes:</span> {totalVotes} / 49</p></div>
 
                           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                             {!isCleared && (
@@ -3771,34 +2517,10 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               className="bg-white hover:bg-red-50 text-red-600 border border-slate-200 hover:border-red-200 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition cursor-pointer"
                             >
                               Delete Request
-                            </button>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            </button></div></div>
                       );
-                    })}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                )}
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    })}</div>
+                )}</div>
 
               {/* Right Column: Gym & Theatre Logging (5 cols) */}
               <div className="lg:col-span-5 space-y-6">
@@ -3812,13 +2534,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
                   {gymTheatreLogs.filter(l => !l.checkOutTime).length === 0 ? (
                     <div className="py-8 text-center text-slate-400 italic text-xs font-semibold">
-                      No residents currently active inside Gym or Theatre.
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      No residents currently active inside Gym or Theatre.</div>
                   ) : (
                     <div className="space-y-3">
                       {gymTheatreLogs.filter(l => !l.checkOutTime).map((log) => (
@@ -3828,39 +2544,15 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'}
                             </p>
                             <p className="font-semibold text-slate-700">Flat: {log.flatId}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">In: {new Date(log.checkInTime).toLocaleTimeString('en-IN')}</p>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            <p className="text-[10px] text-slate-400 font-mono">In: {new Date(log.checkInTime).toLocaleTimeString('en-IN')}</p></div>
                           <button
                             onClick={() => handleAdminCheckOutLog(log.id)}
                             className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg text-[9px] uppercase transition cursor-pointer shadow-sm"
                           >
                             Checkout
-                          </button>
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      ))}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                          </button></div>
+                      ))}</div>
+                  )}</div>
 
                 {/* 2. Log History */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
@@ -3871,13 +2563,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
                   {gymTheatreLogs.filter(l => l.checkOutTime).length === 0 ? (
                     <div className="py-8 text-center text-slate-400 italic text-xs font-semibold">
-                      No historical logs checked in.
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      No historical logs checked in.</div>
                   ) : (
                     <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
                       {gymTheatreLogs.filter(l => l.checkOutTime).map((log) => (
@@ -3891,13 +2577,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             </p>
                             <span className="inline-block text-[8px] bg-slate-250 text-slate-800 border border-slate-350 px-1.5 py-0.5 rounded font-mono font-bold uppercase leading-none">
                               {log.durationMinutes} Mins
-                            </span>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            </span></div>
 
                           {log.exitPhotoUrl && (
                             <img
@@ -3907,27 +2587,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               onClick={() => window.open(log.exitPhotoUrl, '_blank')}
                               referrerPolicy="no-referrer"
                             />
-                          )}
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      ))}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                          )}</div>
+                      ))}</div>
+                  )}</div>
 
                 {/* 3. Movie Theatre Postings */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
@@ -3961,23 +2623,11 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     >
                       <Download className="w-3 h-3" />
                       <span>Export CSV</span>
-                    </button>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </button></div>
 
                   {moviesSchedule.length === 0 ? (
                     <div className="py-8 text-center text-slate-400 italic text-xs font-semibold">
-                      No movies currently scheduled.
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      No movies currently scheduled.</div>
                   ) : (
                     <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                       {moviesSchedule.map((movie) => (
@@ -3990,13 +2640,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               <a href={movie.trailerUrl} target="_blank" rel="noopener noreferrer" className="text-[9px] text-indigo-500 underline font-semibold">
                                 Watch Trailer
                               </a>
-                            )}
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            )}</div>
                           <div className="flex items-center gap-2">
                             {movie.posterUrl && (
                               <img
@@ -4020,54 +2664,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               title="Delete Screening"
                             >
                               ✕
-                            </button>
-                            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                          {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                      ))}
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  )}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                            </button></div></div>
+                      ))}</div>
+                  )}</div></div></div></div>
         )}
 
         {/* 6. SYSTEM UTILITIES TAB */}
@@ -4079,36 +2678,18 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               <div>
                 <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-indigo-600">
                   <Key className="w-5 h-5" />
-                  <h3 className="font-display font-bold text-base text-slate-800">Admin Password Override</h3>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <h3 className="font-display font-bold text-base text-slate-800">Admin Password Override</h3></div>
 
                 {passError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
                     <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                    <span>{passError}</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span>{passError}</span></div>
                 )}
 
                 {passSuccess && (
                   <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-xl text-xs flex items-start space-x-1.5 mb-4">
                     <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{passSuccess}</span>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    <span>{passSuccess}</span></div>
                 )}
 
                 <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -4122,13 +2703,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       >
                         <option value="A">Wing A</option>
                         <option value="B">Wing B</option>
-                      </select>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </select></div>
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Flat No</label>
@@ -4140,19 +2715,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {flats.map((f) => (
                           <option key={f} value={f}>{f}</option>
                         ))}
-                      </select>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </select></div></div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">New Password</label>
@@ -4162,13 +2725,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-medium outline-none focus:bg-white"
-                    />
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    /></div>
 
                   <button
                     type="submit" disabled={passLoading}
@@ -4176,25 +2733,13 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   >
                     {passLoading ? 'Updating...' : 'Update Password Override'}
                   </button>
-                </form>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                </form></div>
 
               {/* ===== MASTER VISITOR LOGS CSV DOWNLOADER ===== */}
               <div className="border-t border-slate-100 pt-6">
                 <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-emerald-600">
                   <FileSpreadsheet className="w-5 h-5" />
-                  <h3 className="font-display font-bold text-base text-slate-800">Master Building Visitor Reports</h3>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  <h3 className="font-display font-bold text-base text-slate-800">Master Building Visitor Reports</h3></div>
                 <p className="text-xs text-slate-500 leading-relaxed mb-4">
                   Download a highly detailed, professional Excel-compatible CSV of visitor entries across all wings and flats.
                 </p>
@@ -4223,48 +2768,18 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     className="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
                   >
                     🗂️ Download All-Time Logs
-                  </button>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-              {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  </button></div></div></div>
 
 
             {/* Factory Reset */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border-orange-200 bg-orange-50/10">
               <div className="flex items-center space-x-2 border-b border-orange-100 pb-3 mb-4 text-orange-600">
                 <Database className="w-5 h-5" />
-                <h3 className="font-display font-bold text-base text-slate-800">Database Factory Reset</h3>
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                <h3 className="font-display font-bold text-base text-slate-800">Database Factory Reset</h3></div>
 
               {resetSuccess && (
                 <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-lg text-xs mb-3">
-                  {resetSuccess}
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                  {resetSuccess}</div>
               )}
 
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
@@ -4289,19 +2804,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold cursor-pointer"
                     >
                       Cancel
-                    </button>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                  {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    </button></div></div>
               ) : (
                 <button
                   onClick={() => setShowConfirmReset(true)}
@@ -4323,13 +2826,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
                 {wipeSuccess && (
                   <div className={`p-3 rounded-xl text-xs font-bold mb-3 ${wipeSuccess.startsWith('✅') ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
-                    {wipeSuccess}
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                    {wipeSuccess}</div>
                 )}
 
                 {showConfirmWipe ? (
@@ -4350,19 +2847,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold cursor-pointer"
                       >
                         Cancel
-                      </button>
-                      {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
-                    {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+                      </button></div></div>
                 ) : (
                   <button
                     onClick={() => setShowConfirmWipe(true)}
@@ -4371,40 +2856,181 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     <Trash2 className="w-4 h-4" />
                     <span>🗑️ Wipe All Transactional Data</span>
                   </button>
-                )}
-                {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
+                )}</div></div></div>
         )}
 
-      </div>
-              {/* 9. LOCAL SERVICES */}
+                {/* 9. LOCAL SERVICES TAB */}
         {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+          <div className="space-y-6 animate-fadeIn">
+            {localSubTab === 'menu' && (
+              <div className="space-y-4 text-left">
+                <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
+                  <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                    <User className="w-4 h-4 text-indigo-600" />
+                    Local Directory & Handymen
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div
+                    onClick={() => setLocalSubTab('local')}
+                    className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
+                  >
+                    <div className="w-14 h-14 rounded-none bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <User className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Local Services & Providers
+                    </h4>
+                  </div>
+                  <div
+                    onClick={() => setLocalSubTab('building')}
+                    className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
+                  >
+                    <div className="w-14 h-14 rounded-none bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <BookOpen className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
+                      Building Services & Contacts
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            )}
+            {localSubTab === 'local' && (
+              <div>
+                <button onClick={() => setLocalSubTab('menu')} className="mb-4 bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition shadow-sm flex items-center gap-1 cursor-pointer"><ArrowLeft className="w-3.5 h-3.5"/> Back to Menu</button>
+                <AdminLocalServices />
+              </div>
+            )}
+            {localSubTab === 'building' && (
+              <div>
+                <button onClick={() => setLocalSubTab('menu')} className="mb-4 bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition shadow-sm flex items-center gap-1 cursor-pointer"><ArrowLeft className="w-3.5 h-3.5"/> Back to Menu</button>
+                          <div className="space-y-6">
+            
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-left">
+              <div>
+                <h3 className="font-display font-bold text-base text-slate-800">Essential Contacts Suite</h3>
+                <p className="text-xs text-slate-400">Add, edit, or delete plumbers, electricians, security desks, gardeners and society staff.</p></div>
+              <button
+                onClick={() => {
+                  setEditingContact(null);
+                  setContactName('');
+                  setContactPhone('');
+                  setContactAltPhone('');
+                  setShowContactForm(!showContactForm);
+                }}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
+              >
+                {showContactForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                <span>{showContactForm ? 'Cancel Form' : 'Add New Contact'}</span>
+              </button></div>
 
-      </div>
+            {contactSuccess && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs font-bold flex items-center gap-1">
+                <Check className="w-4 h-4 text-emerald-500" />
+                <span>{contactSuccess}</span></div>
+            )}
 
+            {/* Address Book Add / Edit Form */}
+            {showContactForm && (
+              <form onSubmit={handleSaveContact} className="bg-white border border-slate-200 p-5 md:p-6 rounded-2xl shadow-sm space-y-4 text-left">
+                <h4 className="font-display font-bold text-sm text-slate-800 border-b border-slate-100 pb-2">
+                  {editingContact ? '✏️ Edit Contact details' : '📞 Register New Staff Contact'}
+                </h4>
 
-            {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Staff Name</label>
+                    <input
+                      type="text" required placeholder="e.g. Ramesh Patel"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white uppercase"
+                    /></div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Service Category</label>
+                    <select
+                      value={contactCategory}
+                      onChange={(e) => setContactCategory(e.target.value as any)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:bg-white"
+                    >
+                      <option value="Plumber">Plumber</option>
+                      <option value="Electrician">Electrician</option>
+                      <option value="Security">Security / Gate Duty</option>
+                      <option value="Manager">Society Manager</option>
+                      <option value="Gardener">Gardener</option>
+                      <option value="Other">Other Helper</option>
+                    </select></div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Primary Mobile Number</label>
+                    <input
+                      type="tel" required placeholder="10-digit number"
+                      value={contactPhone}
+                      onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
+                    /></div></div>
 
-      </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alternate Number (Optional)</label>
+                  <input
+                    type="tel" placeholder="Alt phone number"
+                    value={contactAltPhone}
+                    onChange={(e) => setContactAltPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:bg-white"
+                  /></div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button type="submit" className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs cursor-pointer shadow">
+                    {editingContact ? 'Save Changes' : 'Register Contact'}
+                  </button>
+                  <button type="button" onClick={() => setShowContactForm(false)} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer">Cancel</button></div>
+              </form>
+            )}
+
+            {/* Grid of Contacts */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {contacts.map((c) => (
+                <div key={c.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm text-left flex justify-between items-start gap-4">
+                  <div className="space-y-2">
+                    <span className="text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      {c.category}
+                    </span>
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm leading-tight uppercase">{c.name}</h4>
+                      <p className="text-[11px] text-slate-500 font-mono mt-1 font-semibold flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5 text-slate-400" />
+                        <span>+91 {c.phone}</span>
+                      </p>
+                      {c.alternatePhone && (
+                        <p className="text-[10px] text-slate-400 font-mono font-medium ml-4">Alt: +91 {c.alternatePhone}</p>
+                      )}</div></div>
+
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleEditContact(c)}
+                      className="text-indigo-600 hover:bg-indigo-50 border border-indigo-100 p-1.5 rounded-lg transition"
+                      title="Edit"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteContact(c.id)}
+                      className="text-red-600 hover:bg-red-50 border border-red-100 p-1.5 rounded-lg transition"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button></div></div>
+              ))}</div></div>
+
+              </div>
+            )}
+          </div>
         )}
 
         {/* 8. VISITOR RECORDS TAB */}
         {activeTab === 'visitors' && (
           <AdminVisitorRecords onBack={() => window.location.hash = 'home'} />
-        )}
-
-        {/* 9. LOCAL SERVICES */}
-        {activeTab === 'local-services' && (
-          <AdminLocalServices />
-        )}
-
-      </div>
+        )}</div>
 
     </div>
   );
