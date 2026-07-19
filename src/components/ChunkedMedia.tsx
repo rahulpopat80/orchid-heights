@@ -43,7 +43,7 @@ export default function ChunkedMedia({ fileId, type, fallbackName }: ChunkedMedi
   if (loading) {
     return (
       <div className="flex items-center justify-center p-4 bg-slate-50 border border-slate-150 rounded-xl min-h-[90px] w-full">
-        <Loader2 className="w-4 h-4 text-indigo-500 animate-spin mr-2" />
+        <Loader2 className="w-4 h-4 text-pink-500 animate-spin mr-2" />
         <span className="text-[10px] font-bold text-slate-500">Loading attachment...</span>
       </div>
     );
@@ -77,7 +77,7 @@ export default function ChunkedMedia({ fileId, type, fallbackName }: ChunkedMedi
               link.click();
               document.body.removeChild(link);
             }}
-            className="text-indigo-600 hover:text-indigo-700 p-1 flex items-center gap-1 cursor-pointer"
+            className="text-pink-600 hover:text-pink-700 p-1 flex items-center gap-1 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="text-[9px] font-bold">Save</span>
@@ -102,7 +102,7 @@ export default function ChunkedMedia({ fileId, type, fallbackName }: ChunkedMedi
               link.click();
               document.body.removeChild(link);
             }}
-            className="text-indigo-400 hover:text-indigo-300 p-1 flex items-center gap-1 cursor-pointer"
+            className="text-pink-400 hover:text-pink-300 p-1 flex items-center gap-1 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="text-[9px] font-bold">Save</span>
@@ -115,7 +115,7 @@ export default function ChunkedMedia({ fileId, type, fallbackName }: ChunkedMedi
   return (
     <div className="bg-slate-50 border border-slate-200/80 p-3 rounded-xl flex items-center justify-between text-xs w-full shadow-sm text-left">
       <div className="flex items-center space-x-2 truncate">
-        <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-pink-600 shrink-0">
           <FileText className="w-5 h-5" />
         </div>
         <div className="text-left truncate">
@@ -132,7 +132,7 @@ export default function ChunkedMedia({ fileId, type, fallbackName }: ChunkedMedi
           link.click();
           document.body.removeChild(link);
         }}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg text-[10px] flex items-center space-x-1 cursor-pointer transition shadow hover:shadow-md"
+        className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-1.5 px-3 rounded-lg text-[10px] flex items-center space-x-1 cursor-pointer transition shadow hover:shadow-md"
       >
         <Download className="w-3 h-3" />
         <span>Download</span>

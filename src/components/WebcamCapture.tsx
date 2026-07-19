@@ -16,7 +16,7 @@ interface WebcamCaptureProps {
 // Let's create beautiful SVG string assets representing each guest type.
 const PRESETS: Record<string, { label: string; svgColor: string; iconLetter: string }> = {
   delivery: { label: 'Delivery Driver', svgColor: 'from-amber-400 to-orange-500', iconLetter: '📦' },
-  guest: { label: 'Guest / Relative', svgColor: 'from-indigo-400 to-indigo-600', iconLetter: '👋' },
+  guest: { label: 'Guest / Relative', svgColor: 'from-pink-400 to-pink-600', iconLetter: '👋' },
   electrician: { label: 'Technician / Repair', svgColor: 'from-blue-400 to-blue-600', iconLetter: '⚡' },
   milkman: { label: 'Milkman / Dairy', svgColor: 'from-sky-300 to-slate-200', iconLetter: '🥛' },
   maid: { label: 'Household Help', svgColor: 'from-emerald-400 to-emerald-600', iconLetter: '🧹' },
@@ -66,7 +66,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
       // Draw background gradient
       const grad = ctx.createLinearGradient(0, 0, 300, 300);
       if (key === 'delivery') { grad.addColorStop(0, '#f59e0b'); grad.addColorStop(1, '#ea580c'); }
-      else if (key === 'guest') { grad.addColorStop(0, '#818cf8'); grad.addColorStop(1, '#4f46e5'); }
+      else if (key === 'guest') { grad.addColorStop(0, '#f472b6'); grad.addColorStop(1, '#db2777'); }
       else if (key === 'electrician') { grad.addColorStop(0, '#60a5fa'); grad.addColorStop(1, '#2563eb'); }
       else if (key === 'milkman') { grad.addColorStop(0, '#7dd3fc'); grad.addColorStop(1, '#cbd5e1'); }
       else if (key === 'maid') { grad.addColorStop(0, '#34d399'); grad.addColorStop(1, '#059669'); }
@@ -212,7 +212,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
             <button
               type="button"
               onClick={flipCamera}
-              className="px-2.5 py-1 rounded-md transition text-indigo-600 bg-indigo-50 hover:bg-indigo-100 flex items-center gap-1 ml-1"
+              className="px-2.5 py-1 rounded-md transition text-pink-600 bg-pink-50 hover:bg-pink-100 flex items-center gap-1 ml-1"
             >
               <FlipHorizontal className="w-3 h-3" /> Flip
             </button>
@@ -256,7 +256,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
                       onClick={() => selectPreset(key)}
                       className={`py-1.5 px-2 rounded-lg border text-xs font-semibold flex items-center justify-center space-x-1.5 transition text-left cursor-pointer ${
                         selectedPreset === key
-                          ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
+                          ? 'border-pink-500 bg-pink-50 text-pink-700 shadow-sm'
                           : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
                       }`}
                     >
@@ -298,7 +298,7 @@ export default function WebcamCapture({ onPhotoCaptured, value, guestType }: Web
                   <button
                     type="button"
                     onClick={capturePhoto}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-1.5 px-3.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow transition cursor-pointer"
+                    className="bg-pink-600 hover:bg-pink-700 text-white py-1.5 px-3.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow transition cursor-pointer"
                   >
                     <Camera className="w-3.5 h-3.5" />
                     <span>Snap Photo</span>

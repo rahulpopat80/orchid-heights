@@ -35,7 +35,7 @@ export default function Navbar({ session, onLogout, activeTab, setActiveTab }: N
 
   const getRoleIcon = () => {
     if (session.role === 'security') return <Shield className="w-4 h-4 text-emerald-600" />;
-    return <Home className="w-4 h-4 text-indigo-600" />;
+    return <Home className="w-4 h-4 text-pink-600" />;
   };
 
   return (
@@ -117,7 +117,7 @@ export default function Navbar({ session, onLogout, activeTab, setActiveTab }: N
             <button
               onClick={() => setActiveTab('security')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                activeTab === 'security' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500'
+                activeTab === 'security' ? 'bg-pink-50 text-pink-700' : 'text-slate-500'
               }`}
             >
               Gate Entry

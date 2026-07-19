@@ -29,7 +29,7 @@ const getBase64ImageFromURL = (url: string): Promise<string> => {
 };
 
 const drawPDFHeader = async (doc: jsPDF, title: string, subtitle: string, pageWidth: number) => {
-  doc.setFillColor(79, 70, 229); // Indigo 600
+  doc.setFillColor(216, 27, 96); // Dark Pink (Orchid) #d81b60
   doc.rect(0, 0, pageWidth, 28, 'F');
   
   try {
@@ -76,14 +76,14 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
+      doc.setFillColor(253, 242, 248); // pink-50
+      doc.setDrawColor(244, 114, 182); // pink-400
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 50;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -92,14 +92,14 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
           doc.addImage(log.photoUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
-          doc.setTextColor(148, 163, 184);
+          doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -187,7 +187,7 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
   doc.save(`Orchid_Heights_Visitors_${new Date().getTime()}.pdf`);
 };
 
-export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string, subtitle: string, isAdmin: boolean = false) => {
+export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string, subtitle: string, isAdmin: boolean = false, owners: any[] = []) => {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -206,14 +206,17 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
+      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.flatId);
+      const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
+
+      doc.setFillColor(253, 242, 248); // pink-50
+      doc.setDrawColor(244, 114, 182); // pink-400
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 50;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -222,14 +225,14 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
           doc.addImage(log.exitPhotoUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
-          doc.setTextColor(148, 163, 184);
+          doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Exit Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -244,7 +247,7 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Flat: ${log.flatId}`, textX, currY);
+      doc.text(`Flat: ${log.flatId} (${sanitizeText(ownerName)})`, textX, currY);
       
       currY += 6;
       doc.text(`Duration: ${log.durationMinutes ? log.durationMinutes + ' mins' : 'In Progress'}`, textX, currY);
@@ -300,7 +303,7 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
   doc.save(`Orchid_Heights_GymTheatre_${new Date().getTime()}.pdf`);
 };
 
-export const generateMoviePDF = async (logs: any[], title: string, subtitle: string, isAdmin: boolean = false) => {
+export const generateMoviePDF = async (logs: any[], title: string, subtitle: string, isAdmin: boolean = false, owners: any[] = []) => {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -319,14 +322,17 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
+      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.hostFlat);
+      const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
+
+      doc.setFillColor(253, 242, 248);
+      doc.setDrawColor(244, 114, 182);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 60;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -335,14 +341,14 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
           doc.addImage(log.posterUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
-          doc.setTextColor(148, 163, 184);
+          doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Poster', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(226, 232, 240);
+      doc.setDrawColor(252, 165, 165);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -357,7 +363,7 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Host: Flat ${log.hostFlat}`, textX, currY);
+      doc.text(`Host: Flat ${log.hostFlat} (${sanitizeText(ownerName)})`, textX, currY);
       
       currY += 6;
       doc.text(`Showtime: ${new Date(log.showTime).toLocaleString('en-IN')}`, textX, currY);
@@ -393,7 +399,7 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
   doc.save(`Orchid_Heights_Movies_${new Date().getTime()}.pdf`);
 };
 
-export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, subtitle: string, isAdmin: boolean = false) => {
+export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, subtitle: string, isAdmin: boolean = false, owners: any[] = []) => {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -412,8 +418,11 @@ export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, 
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(203, 213, 225);
+      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.flatId);
+      const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
+
+      doc.setFillColor(253, 242, 248);
+      doc.setDrawColor(244, 114, 182);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const textX = margin + 5;
@@ -428,7 +437,7 @@ export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, 
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Requested By: Flat ${log.flatId}`, textX, currY);
+      doc.text(`Requested By: Flat ${log.flatId} (${sanitizeText(ownerName)})`, textX, currY);
       
       currY += 6;
       doc.text(`Reason: ${sanitizeText(log.reason)}`, textX, currY);

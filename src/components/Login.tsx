@@ -50,11 +50,21 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       let activeDevice: any = null;
       if (role === 'owner') {
         const flatKey = `${wing}_${flatNo}`;
-        let deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
-        if (!deviceId) {
-          deviceId = 'dev_' + Math.random().toString(36).substring(2, 15) + '_' + flatKey;
-          localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
+        
+        let ipAddress = '115.240.122.' + (Math.floor(Math.random() * 90) + 10);
+        try {
+          const ipRes = await fetch('https://api.ipify.org?format=json');
+          if (ipRes.ok) {
+            const ipData = await ipRes.json();
+            if (ipData.ip) ipAddress = ipData.ip;
+          }
+        } catch (ipErr) {
+          console.warn('IP fetch failed, using fallback.');
         }
+
+        // Strict IP-based Device ID
+        const deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
+        localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
 
         let imei = localStorage.getItem(`orchid_device_imei_${flatKey}`);
         if (!imei) {
@@ -75,17 +85,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = 'Safari';
         else if (/firefox|fxios/i.test(ua)) browser = 'Firefox';
         else if (/edge|edg/i.test(ua)) browser = 'Edge';
-
-        let ipAddress = '115.240.122.' + (Math.floor(Math.random() * 90) + 10);
-        try {
-          const ipRes = await fetch('https://api.ipify.org?format=json');
-          if (ipRes.ok) {
-            const ipData = await ipRes.json();
-            if (ipData.ip) ipAddress = ipData.ip;
-          }
-        } catch (ipErr) {
-          console.warn('IP fetch failed, using fallback.');
-        }
 
         activeDevice = {
           deviceId,
@@ -146,7 +145,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
       {/* Decorative Background Circles */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-20 -translate-y-20"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-20 -translate-y-20"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-20 translate-y-20"></div>
 
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-8 relative z-10">
@@ -163,7 +162,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
           <h1 className="font-display font-bold text-2xl text-slate-900 tracking-tight">Orchid Heights</h1>
           <p className="text-sm text-slate-500 font-medium">ઓર્કીડ હાઇટ્સ સોસાયટી</p>
-          <div className="h-[2px] w-12 bg-indigo-500 mx-auto mt-4 rounded-full"></div>
+          <div className="h-[2px] w-12 bg-pink-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
         {/* Tab Selector */}
@@ -225,8 +224,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       <span className="text-slate-600 text-[11px]">{dev.browser || 'Web Browser'}</span>
                     </p>
                     <p className="text-[10px] text-slate-500 font-mono flex flex-wrap gap-x-2">
-                      <span>IP: <span className="text-indigo-600 font-semibold">{dev.ipAddress}</span></span>
-                      {dev.imei && <span>IMEI: <span className="text-indigo-600 font-semibold">{dev.imei}</span></span>}
+                      <span>IP: <span className="text-pink-600 font-semibold">{dev.ipAddress}</span></span>
+                      {dev.imei && <span>IMEI: <span className="text-pink-600 font-semibold">{dev.imei}</span></span>}
                     </p>
                     <p className="text-[9px] text-slate-400 font-medium">
                       Last Active: {new Date(dev.lastLogin).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}
@@ -268,7 +267,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <select
                       value={wing}
                       onChange={(e) => setWing(e.target.value as 'A' | 'B')}
-                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
                     >
                       <option value="A">Wing A</option>
                       <option value="B">Wing B</option>
@@ -280,7 +279,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <select
                       value={flatNo}
                       onChange={(e) => setFlatNo(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
                     >
                       {flatOptions.map((flat) => (
                         <option key={flat} value={flat}>{flat}</option>
@@ -301,7 +300,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       placeholder="Enter resident password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 pl-10 pr-10 text-sm font-medium transition outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-3 pl-10 pr-10 text-sm font-medium transition outline-none"
                     />
                     <button
                       type="button"
@@ -312,7 +311,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     </button>
                   </div>
                   <p className="text-[10px] text-slate-400 font-medium mt-2 leading-relaxed bg-slate-50 border border-slate-100 p-2 rounded-lg">
-                    💡 Hint: Default resident password is <span className="font-mono text-indigo-600 font-semibold">admin@123</span>.
+                    💡 Hint: Default resident password is <span className="font-mono text-pink-600 font-semibold">admin@123</span>.
                   </p>
                 </div>
               </>
@@ -327,7 +326,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     placeholder="admin"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
                   />
                 </div>
 
@@ -343,7 +342,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       placeholder="Enter security password"
                       value={securityPassword}
                       onChange={(e) => setSecurityPassword(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 pl-10 pr-10 text-sm font-medium transition outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-3 pl-10 pr-10 text-sm font-medium transition outline-none"
                     />
                     <button
                       type="button"
@@ -364,7 +363,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg focus:outline-none cursor-pointer"
+              className="w-full bg-pink-600 hover:bg-pink-700 active:bg-pink-800 disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg focus:outline-none cursor-pointer"
             >
               {loading ? (
                 <span className="inline-block border-2 border-white border-t-transparent rounded-full w-4 h-4 animate-spin"></span>

@@ -344,7 +344,7 @@ export default function AmenitiesSection({
       {activeSub === 'menu' && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
-            <Sparkles className="w-4 h-4 text-indigo-600" />
+            <Sparkles className="w-4 h-4 text-pink-600" />
             <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600">
               Amenities & Reservations
             </h4>
@@ -399,7 +399,7 @@ export default function AmenitiesSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
-              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+              className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
               <span className="text-xl leading-none -mt-0.5">?</span>
               <span className="uppercase tracking-widest text-[10px]">Back</span>
@@ -434,7 +434,7 @@ export default function AmenitiesSection({
             {/* Gym Access Box */}
             <div className="bg-slate-50/70 border border-slate-200 rounded-2xl p-5 flex flex-col justify-between text-center hover:border-slate-300 transition">
               <div className="space-y-2">
-                <span className="inline-flex w-11 h-11 bg-indigo-50 text-indigo-600 rounded-full items-center justify-center border border-indigo-100 shadow-xs text-xl">
+                <span className="inline-flex w-11 h-11 bg-pink-50 text-pink-600 rounded-full items-center justify-center border border-pink-100 shadow-xs text-xl">
                   🏋️
                 </span>
                 <div>
@@ -446,7 +446,7 @@ export default function AmenitiesSection({
               <div className="mt-5">
                 {activeGym ? (
                   <div className="space-y-2">
-                    <div className="bg-indigo-50/60 border border-indigo-100 p-2.5 rounded-xl text-left">
+                    <div className="bg-pink-50/60 border border-pink-100 p-2.5 rounded-xl text-left">
                       <p className="text-[8px] font-mono font-bold text-slate-400 uppercase leading-none">Checked In At</p>
                       <p className="text-xs font-black text-slate-800 mt-1 font-mono">
                         {new Date(activeGym.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
@@ -462,7 +462,7 @@ export default function AmenitiesSection({
                 ) : (
                   <button
                     onClick={() => handleCheckInGymTheatre('Gym')}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2 px-4 rounded-xl text-[10px] uppercase cursor-pointer transition shadow-xs"
+                    className="w-full bg-pink-600 hover:bg-pink-700 text-white font-black py-2 px-4 rounded-xl text-[10px] uppercase cursor-pointer transition shadow-xs"
                   >
                     Aagman (Enter Gym)
                   </button>
@@ -473,7 +473,7 @@ export default function AmenitiesSection({
             {/* Theatre Access Box */}
             <div className="bg-slate-50/70 border border-slate-200 rounded-2xl p-5 flex flex-col justify-between text-center hover:border-slate-300 transition">
               <div className="space-y-2">
-                <span className="inline-flex w-11 h-11 bg-indigo-50 text-indigo-600 rounded-full items-center justify-center border border-indigo-100 shadow-xs text-xl">
+                <span className="inline-flex w-11 h-11 bg-pink-50 text-pink-600 rounded-full items-center justify-center border border-pink-100 shadow-xs text-xl">
                   🎬
                 </span>
                 <div>
@@ -485,7 +485,7 @@ export default function AmenitiesSection({
               <div className="mt-5">
                 {activeTheatre ? (
                   <div className="space-y-2">
-                    <div className="bg-indigo-50/60 border border-indigo-100 p-2.5 rounded-xl text-left">
+                    <div className="bg-pink-50/60 border border-pink-100 p-2.5 rounded-xl text-left">
                       <p className="text-[8px] font-mono font-bold text-slate-400 uppercase leading-none">Checked In At</p>
                       <p className="text-xs font-black text-slate-800 mt-1 font-mono">
                         {new Date(activeTheatre.checkInTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
@@ -501,7 +501,7 @@ export default function AmenitiesSection({
                 ) : (
                   <button
                     onClick={() => handleCheckInGymTheatre('Theatre')}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2 px-4 rounded-xl text-[10px] uppercase cursor-pointer transition shadow-xs"
+                    className="w-full bg-pink-600 hover:bg-pink-700 text-white font-black py-2 px-4 rounded-xl text-[10px] uppercase cursor-pointer transition shadow-xs"
                   >
                     Aagman (Enter Theatre)
                   </button>
@@ -546,7 +546,7 @@ export default function AmenitiesSection({
                           )}
                         </div>
                       ) : (
-                        <span className="text-[7px] bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.5 rounded font-mono font-black uppercase tracking-wider animate-pulse">
+                        <span className="text-[7px] bg-pink-50 text-pink-700 border border-pink-100 px-1.5 py-0.5 rounded font-mono font-black uppercase tracking-wider animate-pulse">
                           Active
                         </span>
                       )}
@@ -565,7 +565,7 @@ export default function AmenitiesSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
-              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+              className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
               <span className="text-xl leading-none -mt-0.5">?</span>
               <span className="uppercase tracking-widest text-[10px]">Back</span>
@@ -591,7 +591,7 @@ export default function AmenitiesSection({
               )}
               <button
                 onClick={() => setShowAddMovieForm(!showAddMovieForm)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase transition flex items-center gap-1 cursor-pointer select-none shadow-xs"
+                className="bg-pink-600 hover:bg-pink-700 text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase transition flex items-center gap-1 cursor-pointer select-none shadow-xs"
               >
                 {showAddMovieForm ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
                 <span>{showAddMovieForm ? 'Close' : 'Schedule'}</span>
@@ -610,7 +610,7 @@ export default function AmenitiesSection({
           {showAddMovieForm && (
             <form onSubmit={handlePostMovie} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-3 text-xs">
               <div className="flex items-center space-x-1.5 text-slate-800 border-b border-slate-200 pb-2 mb-2">
-                <PlusCircle className="w-4 h-4 text-indigo-600" />
+                <PlusCircle className="w-4 h-4 text-pink-600" />
                 <h4 className="font-display font-black text-[10px] uppercase tracking-wider">Post Movie Screening</h4>
               </div>
 
@@ -626,7 +626,7 @@ export default function AmenitiesSection({
                     value={mTitle}
                     onChange={(e) => setMTitle(e.target.value)}
                     placeholder="e.g. Singham Again"
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
 
@@ -637,7 +637,7 @@ export default function AmenitiesSection({
                     value={mGenre}
                     onChange={(e) => setMGenre(e.target.value)}
                     placeholder="e.g. Action / Comedy"
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
 
@@ -646,7 +646,7 @@ export default function AmenitiesSection({
                   <select
                     value={mRating}
                     onChange={(e) => setMRating(e.target.value)}
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-bold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-bold focus:border-pink-500 transition outline-none"
                   >
                     <option value="UA">UA • Parents Guidance</option>
                     <option value="U">U • Unrestricted</option>
@@ -661,7 +661,7 @@ export default function AmenitiesSection({
                   <select
                     value={mDay}
                     onChange={(e) => setMDay(e.target.value)}
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-bold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-bold focus:border-pink-500 transition outline-none"
                   >
                     <option value="Monday">Monday</option>
                     <option value="Tuesday">Tuesday</option>
@@ -680,7 +680,7 @@ export default function AmenitiesSection({
                     required
                     value={mDate}
                     onChange={(e) => setMDate(e.target.value)}
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
 
@@ -692,7 +692,7 @@ export default function AmenitiesSection({
                     value={mTiming}
                     onChange={(e) => setMTiming(e.target.value)}
                     placeholder="e.g. 8:00 PM"
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
 
@@ -704,7 +704,7 @@ export default function AmenitiesSection({
                     value={mLength}
                     onChange={(e) => setMLength(e.target.value)}
                     placeholder="e.g. 2h 40m"
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
               </div>
@@ -717,7 +717,7 @@ export default function AmenitiesSection({
                     value={mTrailerUrl}
                     onChange={(e) => setMTrailerUrl(e.target.value)}
                     placeholder="e.g. https://youtube.com/..."
-                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                    className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none"
                   />
                 </div>
 
@@ -737,7 +737,7 @@ export default function AmenitiesSection({
                     />
                     <label
                       htmlFor="movie-poster-input-ref"
-                      className="flex-1 bg-white border border-dashed border-slate-300 hover:border-indigo-500 p-2 rounded-lg text-center cursor-pointer text-slate-500 hover:text-indigo-600 transition flex items-center justify-center space-x-1.5 text-xs font-semibold"
+                      className="flex-1 bg-white border border-dashed border-slate-300 hover:border-pink-500 p-2 rounded-lg text-center cursor-pointer text-slate-500 hover:text-pink-600 transition flex items-center justify-center space-x-1.5 text-xs font-semibold"
                     >
                       <Upload className="w-4 h-4 shrink-0" />
                       <span className="truncate">{posterFile ? `Poster: ${posterFile.name}` : 'Upload Poster File'}</span>
@@ -752,7 +752,7 @@ export default function AmenitiesSection({
                       </button>
                     )}
                   </div>
-                  {isUploadingPoster && <p className="text-[9px] text-indigo-500 mt-1 animate-pulse">Uploading file chunks safely...</p>}
+                  {isUploadingPoster && <p className="text-[9px] text-pink-500 mt-1 animate-pulse">Uploading file chunks safely...</p>}
                 </div>
               </div>
 
@@ -763,7 +763,7 @@ export default function AmenitiesSection({
                   onChange={(e) => setMSynopsis(e.target.value)}
                   placeholder="Brief movie overview..."
                   rows={2}
-                  className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-indigo-500 transition outline-none resize-none"
+                  className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold focus:border-pink-500 transition outline-none resize-none"
                 ></textarea>
               </div>
 
@@ -771,7 +771,7 @@ export default function AmenitiesSection({
                 <button
                   type="submit"
                   disabled={isUploadingPoster}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-sans font-black px-5 py-2 rounded-xl text-[10px] uppercase tracking-wider cursor-pointer disabled:opacity-50 transition shadow-sm"
+                  className="bg-pink-600 hover:bg-pink-700 text-white font-sans font-black px-5 py-2 rounded-xl text-[10px] uppercase tracking-wider cursor-pointer disabled:opacity-50 transition shadow-sm"
                 >
                   {isUploadingPoster ? 'Processing Chunks...' : 'Post Screening'}
                 </button>
@@ -835,7 +835,7 @@ export default function AmenitiesSection({
                         <h4 className="font-display font-black text-slate-800 text-xs sm:text-sm tracking-tight leading-tight uppercase truncate">
                           {movie.title}
                         </h4>
-                        <div className="flex flex-wrap items-center gap-x-1.5 text-[9px] text-indigo-600 font-bold font-mono">
+                        <div className="flex flex-wrap items-center gap-x-1.5 text-[9px] text-pink-600 font-bold font-mono">
                           <span>{movie.genre}</span>
                           <span className="text-slate-300">•</span>
                           <span>{movie.day} • {movie.date}</span>
@@ -883,7 +883,7 @@ export default function AmenitiesSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/amenities', 'menu')}
-              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+              className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
               <span className="text-xl leading-none -mt-0.5">?</span>
               <span className="uppercase tracking-widest text-[10px]">Back</span>
@@ -904,7 +904,7 @@ export default function AmenitiesSection({
             {/* Booking Form */}
             <div className="lg:col-span-5 bg-slate-50 border border-slate-200 p-4 sm:p-5 rounded-2xl space-y-4 text-left">
               <div className="flex items-center space-x-1.5 text-slate-800">
-                <PlusCircle className="w-4 h-4 text-indigo-600" />
+                <PlusCircle className="w-4 h-4 text-pink-600" />
                 <h4 className="font-display font-bold text-xs uppercase tracking-wider">Request Venue</h4>
               </div>
 
@@ -920,7 +920,7 @@ export default function AmenitiesSection({
                     placeholder="e.g. Clubhouse Party Hall"
                     value={fPropertyName}
                     onChange={(e) => setFPropertyName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -932,7 +932,7 @@ export default function AmenitiesSection({
                       required
                       value={fDateFrom}
                       onChange={(e) => setFDateFrom(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-pink-500"
                     />
                   </div>
 
@@ -943,7 +943,7 @@ export default function AmenitiesSection({
                       required
                       value={fDateTo}
                       onChange={(e) => setFDateTo(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-indigo-500"
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-pink-500"
                     />
                   </div>
                 </div>
@@ -956,7 +956,7 @@ export default function AmenitiesSection({
                     placeholder="e.g. Daughter's 5th Birthday Celebration"
                     value={fReason}
                     onChange={(e) => setFReason(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -968,7 +968,7 @@ export default function AmenitiesSection({
                     placeholder="e.g. sound system, 100 chairs, buffet tables, generator"
                     value={fStuffNeeded}
                     onChange={(e) => setFStuffNeeded(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -980,7 +980,7 @@ export default function AmenitiesSection({
                     placeholder="e.g. 10 visitor parking slots, late extension till 11 PM"
                     value={fParkingRequest}
                     onChange={(e) => setFParkingRequest(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -990,7 +990,7 @@ export default function AmenitiesSection({
 
                 <button
                   type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-sans font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-sm select-none"
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-sans font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-sm select-none"
                 >
                   Submit Booking Request
                 </button>
@@ -1082,7 +1082,7 @@ export default function AmenitiesSection({
                               className={`py-1.5 px-3 rounded-xl text-[10px] font-extrabold uppercase transition select-none cursor-pointer border ${
                                 alreadyVoted
                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                  : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 shadow-sm'
+                                  : 'bg-pink-600 text-white border-pink-600 hover:bg-pink-700 shadow-sm'
                               }`}
                             >
                               {alreadyVoted ? 'Approved ✓' : 'Approve Reservation'}
@@ -1100,7 +1100,7 @@ export default function AmenitiesSection({
       )}
       {/* Exit Photo Modal */}
       {showExitPhotoModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowExitPhotoModal(false)}></div>
           <div className="relative bg-white rounded-3xl p-5 shadow-2xl w-full max-w-sm space-y-4">
             <div className="text-center">
@@ -1132,8 +1132,8 @@ export default function AmenitiesSection({
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center cursor-pointer w-full h-full text-indigo-600 hover:text-indigo-700 transition">
-                  <div className="bg-white p-3 rounded-full shadow-sm mb-2 border border-indigo-100">
+                <label className="flex flex-col items-center justify-center cursor-pointer w-full h-full text-pink-600 hover:text-pink-700 transition">
+                  <div className="bg-white p-3 rounded-full shadow-sm mb-2 border border-pink-100">
                     <Camera className="w-6 h-6" />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider">Tap to Capture/Upload</span>
@@ -1162,7 +1162,7 @@ export default function AmenitiesSection({
               <button
                 onClick={handleConfirmCheckOut}
                 disabled={!exitPhotoBase64}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl text-[10px] uppercase transition shadow-md"
+                className="flex-1 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-xl text-[10px] uppercase transition shadow-md"
               >
                 Confirm Exit
               </button>

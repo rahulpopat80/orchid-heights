@@ -65,12 +65,12 @@ export default function DirectorySection({
     <div className="space-y-6 text-left">
       {/* Meta Stats Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-tr from-indigo-50/50 to-indigo-100/50 border border-indigo-100 p-4.5 rounded-2xl flex items-center space-x-3.5 shadow-sm">
-          <div className="bg-indigo-600 text-white p-2.5 rounded-xl shadow-sm">
+        <div className="bg-gradient-to-tr from-pink-50/50 to-pink-100/50 border border-pink-100 p-4.5 rounded-2xl flex items-center space-x-3.5 shadow-sm">
+          <div className="bg-pink-600 text-white p-2.5 rounded-xl shadow-sm">
             <Building className="w-4.5 h-4.5" />
           </div>
           <div>
-            <p className="text-[9px] text-indigo-500 uppercase tracking-wider font-extrabold">Building Capacity</p>
+            <p className="text-[9px] text-pink-500 uppercase tracking-wider font-extrabold">Building Capacity</p>
             <p className="text-lg font-display font-black text-slate-800 leading-tight">96 Flats <span className="text-[10px] font-normal text-slate-500">A & B Wings</span></p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function DirectorySection({
       <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center space-x-2.5">
-            <BookOpen className="w-5 h-5 text-indigo-600" />
+            <BookOpen className="w-5 h-5 text-pink-600" />
             <div>
               <h3 className="font-display font-black text-base text-slate-800 uppercase tracking-tight">Orchid Heights Directory</h3>
               <p className="text-[10px] text-slate-400 font-medium">Verify neighbours, vehicles, and daily helper associations</p>
@@ -120,7 +120,7 @@ export default function DirectorySection({
               placeholder="Search by name, flat (B-1104), phone, helper or plate #..."
               value={directorySearch}
               onChange={(e) => setDirectorySearch(e.target.value)}
-              className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold transition outline-none"
+              className="w-full bg-white border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold transition outline-none"
             />
           </div>
 
@@ -187,7 +187,7 @@ export default function DirectorySection({
                     {/* Top Row: Flat # & Badge */}
                     <div className="flex justify-between items-start">
                       <div className="flex items-center space-x-2">
-                        <span className="bg-indigo-600 text-white font-mono text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
+                        <span className="bg-pink-600 text-white font-mono text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
                           Flat {flatId}
                         </span>
                         <span className="text-[9px] text-slate-400 font-bold uppercase">
@@ -219,7 +219,7 @@ export default function DirectorySection({
                             {owner.nameEn}
                           </h4>
                           {owner.nameGu && (
-                            <p className="text-xs text-indigo-700 font-bold font-sans mt-0.5">{owner.nameGu}</p>
+                            <p className="text-xs text-pink-700 font-bold font-sans mt-0.5">{owner.nameGu}</p>
                           )}
                         </div>
                       )}
@@ -231,7 +231,7 @@ export default function DirectorySection({
                         <p className="flex items-center font-semibold">
                           <Phone className="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" />
                           {owner.phone ? (
-                            <a href={`tel:+91${owner.phone}`} className="text-indigo-600 hover:underline font-mono">+91 {owner.phone}</a>
+                            <a href={`tel:+91${owner.phone}`} className="text-pink-600 hover:underline font-mono">+91 {owner.phone}</a>
                           ) : (
                             <span className="text-slate-400">No phone listed</span>
                           )}
@@ -271,11 +271,11 @@ export default function DirectorySection({
                           {owner.vehicles.map((v) => (
                             <span
                               key={v.id}
-                              className="inline-flex items-center bg-indigo-50/50 border border-indigo-100/50 text-indigo-800 px-2 py-1 rounded-lg font-mono text-[9px] font-black text-left"
+                              className="inline-flex items-center bg-pink-50/50 border border-pink-100/50 text-pink-800 px-2 py-1 rounded-lg font-mono text-[9px] font-black text-left"
                             >
                               <span className="mr-1">{v.type === 'fourwheeler' ? '🚗' : '🏍️'}</span>
                               <span>{v.plateNumber}</span>
-                              {v.parkingPlot && <span className="text-[8px] text-indigo-500 ml-1.5 font-bold">🅿️ Plot: {v.parkingPlot}</span>}
+                              {v.parkingPlot && <span className="text-[8px] text-pink-500 ml-1.5 font-bold">🅿️ Plot: {v.parkingPlot}</span>}
                             </span>
                           ))}
                         </div>
@@ -321,7 +321,7 @@ export default function DirectorySection({
                     <div className="border-t border-slate-100 pt-3 flex justify-end">
                       <button
                         onClick={() => onEditTrigger!(owner)}
-                        className="text-[10px] font-extrabold text-indigo-600 hover:text-indigo-800 bg-white border border-slate-200 rounded-lg px-3 py-1 hover:border-indigo-200 transition shadow-sm cursor-pointer"
+                        className="text-[10px] font-extrabold text-pink-600 hover:text-pink-800 bg-white border border-slate-200 rounded-lg px-3 py-1 hover:border-pink-200 transition shadow-sm cursor-pointer"
                       >
                         Edit Owner Profile
                       </button>

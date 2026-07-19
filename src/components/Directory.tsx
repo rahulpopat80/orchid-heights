@@ -60,12 +60,12 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
       
       {/* Bento Meta Header Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-tr from-indigo-50 to-indigo-100 border border-indigo-200/50 p-5 rounded-2xl flex items-center space-x-4 shadow-sm">
-          <div className="bg-indigo-600 text-white p-3 rounded-xl shadow-md">
+        <div className="bg-gradient-to-tr from-pink-50 to-pink-100 border border-pink-200/50 p-5 rounded-2xl flex items-center space-x-4 shadow-sm">
+          <div className="bg-pink-600 text-white p-3 rounded-xl shadow-md">
             <Building className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] text-indigo-500 uppercase tracking-wider font-semibold">Total Building Capacity</p>
+            <p className="text-[10px] text-pink-500 uppercase tracking-wider font-semibold">Total Building Capacity</p>
             <p className="text-2xl font-display font-bold text-slate-800">96 Flats <span className="text-xs font-normal text-slate-500">(2 Wings)</span></p>
           </div>
         </div>
@@ -105,7 +105,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
               placeholder="Search by name, flat (A-202), phone, or plate #..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium transition outline-none"
+              className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium transition outline-none"
             />
           </div>
 
@@ -170,9 +170,9 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                 }`}
               >
                 {/* Flat Banner */}
-                <div className={`p-4 flex justify-between items-center border-b ${isVacant ? 'bg-slate-100/50 border-slate-100' : 'bg-indigo-50/40 border-indigo-100'}`}>
+                <div className={`p-4 flex justify-between items-center border-b ${isVacant ? 'bg-slate-100/50 border-slate-100' : 'bg-pink-50/40 border-pink-100'}`}>
                   <div className="flex items-center space-x-2">
-                    <span className="font-mono bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                    <span className="font-mono bg-pink-600 text-white text-xs font-bold px-2.5 py-1 rounded-md">
                       {owner.wing}-{owner.flatNo}
                     </span>
                     <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -184,7 +184,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                   {isAdminEdit && (
                     <button
                       onClick={() => onEditTrigger!(owner)}
-                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-white border border-slate-200 rounded-lg px-2.5 py-1 hover:border-indigo-200 transition shadow-sm cursor-pointer"
+                      className="text-xs font-semibold text-pink-600 hover:text-pink-800 bg-white border border-slate-200 rounded-lg px-2.5 py-1 hover:border-pink-200 transition shadow-sm cursor-pointer"
                     >
                       Edit Owner
                     </button>
@@ -208,8 +208,8 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                         </div>
                         {owner.nameGu && (
                           <div className="flex items-center space-x-1.5">
-                            <Languages className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                            <p className="text-xs font-semibold text-indigo-700 font-sans">{owner.nameGu}</p>
+                            <Languages className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                            <p className="text-xs font-semibold text-pink-700 font-sans">{owner.nameGu}</p>
                           </div>
                         )}
                       </div>
@@ -224,7 +224,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                         {owner.phone ? (
                           <a
                             href={`tel:+91${owner.phone}`}
-                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline font-mono transition"
+                            className="text-xs font-semibold text-pink-600 hover:text-pink-800 hover:underline font-mono transition"
                             title={`Click to call ${owner.nameEn}`}
                           >
                             +91 {owner.phone}
@@ -240,7 +240,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                           <Phone className="w-3.5 h-3.5 text-slate-300 shrink-0" />
                           <a
                             href={`tel:+91${owner.secondaryContact}`}
-                            className="text-xs text-slate-500 hover:text-indigo-600 hover:underline font-mono italic transition"
+                            className="text-xs text-slate-500 hover:text-pink-600 hover:underline font-mono italic transition"
                             title={`Click to call alternate contact`}
                           >
                             Alt: +91 {owner.secondaryContact}
@@ -275,7 +275,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                               <span className="text-base">{v.type === 'fourwheeler' ? '🚗' : '🏍️'}</span>
                               <span className="font-semibold text-slate-700 capitalize text-[11px]">{v.brandModel || 'Vehicle'}</span>
                             </div>
-                            <span className="font-mono font-bold bg-white text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded text-[10px] uppercase">
+                            <span className="font-mono font-bold bg-white text-pink-700 border border-pink-200 px-2 py-0.5 rounded text-[10px] uppercase">
                               {v.plateNumber}
                             </span>
                           </div>

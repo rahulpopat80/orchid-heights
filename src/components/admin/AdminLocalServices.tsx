@@ -98,7 +98,7 @@ export default function AdminLocalServices() {
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase transition flex items-center shadow-sm"
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase transition flex items-center shadow-sm"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Provider
@@ -120,7 +120,7 @@ export default function AdminLocalServices() {
                   <button type="button" onClick={() => setPhotoUrl('')} className="absolute -top-2 -right-2 bg-slate-800 text-white rounded-full p-1"><X className="w-3 h-3"/></button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center cursor-pointer text-indigo-500 hover:text-indigo-600">
+                <label className="flex flex-col items-center cursor-pointer text-pink-500 hover:text-pink-600">
                   <Camera className="w-8 h-8 mb-2" />
                   <span className="text-[10px] font-bold uppercase">Upload Photo *</span>
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => {
@@ -135,17 +135,17 @@ export default function AdminLocalServices() {
             <div className="space-y-3">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Full Name *</label>
-                <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-indigo-500" />
+                <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-pink-500" />
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mobile Number *</label>
-                <input required type="text" maxLength={10} value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-indigo-500" />
+                <input required type="text" maxLength={10} value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-pink-500" />
               </div>
             </div>
             
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Role Type *</label>
-              <select value={role} onChange={e => setRole(e.target.value as any)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-indigo-500">
+              <select value={role} onChange={e => setRole(e.target.value as any)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-pink-500">
                 <option value="Maid">Maid</option>
                 <option value="Milkman">Milkman</option>
                 <option value="Car Cleaner">Car Cleaner</option>
@@ -156,11 +156,11 @@ export default function AdminLocalServices() {
             
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Assigned Flats (Comma Separated)</label>
-              <input type="text" placeholder="e.g. A-101, B-202" value={flatsRaw} onChange={e => setFlatsRaw(e.target.value)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-indigo-500" />
+              <input type="text" placeholder="e.g. A-101, B-202" value={flatsRaw} onChange={e => setFlatsRaw(e.target.value)} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-xs font-semibold outline-none focus:border-pink-500" />
             </div>
             
             <div className="md:col-span-2 pt-3 border-t border-slate-100 flex justify-end">
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-wider transition shadow-sm">
+              <button type="submit" className="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-xl font-bold uppercase text-[10px] tracking-wider transition shadow-sm">
                 {editingId ? 'Save Changes' : 'Register Provider'}
               </button>
             </div>
@@ -201,7 +201,7 @@ export default function AdminLocalServices() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="bg-indigo-50 text-indigo-700 border border-indigo-100 px-2 py-0.5 rounded text-[9px] font-bold uppercase">
+                    <span className="bg-pink-50 text-pink-700 border border-pink-100 px-2 py-0.5 rounded text-[9px] font-bold uppercase">
                       {h.role}
                     </span>
                   </td>
@@ -215,7 +215,7 @@ export default function AdminLocalServices() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
-                    <button onClick={() => handleEdit(h)} className="text-indigo-500 hover:bg-indigo-50 p-1.5 rounded transition"><Edit2 className="w-4 h-4"/></button>
+                    <button onClick={() => handleEdit(h)} className="text-pink-500 hover:bg-pink-50 p-1.5 rounded transition"><Edit2 className="w-4 h-4"/></button>
                     <button onClick={() => handleDelete(h.id)} className="text-red-500 hover:bg-red-50 p-1.5 rounded transition"><Trash2 className="w-4 h-4"/></button>
                   </td>
                 </tr>

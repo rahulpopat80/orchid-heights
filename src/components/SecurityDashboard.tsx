@@ -428,7 +428,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm gap-4">
         <div className="text-left">
           <h1 className="font-display font-bold text-2xl text-slate-800 tracking-tight flex items-center space-x-2">
-            <span className="inline-block w-3 h-3 bg-indigo-600 rounded-full animate-pulse"></span>
+            <span className="inline-block w-3 h-3 bg-pink-600 rounded-full animate-pulse"></span>
             <span>ગેટ સિક્યુરિટી કંટ્રોલ પેનલ</span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">રહેવાસીઓની પરવાનગી મેળવવા માટેની લાઈવ સુરક્ષા સિસ્ટમ.</p>
@@ -438,9 +438,9 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             type="button"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="w-full sm:w-auto bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-700 px-6 py-3 rounded-xl text-lg font-bold flex items-center justify-center space-x-2 transition shadow-sm"
+            className="w-full sm:w-auto bg-pink-50 hover:bg-pink-100 active:bg-pink-200 text-pink-700 px-6 py-3 rounded-xl text-lg font-bold flex items-center justify-center space-x-2 transition shadow-sm"
           >
-            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-pink-600' : ''}`} />
             <span>{isRefreshing ? 'લોડ થાય છે...' : 'રીફ્રેશ કરો'}</span>
           </button>
         </div>
@@ -477,7 +477,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
         
         <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-8 text-left">
           <div className="flex items-center space-x-4 mb-8 border-b border-slate-100 pb-5">
-            <div className="bg-indigo-100 p-3 rounded-2xl text-indigo-700">
+            <div className="bg-pink-100 p-3 rounded-2xl text-pink-700">
               <Shield className="w-8 h-8" />
             </div>
             <div>
@@ -523,8 +523,8 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             <WebcamCapture onPhotoCaptured={(base64) => setPhotoUrl(base64)} value={photoUrl} guestType={guestType} />
 
             {isDailyHelperType && (
-              <div className="bg-indigo-50 border border-indigo-100 p-5 rounded-2xl space-y-4">
-                <div className="flex items-center space-x-2 text-indigo-800">
+              <div className="bg-pink-50 border border-pink-100 p-5 rounded-2xl space-y-4">
+                <div className="flex items-center space-x-2 text-pink-800">
                   <Sparkles className="w-5 h-5 shrink-0" />
                   <span className="font-bold text-lg">રજિસ્ટર્ડ હેલ્પર ડાયરેક્ટરી</span>
                 </div>
@@ -534,7 +534,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                   className="w-full bg-white border border-slate-300 rounded-xl py-3 px-4 text-base font-bold outline-none"
                 >
                   <option value="">-- રજિસ્ટર્ડ હેલ્પર પસંદ કરો --</option>
-                  <option value="new" className="text-indigo-600">+ નવો હેલ્પર રજિસ્ટર કરો</option>
+                  <option value="new" className="text-pink-600">+ નવો હેલ્પર રજિસ્ટર કરો</option>
                   {mappedHelpers.map((h) => (
                     <option key={h.id} value={h.id}>{h.name} ({h.phone})</option>
                   ))}
@@ -622,11 +622,11 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                 className="w-full bg-slate-100 hover:bg-slate-200 py-4 px-5 flex items-center justify-between text-base font-bold text-slate-800 transition"
               >
                 <div className="flex items-center space-x-3">
-                  <Layers className="w-6 h-6 text-indigo-600" />
+                  <Layers className="w-6 h-6 text-pink-600" />
                   <span>ટાર્ગેટ ફ્લેટ પસંદ કરો (મલ્ટી-સિલેક્ટ)</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded-full text-sm">{selectedFlats.length} પસંદ કરેલ</span>
+                  <span className="bg-pink-200 text-pink-800 px-3 py-1 rounded-full text-sm">{selectedFlats.length} પસંદ કરેલ</span>
                   <span>{isMultiSelectOpen ? '▲' : '▼'}</span>
                 </div>
               </button>
@@ -653,7 +653,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                           key={flatId}
                           onClick={() => toggleFlatSelection(flatId)}
                           className={`py-2 rounded text-xs font-bold border transition-all text-center ${
-                            isChecked ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-300 text-slate-700'
+                            isChecked ? 'bg-pink-600 border-pink-600 text-white shadow-md' : 'bg-white border-slate-300 text-slate-700'
                           }`}
                         >
                           {flatId}
@@ -683,8 +683,8 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                       ? (owner.nameGu || owner.nameEn)
                       : 'Vacant';
                     return (
-                      <div key={fId} className="bg-white border border-indigo-100 rounded-xl px-3 py-2 flex items-center space-x-2">
-                        <span className="text-[10px] font-black font-mono bg-indigo-600 text-white px-2 py-0.5 rounded">{fId}</span>
+                      <div key={fId} className="bg-white border border-pink-100 rounded-xl px-3 py-2 flex items-center space-x-2">
+                        <span className="text-[10px] font-black font-mono bg-pink-600 text-white px-2 py-0.5 rounded">{fId}</span>
                         <span className="text-sm font-bold text-slate-800 truncate">{oName}</span>
                       </div>
                     );
@@ -723,7 +723,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold py-5 px-6 rounded-2xl text-xl shadow-lg transition flex items-center justify-center space-x-3"
+              className="w-full bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white font-bold py-5 px-6 rounded-2xl text-xl shadow-lg transition flex items-center justify-center space-x-3"
             >
               {submitting ? (
                 <span className="inline-block border-4 border-white border-t-transparent rounded-full w-8 h-8 animate-spin"></span>
@@ -782,7 +782,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                 <h3 className="font-display font-bold text-xl text-slate-800">આજના પૂર્ણ થયેલ પ્રવેશ</h3>
                 <p className="text-sm text-slate-500 mt-1">આજના બધા મંજૂર કે અસ્વીકાર થયેલ મુલાકાતીઓ.</p>
               </div>
-              <span className="bg-indigo-150 text-indigo-800 border border-indigo-200 text-sm font-bold px-3 py-1.5 rounded-full">
+              <span className="bg-pink-150 text-pink-800 border border-pink-200 text-sm font-bold px-3 py-1.5 rounded-full">
                 {filteredLogs.filter(v => {
                   const todayStr = new Date().toDateString();
                   return new Date(v.requestTime).toDateString() === todayStr;
@@ -798,7 +798,7 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
                 placeholder="નામ, ફોન કે ફ્લેટ નંબરથી શોધો..."
                 value={logsSearch}
                 onChange={(e) => setLogsSearch(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl py-2 pl-10 pr-4 text-sm outline-none focus:border-pink-500"
               />
             </div>
 

@@ -163,14 +163,14 @@ export default function VisitorsSection({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
           <div>
             <div className="flex items-center space-x-2.5">
-              <ClipboardList className="w-5 h-5 text-indigo-600" />
+              <ClipboardList className="w-5 h-5 text-pink-600" />
               <h3 className="font-display font-bold text-base text-slate-800">Guest History & Reports</h3>
             </div>
             <p className="text-xs text-slate-400 mt-1">Logs populate as soon as visitors register at the security gate.</p>
           </div>
           <button
             onClick={handleDownloadVisitorReport}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer select-none"
+            className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer select-none"
           >
             <Download className="w-4 h-4" />
             <span>Download 3-Month Report</span>
@@ -179,7 +179,7 @@ export default function VisitorsSection({
 
         {loadingHistory && guestHistory.length === 0 ? (
           <div className="py-12 flex items-center justify-center">
-            <span className="inline-block border-2 border-indigo-600 border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+            <span className="inline-block border-2 border-pink-600 border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
           </div>
         ) : guestHistory.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-slate-400 py-12 border-2 border-dashed border-slate-150 rounded-xl">

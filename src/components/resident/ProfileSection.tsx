@@ -137,7 +137,7 @@ export default function ProfileSection({
           {/* Box 1: Household Family Members */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-2.5">
-              <Users className="w-4.5 h-4.5 text-indigo-600" />
+              <Users className="w-4.5 h-4.5 text-pink-600" />
               <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-800">
                 Household Family Members
               </h4>
@@ -181,20 +181,20 @@ export default function ProfileSection({
                   placeholder="Full Name (e.g. Rahul Popat)"
                   value={newMember}
                   onChange={(e) => setNewMember(e.target.value)}
-                  className="flex-1 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg px-3 py-2 text-xs font-medium outline-none transition"
+                  className="flex-1 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-lg px-3 py-2 text-xs font-medium outline-none transition"
                 />
                 <input
                   type="tel"
                   placeholder="Contact No. (Optional)"
                   value={newMemberPhone}
                   onChange={(e) => setNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg px-3 py-2 text-xs font-medium outline-none transition w-full sm:w-40"
+                  className="bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-lg px-3 py-2 text-xs font-medium outline-none transition w-full sm:w-40"
                 />
               </div>
               <button
                 type="submit"
                 disabled={savingSettings}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg flex items-center justify-center space-x-1.5 transition cursor-pointer text-xs"
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 rounded-lg flex items-center justify-center space-x-1.5 transition cursor-pointer text-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Household Member</span>
@@ -205,7 +205,7 @@ export default function ProfileSection({
           {/* Box 2: Registered Vehicles */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-2.5">
-              <Car className="w-4.5 h-4.5 text-indigo-600" />
+              <Car className="w-4.5 h-4.5 text-pink-600" />
               <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-800">
                 Registered Vehicles
               </h4>
@@ -229,7 +229,7 @@ export default function ProfileSection({
                         <span className="text-[10px] text-slate-400 font-normal">({v.brandModel})</span>
                       </div>
                       {v.parkingPlot && (
-                        <span className="text-[10px] text-indigo-600 font-bold mt-0.5">🅿️ Plot: {v.parkingPlot}</span>
+                        <span className="text-[10px] text-pink-600 font-bold mt-0.5">🅿️ Plot: {v.parkingPlot}</span>
                       )}
                     </div>
                     <button
@@ -256,7 +256,7 @@ export default function ProfileSection({
                   type="button"
                   onClick={() => setVType('twowheeler')}
                   className={`flex-1 py-1.5 rounded text-[10px] font-bold border transition cursor-pointer ${
-                    vType === 'twowheeler' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200'
+                    vType === 'twowheeler' ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-slate-600 border-slate-200'
                   }`}
                 >
                   🏍️ Two Wheeler
@@ -265,7 +265,7 @@ export default function ProfileSection({
                   type="button"
                   onClick={() => setVType('fourwheeler')}
                   className={`flex-1 py-1.5 rounded text-[10px] font-bold border transition cursor-pointer ${
-                    vType === 'fourwheeler' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200'
+                    vType === 'fourwheeler' ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-slate-600 border-slate-200'
                   }`}
                 >
                   🚗 Four Wheeler
@@ -279,7 +279,7 @@ export default function ProfileSection({
                   placeholder="PLATE (e.g. GJ01AB1234)"
                   value={vPlate}
                   onChange={(e) => setVPlate(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg px-2.5 py-2 uppercase outline-none focus:border-indigo-500"
+                  className="bg-white border border-slate-200 rounded-lg px-2.5 py-2 uppercase outline-none focus:border-pink-500"
                 />
                 <input
                   type="text"
@@ -287,7 +287,7 @@ export default function ProfileSection({
                   placeholder="MODEL (e.g. Activa / Swift)"
                   value={vModel}
                   onChange={(e) => setVModel(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg px-2.5 py-2 outline-none focus:border-indigo-500"
+                  className="bg-white border border-slate-200 rounded-lg px-2.5 py-2 outline-none focus:border-pink-500"
                 />
               </div>
 
@@ -297,14 +297,14 @@ export default function ProfileSection({
                   placeholder="Parking Plot (e.g. B-1 (Basement), G-1 (Ground))"
                   value={vParkingPlot}
                   onChange={(e) => setVParkingPlot(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 outline-none focus:border-indigo-500"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 outline-none focus:border-pink-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={savingSettings}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-[10px] transition cursor-pointer uppercase tracking-wider"
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 rounded-lg text-[10px] transition cursor-pointer uppercase tracking-wider"
               >
                 Register Vehicle
               </button>
@@ -317,7 +317,7 @@ export default function ProfileSection({
           {/* Box 3: Alternate Contact & Password Security */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-2.5">
-              <Lock className="w-4.5 h-4.5 text-indigo-600" />
+              <Lock className="w-4.5 h-4.5 text-pink-600" />
               <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-800">
                 Security & Alternate Contact
               </h4>
@@ -332,7 +332,7 @@ export default function ProfileSection({
                   autoComplete="new-password"
                   value={altContact}
                   onChange={(e) => setAltContact(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition"
+                  className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition"
                 />
               </div>
 
@@ -345,7 +345,7 @@ export default function ProfileSection({
                     value={newPassword}
                     autoComplete="new-password"
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition pr-10"
+                    className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-lg p-2.5 text-xs outline-none transition pr-10"
                   />
                   <button
                     type="button"
@@ -360,7 +360,7 @@ export default function ProfileSection({
               <button
                 type="submit"
                 disabled={savingSettings}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-xs transition cursor-pointer"
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-lg text-xs transition cursor-pointer"
               >
                 {savingSettings ? 'Saving...' : 'Save Contact & Password'}
               </button>
@@ -370,7 +370,7 @@ export default function ProfileSection({
           {/* Box 4: Absence & Delivery Redirection Management */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-2.5">
-              <Calendar className="w-4.5 h-4.5 text-indigo-600" />
+              <Calendar className="w-4.5 h-4.5 text-pink-600" />
               <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-800">
                 Absence & Delivery Redirection
               </h4>
@@ -458,7 +458,7 @@ export default function ProfileSection({
                     placeholder="e.g. A-102"
                     value={absMilkRedirect}
                     onChange={(e) => setAbsMilkRedirect(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -469,7 +469,7 @@ export default function ProfileSection({
                     placeholder="e.g. B-1104"
                     value={absNewspaperRedirect}
                     onChange={(e) => setAbsNewspaperRedirect(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-pink-500"
                   />
                 </div>
 
@@ -480,13 +480,13 @@ export default function ProfileSection({
                     placeholder="e.g. A-102"
                     value={absParcelRedirect}
                     onChange={(e) => setAbsParcelRedirect(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-pink-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition cursor-pointer"
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition cursor-pointer"
                 >
                   Register Absence Redirection
                 </button>
@@ -498,7 +498,7 @@ export default function ProfileSection({
           {activeHelpers.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
               <div className="flex items-center space-x-2 border-b border-slate-100 pb-2.5">
-                <ShieldCheck className="w-4.5 h-4.5 text-indigo-600" />
+                <ShieldCheck className="w-4.5 h-4.5 text-pink-600" />
                 <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-800">
                   My Assigned Helpers
                 </h4>
