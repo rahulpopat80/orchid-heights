@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { Visitor, GymTheatreLog, AmenityBooking } from '../types';
+import { downloadChunkedFile } from './fileStorage';
 
 const sanitizeText = (str: string) => {
   if (!str) return '';
@@ -7,7 +8,15 @@ const sanitizeText = (str: string) => {
   return clean || '[Local Name]';
 };
 
-const getBase64ImageFromURL = (url: string): Promise<string> => {
+const getBase64ImageFromURL = async (url: string): Promise<string> => {
+  if (url.startsWith('file_')) {
+    try {
+      const chunked = await downloadChunkedFile(url);
+      return chunked.base64;
+    } catch (e) {
+      throw new Error('Failed to load chunked image');
+    }
+  }
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
@@ -328,8 +337,8 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 15;
   const contentWidth = pageWidth - margin * 2;
-  const logsPerPage = 3;
-  const cardHeight = 70;
+  const logsPerPage = 2; // Reduced to fit more details like Synopsis
+  const cardHeight = 110;
   const cardSpacing = 5;
 
   let currentLogIndex = 0;
@@ -341,14 +350,16 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.hostFlat);
+      // Note: Movie schedule uses `postedBy` to store flatId (e.g., 'A-101')
+      const flatId = log.postedBy || log.hostFlat; 
+      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === flatId);
       const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
 
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(226, 232, 240);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
-      const photoSize = 60;
+      const photoSize = 75;
       const photoX = margin + 5;
       const photoY = startY + 5;
       doc.setDrawColor(226, 232, 240);
@@ -362,12 +373,12 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
           doc.addImage(base64Img, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
           doc.setTextColor(156, 163, 175);
-          doc.setFontSize(8);
+          doc.setFontSize(10);
           doc.text('No Poster', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
       } catch (err) {
         doc.setTextColor(156, 163, 175);
-        doc.setFontSize(8);
+        doc.setFontSize(10);
         doc.text('No Poster', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
       }
 
@@ -378,31 +389,61 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       const textX = sepX + 8;
       let currY = startY + 12;
 
+      // Title
       doc.setTextColor(15, 23, 42);
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text(sanitizeText(log.title).toUpperCase(), textX, currY);
 
+      // Genre & Rating
       currY += 7;
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${sanitizeText(log.genre) || 'Entertainment'} | Rating: ${sanitizeText(log.rating) || 'UA'}`, textX, currY);
+
+      // Date & Time
+      currY += 6;
       doc.setFont('helvetica', 'normal');
-      doc.text(`Length: ${sanitizeText(log.length) || 'N/A'}`, textX, currY);
-      
-      currY += 6;
-      doc.text(`Date: ${sanitizeText(log.date)} (${sanitizeText(log.day)})`, textX, currY);
-      
-      currY += 6;
-      doc.text(`Time: ${sanitizeText(log.timing)}`, textX, currY);
+      doc.text(`Scheduled: ${sanitizeText(log.date)} (${sanitizeText(log.day)}) at ${sanitizeText(log.timing)}`, textX, currY);
 
+      // Duration
+      currY += 6;
+      doc.text(`Duration: ${sanitizeText(log.length) || 'N/A'}`, textX, currY);
+      
+      // Flat Info
+      currY += 6;
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Hosted By: Flat ${flatId} (${sanitizeText(ownerName)})`, textX, currY);
+
+      // Synopsis Title
+      currY += 8;
+      doc.setTextColor(71, 85, 105);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SYNOPSIS', textX, currY);
+      
+      // Synopsis Content (Wrapped)
+      currY += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      const synopsisLines = doc.splitTextToSize(sanitizeText(log.synopsis) || 'No synopsis provided.', contentWidth - (textX - margin) - 10);
+      // Limit to 4 lines maximum to avoid overflow
+      const maxLines = 4;
+      const truncatedLines = synopsisLines.slice(0, maxLines);
+      if (synopsisLines.length > maxLines) {
+          truncatedLines[maxLines - 1] = truncatedLines[maxLines - 1].substring(0, truncatedLines[maxLines - 1].length - 3) + '...';
+      }
+      doc.text(truncatedLines, textX, currY);
+
+      // Trailer Link Status
       const rightX = pageWidth - margin - 5;
-      currY = startY + 12;
-
       if (log.trailerUrl) {
-        currY += 7;
         doc.setTextColor(37, 99, 235);
         doc.setFontSize(8);
-        doc.text('Trailer Available', rightX, currY, { align: 'right' });
+        doc.setFont('helvetica', 'bold');
+        doc.text('Trailer Available', rightX, startY + cardHeight - 8, { align: 'right' });
       }
 
       startY += cardHeight + cardSpacing;

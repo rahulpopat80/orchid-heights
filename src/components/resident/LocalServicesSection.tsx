@@ -51,6 +51,8 @@ export default function LocalServicesSection({
 
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
+  const [helperPhoto, setHelperPhoto] = useState('');
+  const [photoError, setPhotoError] = useState('');
 
   const handleOpenAdd = () => {
     setHelperName('');
@@ -68,6 +70,8 @@ export default function LocalServicesSection({
     setHelperRole(helper.role as any);
     setFormError('');
     setFormSuccess('');
+    setPhotoError('');
+    setHelperPhoto(helper.photoUrl || '');
     setEditingHelperId(helper.id);
     setShowAddForm(true);
   };
@@ -263,23 +267,71 @@ export default function LocalServicesSection({
                     className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
                   />
                 </div>
-                <div>
-                  <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Service Category</label>
-                  <select
-                    value={helperRole}
-                    onChange={(e: any) => setHelperRole(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold outline-none focus:border-indigo-500 transition"
-                  >
-                    <option value="Maid">Sweep & Maid (🧹)</option>
-                    <option value="Milkman">Milkman (🥛)</option>
-                    <option value="Car Cleaner">Vehicle Cleaner (🚗)</option>
-                    <option value="Newspaper Guy">Newspaper Guy (📰)</option>
-                    <option value="Care Taker">Care Taker (🧑‍⚕️)</option>
-                    <option value="Cook">Cook (👨‍🍳)</option>
-                    <option value="Other">Other helper (🛠)</option>
-                  </select>
-                </div>
-              </div>
+                      <div>
+                        <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Service Role *</label>
+                        <select
+                          value={helperRole}
+                          onChange={(e) => setHelperRole(e.target.value as any)}
+                          className="w-full bg-white border border-slate-200 p-2.5 rounded-xl text-xs font-semibold focus:border-indigo-500 transition outline-none"
+                        >
+                          <option value="Maid">Maid</option>
+                          <option value="Milkman">Milkman</option>
+                          <option value="Car Cleaner">Car Cleaner</option>
+                          <option value="Newspaper Guy">Newspaper Guy</option>
+                          <option value="Care Taker">Care Taker</option>
+                          <option value="Cook">Cook</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+
+                      {/* Photo Upload for Helper */}
+                      <div className="col-span-1 md:col-span-2">
+                        <label className="block text-[9px] font-bold text-slate-500 uppercase mb-1">Helper Photo *</label>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                            {helperPhoto ? (
+                              <img src={helperPhoto} alt="Helper" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-5 h-5 text-slate-400" />
+                            )}
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                try {
+                                  const base64 = await compressImage(e.target.files[0]);
+                                  setHelperPhoto(base64);
+                                  setPhotoError('');
+                                } catch (err) {
+                                  setPhotoError('Error processing image. Try another.');
+                                }
+                              }
+                            }}
+                            className="hidden"
+                            id="helper-photo-upload"
+                          />
+                          <label
+                            htmlFor="helper-photo-upload"
+                            className="bg-white border border-dashed border-slate-300 hover:border-indigo-500 px-4 py-2 rounded-xl text-[10px] font-bold text-slate-500 hover:text-indigo-600 cursor-pointer transition flex items-center space-x-1"
+                          >
+                            <Camera className="w-3.5 h-3.5" />
+                            <span>{helperPhoto ? 'Change Photo' : 'Upload Photo'}</span>
+                          </label>
+                          {helperPhoto && (
+                            <button
+                              type="button"
+                              onClick={() => setHelperPhoto('')}
+                              className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        {photoError && <p className="text-[10px] text-red-500 font-medium mt-1">{photoError}</p>}
+                      </div>
+                    </div>
 
               <button
                 type="submit"
@@ -302,8 +354,10 @@ export default function LocalServicesSection({
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-2.5 min-w-0">
-                      <span className="text-xl bg-white border border-slate-100 p-2 rounded-xl shrink-0 shadow-xs">
-                        {helper.role === 'Maid' ? '🧹' : helper.role === 'Milkman' ? '🥛' : helper.role === 'Car Cleaner' ? '🚗' : helper.role === 'Newspaper Guy' ? '📰' : helper.role === 'Care Taker' ? '🧑‍⚕️' : helper.role === 'Cook' ? '👨‍🍳' : '🛠'}
+                      <span className="text-xl bg-white border border-slate-100 p-2 rounded-xl shrink-0 shadow-xs flex items-center justify-center">
+                        {helper.photoUrl ? (
+                          <img src={helper.photoUrl} alt="Helper" className="w-8 h-8 object-cover rounded-lg" />
+                        ) : helper.role === 'Maid' ? '🧹' : helper.role === 'Milkman' ? '🥛' : helper.role === 'Car Cleaner' ? '🚗' : helper.role === 'Newspaper Guy' ? '📰' : helper.role === 'Care Taker' ? '🧑‍⚕️' : helper.role === 'Cook' ? '👨‍🍳' : '🛠'}
                       </span>
                       <div className="min-w-0">
                         <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
