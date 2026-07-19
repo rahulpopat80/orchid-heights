@@ -187,6 +187,8 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
 
   // Track which visitors have already triggered audio/desktop notifications
   const notifiedVisitorIds = useRef<Set<string>>(new Set());
+  const notifiedSocietyNotifIds = useRef<Set<string>>(new Set());
+  const isFirstNotifLoad = useRef(true);
 
   // Find current owner data
   const myOwnerData = owners.find((o) => o.wing === wing && o.flatNo === flatNo);
@@ -395,6 +397,22 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
     // 6. Society Notifications
     const unsubSocietyNotifs = api.subscribeSocietyNotifications(wing, flatNo, (list) => {
       setSocietyNotifications(list);
+      if (isFirstNotifLoad.current) {
+        list.forEach(n => notifiedSocietyNotifIds.current.add(n.id));
+        isFirstNotifLoad.current = false;
+      } else {
+        list.forEach(notif => {
+          if (!notifiedSocietyNotifIds.current.has(notif.id)) {
+            notifiedSocietyNotifIds.current.add(notif.id);
+            if (Notification.permission === 'granted') {
+              new Notification(notif.title || 'Orchid Alerts', {
+                body: notif.message,
+                icon: 'https://i.ibb.co/zT5tpcdY/1000296229-1.png'
+              });
+            }
+          }
+        });
+      }
     });
 
     return () => {
@@ -1885,9 +1903,8 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     <button
                                       onClick={() => {
                                         setIsNotificationsOpen(false);
-                                        setLastVisitedSubSection('amenity');
-                                        setActiveSubSection('amenity');
                                         localStorage.setItem('orchid_deep_redirect', 'movies');
+                                        navigateToRoute('/amenities/movie', 'amenity');
                                         setTimeout(() => window.dispatchEvent(new Event('orchid_amenities_redirect')), 100);
                                       }}
                                       className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
@@ -1900,8 +1917,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     <button
                                       onClick={() => {
                                         setIsNotificationsOpen(false);
-                                        setLastVisitedSubSection('complaints');
-                                        setActiveSubSection('complaints');
+                                        navigateToRoute('/complaints', 'complaints');
                                       }}
                                       className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer"
                                     >
@@ -1913,7 +1929,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     <button
                                       onClick={() => {
                                         setIsNotificationsOpen(false);
-                                        setActiveSubSection('helpdesk');
+                                        navigateToRoute('/help-desk/noticies', 'helpdesk');
                                       }}
                                       className="text-[9px] font-black uppercase tracking-tight bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 px-2 py-1 rounded-lg cursor-pointer"
                                     >
@@ -1925,7 +1941,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     <button
                                       onClick={() => {
                                         setIsNotificationsOpen(false);
-                                        setActiveSubSection('helpdesk');
+                                        navigateToRoute('/help-desk/financial-ledger', 'helpdesk');
                                       }}
                                       className="text-[9px] font-black uppercase tracking-tight bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 px-2 py-1 rounded-lg cursor-pointer"
                                     >

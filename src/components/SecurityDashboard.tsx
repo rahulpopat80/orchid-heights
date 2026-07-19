@@ -297,15 +297,34 @@ export default function SecurityDashboard({ owners, onRefreshOwners }: SecurityD
         let targetFlatNo = fNo;
 
         try {
-          const absenceDoc = await getDoc(doc(db, 'absences', flatId));
-          if (absenceDoc.exists()) {
-            const absenceData = absenceDoc.data();
-            redirectAlert = `🚨 ALERT: Flat ${flatId} is ABSENT / OUT OF STATION!\n\nPlease redirect this delivery/visitor to:\n➡️ ${absenceData.redirectFlatId} (${absenceData.redirectName})`;
+          const activeAbs = absenceLogs.find(a => {
+            if (a.flatId !== flatId) return false;
+            const now = new Date().getTime();
+            const from = new Date(a.dateFrom).getTime();
+            const to = new Date(a.dateTo).getTime();
+            return now >= from && now <= to + (24 * 60 * 60 * 1000 - 1);
+          });
+          
+          if (activeAbs) {
+            let redirectFlat = '';
+            const gTypeUpper = guestType.toUpperCase();
+            if (gTypeUpper.includes('MILK')) {
+              redirectFlat = activeAbs.milkRedirectFlat || '';
+            } else if (gTypeUpper.includes('NEWSPAPER')) {
+              redirectFlat = activeAbs.newspaperRedirectFlat || '';
+            } else if (gTypeUpper.includes('DELIVERY') || gTypeUpper.includes('PARCEL') || gTypeUpper.includes('COURIER')) {
+              redirectFlat = activeAbs.parcelRedirectFlat || '';
+            }
             
-            if (absenceData.redirectFlatId) {
-              const redirectedParts = absenceData.redirectFlatId.split('-');
-              targetWing = redirectedParts[0] as 'A' | 'B';
-              targetFlatNo = parseInt(redirectedParts[1], 10);
+            if (redirectFlat) {
+              redirectAlert = `🚨 ALERT: Flat ${flatId} is ABSENT / OUT OF STATION!\n\nPlease redirect this ${guestType} to:\n➡️ Flat ${redirectFlat}`;
+              const redirectedParts = redirectFlat.split('-');
+              if (redirectedParts.length === 2) {
+                targetWing = redirectedParts[0] as 'A' | 'B';
+                targetFlatNo = parseInt(redirectedParts[1], 10);
+              }
+            } else {
+              redirectAlert = `🚨 ALERT: Flat ${flatId} is ABSENT / OUT OF STATION!\n\nThey are currently marked as absent with no specific redirection for ${guestType}.`;
             }
           }
         } catch (e) {

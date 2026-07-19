@@ -427,7 +427,8 @@ export async function verifyCredentials(role: string, payload: any): Promise<{ s
             role: 'owner',
             wing,
             flatNo: flatNum,
-            ownerName: matchedName || `Flat ${wing}-${flatNum}`
+            ownerName: matchedName || `Flat ${wing}-${flatNum}`,
+            phone: phoneNumber
           }
         };
       }

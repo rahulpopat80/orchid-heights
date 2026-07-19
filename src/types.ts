@@ -64,6 +64,7 @@ export interface UserSession {
   wing?: 'A' | 'B';
   flatNo?: number;
   ownerName?: string;
+  phone?: string;
 }
 
 export interface Announcement {

@@ -2893,8 +2893,16 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 {/* 9. LOCAL SERVICES TAB */}
         {activeTab === 'local-services' && (
           <div className="space-y-6 animate-fadeIn">
+            <AnimatePresence mode="wait">
             {localSubTab === 'menu' && (
-              <div className="space-y-4 text-left">
+              <motion.div
+                key="menu"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4 text-left"
+              >
                 <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
                   <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                     <User className="w-4 h-4 text-indigo-600" />
@@ -2925,16 +2933,28 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     </h4>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
             {localSubTab === 'local' && (
-              <div>
+              <motion.div
+                key="local"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <button onClick={() => setLocalSubTab('menu')} className="mb-4 bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition shadow-sm flex items-center gap-1 cursor-pointer"><ArrowLeft className="w-3.5 h-3.5"/> Back to Menu</button>
                 <AdminLocalServices />
-              </div>
+              </motion.div>
             )}
             {localSubTab === 'building' && (
-              <div>
+              <motion.div
+                key="building"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <button onClick={() => setLocalSubTab('menu')} className="mb-4 bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition shadow-sm flex items-center gap-1 cursor-pointer"><ArrowLeft className="w-3.5 h-3.5"/> Back to Menu</button>
                           <div className="space-y-6">
             
@@ -3053,8 +3073,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     </button></div></div>
               ))}</div></div>
 
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         )}
 

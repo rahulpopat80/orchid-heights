@@ -251,7 +251,8 @@ export default function App() {
             imei,
             os,
             browser,
-            lastLogin: new Date().toISOString()
+            lastLogin: new Date().toISOString(),
+            phoneNumber: session.phone
           };
 
           await api.registerDevice(session.wing, session.flatNo, devInfo);

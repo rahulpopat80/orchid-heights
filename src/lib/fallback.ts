@@ -195,7 +195,8 @@ export function verifyCredentialsLocal(role: string, payload: any) {
           role: 'owner',
           wing,
           flatNo: flatNum,
-          ownerName: matchedName || `Flat ${wing}-${flatNum}`
+          ownerName: matchedName || `Flat ${wing}-${flatNum}`,
+          phone: phoneNumber
         }
       };
     }
