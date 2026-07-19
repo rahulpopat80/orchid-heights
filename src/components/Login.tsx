@@ -225,7 +225,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     </p>
                     <p className="text-[10px] text-slate-500 font-mono flex flex-wrap gap-x-2">
                       <span>IP: <span className="text-indigo-600 font-semibold">{dev.ipAddress}</span></span>
-                      {dev.imei && <span>IMEI: <span className="text-indigo-600 font-semibold">{dev.imei}</span></span>}
+                      {dev.imei && <span>{dev.os === 'Windows' || dev.os === 'MacOS' ? 'S/N' : 'IMEI'}: <span className="text-indigo-600 font-semibold">{dev.imei}</span></span>}
                     </p>
                     <p className="text-[9px] text-slate-400 font-medium">
                       Last Active: {new Date(dev.lastLogin).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}

@@ -423,17 +423,12 @@ export function registerUserDeviceLocal(wing: string, flatNo: number, device: De
   if (idx > -1) {
     const ownerData = owners[idx];
     const currentDevices = ownerData.devices || [];
-    const existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
-    if (existingIdx > -1) {
-      currentDevices[existingIdx] = {
-        ...currentDevices[existingIdx],
-        ...device,
-        lastLogin: new Date().toISOString()
-      };
-    } else {
-      currentDevices.push(device);
-    }
-    owners[idx].devices = currentDevices;
+    const filteredDevices = currentDevices.filter(d => d.ipAddress !== device.ipAddress && d.deviceId !== device.deviceId);
+    
+    const newDevice = { ...device, lastLogin: new Date().toISOString() };
+    filteredDevices.push(newDevice);
+
+    owners[idx].devices = filteredDevices;
     saveLocalOwners(owners);
   }
 }

@@ -64,7 +64,7 @@ const drawPDFHeader = async (doc: jsPDF, title: string, subtitle: string, pageWi
   doc.line(15, 38, pageWidth - 15, 38);
 };
 
-export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitle: string, isAdmin: boolean = false) => {
+export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitle: string, isAdmin: boolean = false, owners: any[] = []) => {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -94,16 +94,21 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
-        if (log.photoUrl && log.photoUrl.startsWith('data:image')) {
-          const imgProps = doc.getImageProperties(log.photoUrl);
+        if (log.photoUrl) {
+          const base64Img = log.photoUrl.startsWith('data:image') ? log.photoUrl : await getBase64ImageFromURL(log.photoUrl);
+          const imgProps = doc.getImageProperties(base64Img);
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
-          doc.addImage(log.photoUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
+          doc.addImage(base64Img, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
           doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
-      } catch (err) {}
+      } catch (err) {
+        doc.setTextColor(156, 163, 175);
+        doc.setFontSize(8);
+        doc.text('No Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
+      }
 
       const sepX = photoX + photoSize + 8;
       doc.setDrawColor(226, 232, 240);
@@ -127,7 +132,9 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
       doc.text(`Type: ${sanitizeText(log.guestType).toUpperCase()}`, textX, currY);
       
       currY += 6;
-      doc.text(`Target: Flat ${log.wing}-${log.flatNo} (${sanitizeText(log.flatOwnerName) || 'Resident'})`, textX, currY);
+      const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === `${log.wing}-${log.flatNo}`);
+      const ownerName = ownerMatch ? ownerMatch.nameEn : (log.flatOwnerName || 'Resident');
+      doc.text(`Target: Flat ${log.wing}-${log.flatNo} (${sanitizeText(ownerName)})`, textX, currY);
 
       const rightX = pageWidth - margin - 5;
       currY = startY + 12;
@@ -227,16 +234,21 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
-        if (log.exitPhotoUrl && log.exitPhotoUrl.startsWith('data:image')) {
-          const imgProps = doc.getImageProperties(log.exitPhotoUrl);
+        if (log.exitPhotoUrl) {
+          const base64Img = log.exitPhotoUrl.startsWith('data:image') ? log.exitPhotoUrl : await getBase64ImageFromURL(log.exitPhotoUrl);
+          const imgProps = doc.getImageProperties(base64Img);
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
-          doc.addImage(log.exitPhotoUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
+          doc.addImage(base64Img, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
           doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Exit Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
-      } catch (err) {}
+      } catch (err) {
+        doc.setTextColor(156, 163, 175);
+        doc.setFontSize(8);
+        doc.text('No Exit Photo', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
+      }
 
       const sepX = photoX + photoSize + 8;
       doc.setDrawColor(226, 232, 240);
@@ -343,16 +355,21 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
-        if (log.posterUrl && log.posterUrl.startsWith('data:image')) {
-          const imgProps = doc.getImageProperties(log.posterUrl);
+        if (log.posterUrl) {
+          const base64Img = log.posterUrl.startsWith('data:image') ? log.posterUrl : await getBase64ImageFromURL(log.posterUrl);
+          const imgProps = doc.getImageProperties(base64Img);
           const scale = Math.min(photoSize / imgProps.width, photoSize / imgProps.height);
-          doc.addImage(log.posterUrl, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
+          doc.addImage(base64Img, imgProps.fileType, photoX + (photoSize - imgProps.width * scale) / 2, photoY + (photoSize - imgProps.height * scale) / 2, imgProps.width * scale, imgProps.height * scale);
         } else {
           doc.setTextColor(156, 163, 175);
           doc.setFontSize(8);
           doc.text('No Poster', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
         }
-      } catch (err) {}
+      } catch (err) {
+        doc.setTextColor(156, 163, 175);
+        doc.setFontSize(8);
+        doc.text('No Poster', photoX + photoSize / 2, photoY + photoSize / 2, { align: 'center' });
+      }
 
       const sepX = photoX + photoSize + 8;
       doc.setDrawColor(226, 232, 240);
@@ -370,20 +387,22 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       doc.setTextColor(71, 85, 105);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Host: Flat ${log.hostFlat} (${sanitizeText(ownerName)})`, textX, currY);
+      doc.text(`Length: ${sanitizeText(log.length) || 'N/A'}`, textX, currY);
       
       currY += 6;
-      doc.text(`Showtime: ${new Date(log.showTime).toLocaleString('en-IN')}`, textX, currY);
+      doc.text(`Date: ${sanitizeText(log.date)} (${sanitizeText(log.day)})`, textX, currY);
+      
+      currY += 6;
+      doc.text(`Time: ${sanitizeText(log.timing)}`, textX, currY);
 
       const rightX = pageWidth - margin - 5;
       currY = startY + 12;
 
-      if (isAdmin && (log.ipAddress || log.deviceImei)) {
+      if (log.trailerUrl) {
         currY += 7;
-        doc.setTextColor(100, 116, 139);
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`IP: ${log.ipAddress || 'N/A'} | SN: ${log.deviceImei || 'N/A'}`, rightX, currY, { align: 'right' });
+        doc.setTextColor(37, 99, 235);
+        doc.setFontSize(8);
+        doc.text('Trailer Available', rightX, currY, { align: 'right' });
       }
 
       startY += cardHeight + cardSpacing;

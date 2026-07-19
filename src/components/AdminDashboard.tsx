@@ -1528,7 +1528,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                     <span className="text-base mr-1">{device.os === 'Android' || device.os === 'iOS' ? '📱' : '💻'}</span>
                                     <span>{device.os} • {device.browser}</span>
                                   </p>
-                                  <p className="font-mono text-[10px]"><span className="text-slate-400">IMEI:</span> {device.imei}</p>
+                                  <p className="font-mono text-[10px]"><span className="text-slate-400">{device.os === 'Windows' || device.os === 'MacOS' ? 'S/N' : 'IMEI'}:</span> {device.imei}</p>
                                   <p className="font-mono text-[10px]"><span className="text-slate-400">IP:</span> {device.ipAddress}</p>
                                   <p className="text-[10px] text-slate-400">Login: {new Date(device.lastLogin).toLocaleString('en-IN')}</p></div>
                                 <button
@@ -3066,7 +3066,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
         {/* 8. VISITOR RECORDS TAB */}
         {activeTab === 'visitors' && (
-          <AdminVisitorRecords onBack={() => window.location.hash = 'home'} />
+          <AdminVisitorRecords onBack={() => window.location.hash = 'home'} owners={owners} />
         )}</div>
 
     </div>

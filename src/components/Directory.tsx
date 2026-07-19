@@ -301,7 +301,7 @@ export default function Directory({ owners, session, onEditTrigger }: DirectoryP
                               </span>
                               <span className="font-mono text-slate-400 text-[9px] uppercase">Logged In</span>
                             </div>
-                            <p className="font-mono"><span className="text-slate-400">IMEI:</span> {dev.imei || 'Simulated'}</p>
+                            <p className="font-mono"><span className="text-slate-400">{dev.os === 'Windows' || dev.os === 'MacOS' ? 'S/N' : 'IMEI'}:</span> {dev.imei || 'Simulated'}</p>
                             <p className="font-mono flex items-center justify-between">
                               <span><span className="text-slate-400">IP:</span> {dev.ipAddress}</span>
                               <span className="text-[9px] text-slate-400 bg-white border border-slate-200/50 px-1 py-0.5 rounded font-sans">

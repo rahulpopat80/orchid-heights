@@ -786,19 +786,13 @@ export async function registerUserDevice(wing: string, flatNo: number, device: D
       const currentDevices = ownerData.devices || [];
       
       // Strict matching by IP Address as requested by user (1 IP = 1 Device)
-      let existingIdx = currentDevices.findIndex((d) => d.ipAddress === device.ipAddress);
+      // Filter out ALL existing entries with the same IP or deviceId to clean up any past duplicates
+      const filteredDevices = currentDevices.filter(d => d.ipAddress !== device.ipAddress && d.deviceId !== device.deviceId);
       
-      // Fallback matching by deviceId if IP somehow doesn't exist
-      if (existingIdx === -1) {
-        existingIdx = currentDevices.findIndex((d) => d.deviceId === device.deviceId);
-      }
+      const newDevice = { ...device, lastLogin: new Date().toISOString() };
+      filteredDevices.push(newDevice);
 
-      if (existingIdx > -1) {
-        currentDevices[existingIdx] = { ...currentDevices[existingIdx], ...device, lastLogin: new Date().toISOString() };
-      } else {
-        currentDevices.push(device);
-      }
-      await setDoc(ownerRef, { devices: currentDevices }, { merge: true });
+      await setDoc(ownerRef, { devices: filteredDevices }, { merge: true });
     }
   } catch (error) {
     if (isQuotaError(error)) {
