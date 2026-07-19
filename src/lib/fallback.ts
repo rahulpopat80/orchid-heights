@@ -131,8 +131,10 @@ export function verifyCredentialsLocal(role: string, payload: any) {
   }
 
   if (role === 'owner' || role === 'admin') {
-    const { wing, flatNo, password } = payload;
+    const { wing, flatNo, password, phoneNumber } = payload;
     if (!wing || !flatNo) return { success: false, message: 'Wing and Flat number are required.' };
+    if (!phoneNumber) return { success: false, message: 'Phone number is required.' };
+    
     const flatNum = parseInt(flatNo, 10);
     const id = `${wing}-${flatNum}`;
     const savedPassword = getLocalPasswords()[id] || 'admin@123';
@@ -140,18 +142,34 @@ export function verifyCredentialsLocal(role: string, payload: any) {
     if (password === savedPassword) {
       const owners = getLocalOwners();
       const ownerData = owners.find(o => o.wing === wing && o.flatNo === flatNum) || null;
+      
+      if (!ownerData) return { success: false, message: 'Flat is empty. No owner registered.' };
+
+      let matchedName = '';
+      if (ownerData.phone === phoneNumber) {
+        matchedName = ownerData.nameEn;
+      } else {
+        const memberMatch = (ownerData.members || []).find(m => m.includes(phoneNumber));
+        if (memberMatch) {
+          matchedName = memberMatch.split('(')[0].trim();
+        } else {
+          return { success: false, message: 'Phone number not registered to this flat.' };
+        }
+      }
 
       if (ownerData) {
         const currentDevices = ownerData.devices || [];
         const device = payload.device;
         if (device && device.deviceId) {
           const isRegistered = currentDevices.some((d) => d.deviceId === device.deviceId);
-          if (!isRegistered && currentDevices.length >= 4) {
+          const maxDevices = Math.min(5, 1 + (ownerData.members?.length || 0));
+          if (!isRegistered && currentDevices.length >= maxDevices) {
             return {
               success: false,
               code: 'DEVICE_LIMIT_EXCEEDED',
               devices: currentDevices,
-              message: '4 devices are already signed in for this flat — log out from one first.'
+              maxLimit: maxDevices,
+              message: `${maxDevices} devices are already signed in for this flat — log out from one first.`
             };
           }
         }
@@ -163,7 +181,7 @@ export function verifyCredentialsLocal(role: string, payload: any) {
           role: 'owner',
           wing,
           flatNo: flatNum,
-          ownerName: ownerData ? ownerData.nameEn : `Flat ${wing}-${flatNum}`
+          ownerName: matchedName || `Flat ${wing}-${flatNum}`
         }
       };
     }

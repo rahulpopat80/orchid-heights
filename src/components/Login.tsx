@@ -18,6 +18,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   // Resident fields
   const [wing, setWing] = useState<'A' | 'B'>('A');
   const [flatNo, setFlatNo] = useState<string>('101');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   
   // Security fields
@@ -63,8 +64,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         }
 
         // Strict IP-based Device ID
-        const deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
-        localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
+        let deviceId = localStorage.getItem(`orchid_device_uuid_${flatKey}`);
+        if (!deviceId) {
+          deviceId = `dev_ip_${ipAddress.replace(/\./g, '_')}_${flatKey}`;
+          localStorage.setItem(`orchid_device_uuid_${flatKey}`, deviceId);
+        }
 
         let imei = localStorage.getItem(`orchid_device_imei_${flatKey}`);
         if (!imei) {
@@ -99,7 +103,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       const payload = role === 'security'
         ? { role: 'security', username, password: securityPassword }
-        : { role: 'owner', wing, flatNo, password, device: activeDevice };
+        : { role: 'owner', wing, flatNo, phoneNumber, password, device: activeDevice };
 
       const data = await api.login(payload);
 
@@ -111,7 +115,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       } else if ((data as any).code === 'DEVICE_LIMIT_EXCEEDED') {
         setIsDeviceBlocked(true);
         setBlockedDevices((data as any).devices || []);
-        setError('4 devices are already signed in for this flat — log out from one first.');
+        setError((data as any).message || 'Device limit exceeded — log out from one first.');
       } else {
         setError(data.message || 'Login failed. Please check credentials.');
       }
@@ -207,11 +211,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           <div className="space-y-4 bg-slate-50 border border-slate-200 p-4 md:p-5 rounded-2xl text-left">
             <div className="flex items-center space-x-2 text-amber-600">
               <AlertCircle className="w-5 h-5 shrink-0" />
-              <span className="text-xs font-bold uppercase tracking-wider">Device limit exceeded ({blockedDevices.length}/4 active)</span>
+              <span className="text-xs font-bold uppercase tracking-wider">Device limit exceeded ({blockedDevices.length} active)</span>
             </div>
             
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              Orchid Heights security limits logins to <strong>max 4 active devices</strong> per flat. To log in with this new device, you must log out one of your other devices remotely:
+              Orchid Heights security limits logins based on household size (max 5 active devices per flat). To log in with this new device, you must log out one of your other devices remotely:
             </p>
 
             <div className="space-y-3">
@@ -286,6 +290,18 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter registered phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl py-3 px-4 text-sm font-medium transition outline-none"
+                  />
                 </div>
 
                 <div>
