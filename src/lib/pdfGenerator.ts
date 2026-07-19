@@ -29,7 +29,7 @@ const getBase64ImageFromURL = (url: string): Promise<string> => {
 };
 
 const drawPDFHeader = async (doc: jsPDF, title: string, subtitle: string, pageWidth: number) => {
-  doc.setFillColor(216, 27, 96); // Dark Pink (Orchid) #d81b60
+  doc.setFillColor(255, 255, 255); // White
   doc.rect(0, 0, pageWidth, 28, 'F');
   
   try {
@@ -39,15 +39,22 @@ const drawPDFHeader = async (doc: jsPDF, title: string, subtitle: string, pageWi
     console.warn('Could not load logo for PDF', err);
   }
 
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(15, 23, 42); // slate-900
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.text('ORCHID HEIGHTS GATEKEEPER', pageWidth / 2, 12, { align: 'center' });
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
+  doc.setTextColor(71, 85, 105); // slate-600
   doc.text(title, pageWidth / 2, 18, { align: 'center' });
   
+  // Pink accent line below header
+  doc.setDrawColor(216, 27, 96); // #d81b60
+  doc.setLineWidth(0.5);
+  doc.line(0, 28, pageWidth, 28);
+  doc.setLineWidth(0.2); // reset
+
   // Subtitle
   doc.setTextColor(100, 116, 139); // Slate 500
   doc.setFontSize(9);
@@ -76,14 +83,14 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
 
     for (let i = 0; i < logsPerPage && currentLogIndex < logs.length; i++) {
       const log = logs[currentLogIndex];
-      doc.setFillColor(253, 242, 248); // pink-50
-      doc.setDrawColor(244, 114, 182); // pink-400
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 50;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -99,7 +106,7 @@ export const generateVisitorPDF = async (logs: Visitor[], title: string, subtitl
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -209,14 +216,14 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.flatId);
       const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
 
-      doc.setFillColor(253, 242, 248); // pink-50
-      doc.setDrawColor(244, 114, 182); // pink-400
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 50;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -232,7 +239,7 @@ export const generateGymTheatrePDF = async (logs: GymTheatreLog[], title: string
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -325,14 +332,14 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.hostFlat);
       const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
 
-      doc.setFillColor(253, 242, 248);
-      doc.setDrawColor(244, 114, 182);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const photoSize = 60;
       const photoX = margin + 5;
       const photoY = startY + 5;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.rect(photoX, photoY, photoSize, photoSize);
       
       try {
@@ -348,7 +355,7 @@ export const generateMoviePDF = async (logs: any[], title: string, subtitle: str
       } catch (err) {}
 
       const sepX = photoX + photoSize + 8;
-      doc.setDrawColor(252, 165, 165);
+      doc.setDrawColor(226, 232, 240);
       doc.line(sepX, startY + 5, sepX, startY + cardHeight - 5);
 
       const textX = sepX + 8;
@@ -421,8 +428,8 @@ export const generateAmenityPDF = async (logs: AmenityBooking[], title: string, 
       const ownerMatch = owners.find(o => `${o.wing}-${o.flatNo}` === log.flatId);
       const ownerName = ownerMatch ? ownerMatch.nameEn : 'Resident';
 
-      doc.setFillColor(253, 242, 248);
-      doc.setDrawColor(244, 114, 182);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
       doc.roundedRect(margin, startY, contentWidth, cardHeight, 3, 3, 'FD');
 
       const textX = margin + 5;

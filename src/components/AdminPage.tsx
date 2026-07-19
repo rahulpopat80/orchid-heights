@@ -55,7 +55,7 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="off"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 focus:bg-slate-900/50 rounded-xl py-3 px-4 text-sm font-semibold text-white outline-none transition"
+              className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:bg-slate-900/50 rounded-xl py-3 px-4 text-sm font-semibold text-white outline-none transition"
               placeholder="Username"
             />
           </div>
@@ -69,7 +69,7 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 focus:bg-slate-900/50 rounded-xl py-3 pl-4 pr-10 text-sm font-semibold text-white outline-none transition"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:bg-slate-900/50 rounded-xl py-3 pl-4 pr-10 text-sm font-semibold text-white outline-none transition"
                 placeholder="Password"
               />
               <button
@@ -84,7 +84,7 @@ function AdminLoginForm({ onLoginSuccess, onGoBack }: AdminLoginFormProps) {
 
           <button
             type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition duration-150 transform active:scale-95 cursor-pointer"
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition duration-150 transform active:scale-95 cursor-pointer"
           >
             Authenticate Control Suite
           </button>

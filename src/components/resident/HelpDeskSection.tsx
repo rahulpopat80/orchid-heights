@@ -214,7 +214,7 @@ export default function HelpDeskSection({
       {activeSub === 'menu' && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
-            <FileText className="w-4 h-4 text-pink-600" />
+            <FileText className="w-4 h-4 text-indigo-600" />
             <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600">
               Helpdesk, Notices & Ledger
             </h4>
@@ -256,7 +256,7 @@ export default function HelpDeskSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
-              className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
               <span className="text-xl leading-none -mt-0.5">?</span>
               <span className="uppercase tracking-widest text-[10px]">Back</span>
@@ -302,7 +302,7 @@ export default function HelpDeskSection({
                           </div>
                         </div>
 
-                        <span className="text-[9px] font-mono font-bold bg-pink-100 text-pink-800 border border-pink-150 px-2.5 py-0.5 rounded-full uppercase self-start sm:self-center">
+                        <span className="text-[9px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-150 px-2.5 py-0.5 rounded-full uppercase self-start sm:self-center">
                           {targetType === 'all' ? 'All Residents' : targetType === 'wing' ? `Wing ${targetWing} Only` : `Flat ${targetWing}-${targetFlat}`}
                         </span>
                       </div>
@@ -390,7 +390,7 @@ export default function HelpDeskSection({
                     placeholder="e.g. Lift not working in Wing B"
                     value={compTitle}
                     onChange={(e) => setCompTitle(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-pink-500 transition"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none focus:border-indigo-500 transition"
                   />
                 </div>
 
@@ -402,7 +402,7 @@ export default function HelpDeskSection({
                     placeholder="Provide description of leakages, repairs, wiring issues..."
                     value={compDesc}
                     onChange={(e) => setCompDesc(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none resize-none focus:border-pink-500 transition"
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-semibold outline-none resize-none focus:border-indigo-500 transition"
                   />
                 </div>
 
@@ -429,7 +429,7 @@ export default function HelpDeskSection({
                     }}
                     className={`border-2 border-dashed rounded-xl p-5 text-center transition cursor-pointer ${
                       isDragging
-                        ? 'border-pink-500 bg-pink-50/30'
+                        ? 'border-indigo-500 bg-indigo-50/30'
                         : 'border-slate-200 bg-white hover:bg-slate-50'
                     }`}
                   >
@@ -483,7 +483,7 @@ export default function HelpDeskSection({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-sm select-none"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-sm select-none"
                 >
                   {submitting ? 'Filing Complaint...' : 'Submit Ticket to Admin'}
                 </button>
@@ -511,7 +511,7 @@ export default function HelpDeskSection({
                       <div key={item.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-slate-50 transition space-y-3">
                         <div className="flex justify-between items-start">
                           <div>
-                            <span className="font-mono bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded text-[9px] uppercase">
+                            <span className="font-mono bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded text-[9px] uppercase">
                               Ticket #{item.id?.substring(0, 5) || 'COMP'}
                             </span>
                             <h5 className="font-bold text-slate-800 mt-1 uppercase leading-snug">{item.title}</h5>
@@ -557,8 +557,8 @@ export default function HelpDeskSection({
 
                         {/* Process feedback notes */}
                         {item.resolutionNotes && (
-                          <div className="bg-pink-50 border border-pink-100 p-3 rounded-xl text-pink-900 space-y-1">
-                            <p className="font-bold uppercase tracking-wider text-[8px] text-pink-600">Secretary Update:</p>
+                          <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-indigo-900 space-y-1">
+                            <p className="font-bold uppercase tracking-wider text-[8px] text-indigo-600">Secretary Update:</p>
                             <p className="font-medium text-left">{item.resolutionNotes}</p>
                           </div>
                         )}
@@ -577,7 +577,7 @@ export default function HelpDeskSection({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <button
               onClick={() => navigateToRoute('/help-desk', 'menu')}
-              className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+              className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
             >
               <span className="text-xl leading-none -mt-0.5">?</span>
               <span className="uppercase tracking-widest text-[10px]">Back</span>
@@ -605,10 +605,10 @@ export default function HelpDeskSection({
                   <div key={report.id} className="border border-slate-200 p-4 rounded-xl bg-slate-50/50 flex flex-col justify-between hover:border-slate-300 transition shadow-sm text-left">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono font-bold bg-pink-50 border border-pink-150 text-pink-700 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="text-[9px] font-mono font-bold bg-indigo-50 border border-indigo-150 text-indigo-700 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {report.reportType || report.type || 'Balance Sheet'}
                         </span>
-                        <span className="text-xs font-black text-pink-700 font-mono">
+                        <span className="text-xs font-black text-indigo-700 font-mono">
                           ₹ {report.totalExpense?.toLocaleString('en-IN') || 0}
                         </span>
                       </div>

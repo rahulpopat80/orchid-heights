@@ -1148,7 +1148,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
     <div className="space-y-6 text-left pb-16">
       
       {/* Admin Panel Header Banner */}
-      <div className="bg-gradient-to-tr from-slate-900 to-pink-950 p-6 rounded-2xl text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
+      <div className="bg-gradient-to-tr from-slate-900 to-indigo-950 p-6 rounded-2xl text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
         <div className="flex items-center space-x-4">
           <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-white border border-slate-700 flex items-center justify-center p-1">
             <img 
@@ -1177,7 +1177,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { id: 'flats', label: 'Flats Directory', icon: Smartphone, color: 'text-blue-600', bg: 'bg-blue-50' },
-            { id: 'notices', label: 'Society Notices', icon: Megaphone, color: 'text-pink-600', bg: 'bg-pink-50' },
+            { id: 'notices', label: 'Society Notices', icon: Megaphone, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { id: 'complaints', label: 'Complaints', icon: ClipboardList, color: 'text-rose-600', bg: 'bg-rose-50' },
             { id: 'finance', label: 'Financial Ledger', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
             { id: 'amenities', label: 'Amenities', icon: Sparkles, color: 'text-purple-600', bg: 'bg-purple-50' },
@@ -1209,7 +1209,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
         <div className="mb-4">
           <button
             onClick={() => window.location.hash = 'home'}
-            className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm w-max active:scale-95"
+            className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm w-max active:scale-95"
           >
             <span className="text-xl leading-none -mt-0.5">◀</span>
             <span className="uppercase tracking-widest text-[10px]">Back to Home</span>
@@ -1219,7 +1219,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
       {/* Loading bar indicators */}
       {loading && (
         <div className="w-full bg-slate-100 h-1 overflow-hidden rounded-full">
-          <div className="bg-pink-600 h-full animate-pulse w-1/2 rounded-full"></div></div>
+          <div className="bg-indigo-600 h-full animate-pulse w-1/2 rounded-full"></div></div>
       )}
 
       {/* TAB CONTENT GRID */}
@@ -1251,9 +1251,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               {/* Inline Owner Editor Dialog (inside directory) */}
               {editOwner && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
-                  <div className="mb-6 bg-pink-50/50 border border-pink-200 p-4 md:p-5 rounded-2xl space-y-4 w-full max-w-lg shadow-xl relative animate-fadeIn">
-                    <div className="flex justify-between items-center border-b border-pink-100 pb-2">
-                      <h4 className="font-display font-bold text-sm text-pink-900">
+                  <div className="mb-6 bg-indigo-50/50 border border-indigo-200 p-4 md:p-5 rounded-2xl space-y-4 w-full max-w-lg shadow-xl relative animate-fadeIn">
+                    <div className="flex justify-between items-center border-b border-indigo-100 pb-2">
+                      <h4 className="font-display font-bold text-sm text-indigo-900">
                         ✏️ Edit Owner details: {editOwner.wing}-{editOwner.flatNo}
                       </h4>
                       <button onClick={() => setEditOwner(null)} className="text-slate-400 hover:text-slate-600 p-1">
@@ -1270,14 +1270,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           <input
                             type="text" required placeholder="Owner English Name"
                             value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-pink-500 uppercase"
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-indigo-500 uppercase"
                           /></div>
                         <div>
                           <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Name (Gujarati)</label>
                           <input
                             type="text" placeholder="નામ ગુજરાતીમાં"
                             value={editNameGu} onChange={(e) => setEditNameGu(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-pink-500"
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-indigo-500"
                           /></div></div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
@@ -1285,16 +1285,16 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           <input
                             type="tel" placeholder="10-digit primary"
                             value={editPhone} onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-pink-500"
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-indigo-500"
                           /></div>
                         <div>
                           <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Alt Contact</label>
                           <input
                             type="tel" placeholder="Alternate phone"
                             value={editSecondary} onChange={(e) => setEditSecondary(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-pink-500"
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs outline-none font-semibold focus:border-indigo-500"
                           /></div></div>
-                      <div className="flex gap-2 justify-end pt-2 border-t border-pink-100">
+                      <div className="flex gap-2 justify-end pt-2 border-t border-indigo-100">
                         <button type="submit" disabled={editLoading} className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">
                           {editLoading ? 'Saving...' : 'Save Owner'}
                         </button>
@@ -1323,9 +1323,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       const hasDevices = owner.devices && owner.devices.length > 0;
                       
                       return (
-                        <tr key={flatKey} className={`hover:bg-slate-50/50 transition cursor-pointer ${selectedFlat?.wing === owner.wing && selectedFlat?.flatNo === owner.flatNo ? 'bg-pink-50/40' : ''}`} onClick={() => viewFlatDetails(owner)}>
+                        <tr key={flatKey} className={`hover:bg-slate-50/50 transition cursor-pointer ${selectedFlat?.wing === owner.wing && selectedFlat?.flatNo === owner.flatNo ? 'bg-indigo-50/40' : ''}`} onClick={() => viewFlatDetails(owner)}>
                           <td className="py-3 px-3">
-                            <span className="font-mono font-black text-pink-700 bg-pink-50 border border-pink-100 px-2.5 py-0.5 rounded text-[11px]">
+                            <span className="font-mono font-black text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded text-[11px]">
                               {owner.wing}-{owner.flatNo}
                             </span>
                           </td>
@@ -1357,7 +1357,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <div className="inline-flex items-center gap-1.5">
                               <button
                                 onClick={() => handleOpenEditOwner(owner)}
-                                className="text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 border border-pink-100 p-1.5 rounded-lg transition"
+                                className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 p-1.5 rounded-lg transition"
                                 title="Edit details"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -1385,7 +1385,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     {/* Selected Title */}
                     <div className="flex justify-between items-start border-b border-slate-100 pb-3 pr-10">
                       <div className="text-left">
-                        <span className="text-[10px] bg-pink-600 text-white font-bold px-2 py-0.5 rounded-full uppercase">Inspecting Flat</span>
+                        <span className="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase">Inspecting Flat</span>
                         <h3 className="font-display font-black text-lg text-slate-800 mt-1">{selectedFlat.wing}-{selectedFlat.flatNo}</h3>
                         <p className="text-xs text-slate-400 font-medium">Full registered device logs, household members, and visitor logs override.</p>
                         
@@ -1397,7 +1397,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       
                       <button
                         onClick={() => handleOpenEditOwner(selectedFlat)}
-                        className="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
+                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Edit Owner</span>
@@ -1407,7 +1407,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       {/* Sub-section 1: Household Members & Vehicles */}
                       <div className="space-y-4">
                         <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-pink-600" />
+                          <User className="w-3.5 h-3.5 text-indigo-600" />
                           <span>Household Members ({selectedFlat.members?.length || 0})</span>
                         </h4>
                         {selectedFlat.members && selectedFlat.members.length > 0 ? (
@@ -1432,18 +1432,18 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             placeholder="Add Member Name"
                             value={adminNewMember}
                             onChange={(e) => setAdminNewMember(e.target.value)}
-                            className="flex-1 bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-pink-500 text-[11px]"
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
                           />
                           <input
                             type="tel"
                             placeholder="Phone (opt)"
                             value={adminNewMemberPhone}
                             onChange={(e) => setAdminNewMemberPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                            className="w-24 bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-pink-500 text-[11px]"
+                            className="w-24 bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
                           />
                           <button
                             onClick={() => handleAddMemberToFlat(selectedFlat.wing, selectedFlat.flatNo)}
-                            className="bg-pink-600 hover:bg-pink-700 text-white px-2.5 rounded text-[10px] font-bold uppercase transition cursor-pointer"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 rounded text-[10px] font-bold uppercase transition cursor-pointer"
                           >
                             Add
                           </button></div>
@@ -1451,7 +1451,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {/* Vehicles */}
                         <div className="pt-2 border-t border-slate-100 space-y-3">
                           <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                            <Key className="w-3.5 h-3.5 text-pink-600" />
+                            <Key className="w-3.5 h-3.5 text-indigo-600" />
                             <span>Registered Vehicles ({selectedFlat.vehicles?.length || 0})</span>
                           </h4>
                           {selectedFlat.vehicles && selectedFlat.vehicles.length > 0 ? (
@@ -1461,7 +1461,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                   <div className="text-left font-medium">
                                     <p className="font-bold text-slate-800 uppercase">{v.plateNumber}</p>
                                     <p className="text-[10px] text-slate-500">{v.brandModel} • {v.type === 'twowheeler' ? '2-Wheeler' : '4-Wheeler'}</p>
-                                    {v.parkingPlot && <p className="text-[10px] text-pink-600 font-bold mt-0.5">Plot: {v.parkingPlot}</p>}</div>
+                                    {v.parkingPlot && <p className="text-[10px] text-indigo-600 font-bold mt-0.5">Plot: {v.parkingPlot}</p>}</div>
                                   <button
                                     onClick={() => handleDeleteVehicleFromFlat(selectedFlat.wing, selectedFlat.flatNo, v.id)}
                                     className="text-slate-400 hover:text-red-600 p-1 rounded-md transition cursor-pointer"
@@ -1478,7 +1478,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               <select
                                 value={adminNewVehicleType}
                                 onChange={(e: any) => setAdminNewVehicleType(e.target.value)}
-                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-pink-500 text-[11px] font-bold"
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px] font-bold"
                               >
                                 <option value="twowheeler">2-Wheel</option>
                                 <option value="fourwheeler">4-Wheel</option>
@@ -1488,14 +1488,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 placeholder="PLATE (e.g. GJ05AB1234)"
                                 value={adminNewVehiclePlate}
                                 onChange={(e) => setAdminNewVehiclePlate(e.target.value)}
-                                className="bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-pink-500 text-[11px]"
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 uppercase outline-none focus:border-indigo-500 text-[11px]"
                               />
                               <input
                                 type="text"
                                 placeholder="MODEL (e.g. Swift)"
                                 value={adminNewVehicleModel}
                                 onChange={(e) => setAdminNewVehicleModel(e.target.value)}
-                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-pink-500 text-[11px]"
+                                className="bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px]"
                               /></div>
 
                             <input
@@ -1503,12 +1503,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               placeholder="Parking Plot (e.g. B-1 Basement)"
                               value={adminNewVehicleParking}
                               onChange={(e) => setAdminNewVehicleParking(e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-pink-500 text-[11px] font-medium"
+                              className="w-full bg-slate-50 border border-slate-200 rounded p-1.5 outline-none focus:border-indigo-500 text-[11px] font-medium"
                             />
 
                             <button
                               onClick={() => handleAddVehicleToFlat(selectedFlat.wing, selectedFlat.flatNo)}
-                              className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase cursor-pointer"
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase cursor-pointer"
                             >
                               Register Vehicle
                             </button></div></div></div>
@@ -1516,7 +1516,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       {/* Sub-section 2: Logged in Devices Audit with Remote Logout */}
                       <div className="space-y-3">
                         <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                          <Smartphone className="w-3.5 h-3.5 text-pink-600" />
+                          <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
                           <span>Logged in Devices ({selectedFlat.devices?.length || 0})</span>
                         </h4>
                         {selectedFlat.devices && selectedFlat.devices.length > 0 ? (
@@ -1566,7 +1566,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   setNoticeVideo('');
                   setShowNoticeForm(!showNoticeForm);
                 }}
-                className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
               >
                 {showNoticeForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showNoticeForm ? 'Cancel Form' : 'Publish New Notice'}</span>
@@ -1656,7 +1656,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     }}
                     className={`border-2 border-dashed rounded-xl p-5 text-center transition-all duration-150 flex flex-col items-center justify-center cursor-pointer ${
                       isDraggingNotice
-                        ? 'border-pink-600 bg-pink-50/50'
+                        ? 'border-indigo-600 bg-indigo-50/50'
                         : 'border-slate-200 bg-slate-50 hover:bg-slate-50/80 hover:border-slate-300'
                     }`}
                     onClick={() => document.getElementById('notice-file-input')?.click()}
@@ -1677,7 +1677,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     />
                     
                     <div className="space-y-1.5 py-1">
-                      <div className="mx-auto w-8 h-8 bg-pink-50 text-pink-600 border border-pink-100 rounded-full flex items-center justify-center">
+                      <div className="mx-auto w-8 h-8 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full flex items-center justify-center">
                         <Upload className="w-4 h-4" /></div>
                       <p className="text-xs font-bold text-slate-700">Drag & Drop files or click to select multiple</p>
                       <p className="text-[9px] text-slate-400">Supports PDF, MP4, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p></div></div>
@@ -1693,9 +1693,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                               {att.type?.startsWith('image/') ? (
                                 <img src={att.url} className="w-8 h-8 object-cover rounded border border-slate-100" />
                               ) : att.type?.startsWith('video/') ? (
-                                <div className="w-8 h-8 bg-pink-50 text-pink-600 border border-pink-100 rounded flex items-center justify-center text-[10px]">📹</div>
+                                <div className="w-8 h-8 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded flex items-center justify-center text-[10px]">📹</div>
                               ) : (
-                                <FileText className="w-6 h-6 text-pink-500 shrink-0" />
+                                <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
                               )}
                               <div className="text-left truncate">
                                 <p className="font-bold text-slate-700 truncate max-w-[120px]">{att.name}</p>
@@ -1755,13 +1755,13 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 <div key={ann.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between text-left">
                   <div className="space-y-3">
                     <div className="flex justify-between items-start gap-2">
-                      <span className="text-[9px] font-black bg-pink-50 text-pink-700 border border-pink-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      <span className="text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                         Audience: {ann.target} {ann.target === 'wing' ? `(${ann.wing})` : ann.target === 'flat' ? `(${ann.wing}-${ann.flatNo})` : ''}
                       </span>
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleEditNotice(ann)}
-                          className="text-pink-600 hover:bg-pink-50 p-1.5 rounded-lg border border-pink-100 transition"
+                          className="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg border border-indigo-100 transition"
                           title="Edit"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1792,9 +1792,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           {ann.pdfUrl && !(ann.attachments && ann.attachments.some((a: any) => a.url === ann.pdfUrl)) && (
                             <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex items-center justify-between text-xs col-span-full">
                               <div className="flex items-center space-x-2 truncate">
-                                <FileText className="w-6 h-6 text-pink-500 shrink-0" />
+                                <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
                                 <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{ann.fileName || 'document.pdf'}</span></div>
-                              <a href={ann.pdfUrl} download={ann.fileName || 'document.pdf'} className="text-pink-600 hover:underline font-extrabold text-[10px]">Download</a></div>
+                              <a href={ann.pdfUrl} download={ann.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                           )}
 
                           {/* Multi attachments list */}
@@ -1807,14 +1807,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 <video src={att.url} controls className="max-h-[100px] w-full rounded border bg-black" />
                               ) : (
                                 <div className="flex items-center gap-1.5">
-                                  <FileText className="w-5 h-5 text-pink-500 shrink-0" />
+                                  <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
                                   <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                               )}
                               <div className="flex items-center justify-between text-[10px]">
                                 {!att.type?.startsWith('image/') && !att.type?.startsWith('video/') && (
                                   <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                                 )}
-                                <a href={att.url} download={att.name || 'Attachment'} className="text-pink-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
                           ))}</div></div>
                     )}</div>
 
@@ -1847,9 +1847,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
             {/* Editing Complaint Modal overlay or drawer */}
             {editingComplaint && (
-              <form onSubmit={handleSaveComplaintEdit} className="bg-pink-50/40 border border-pink-200 p-5 rounded-2xl shadow-sm space-y-4">
-                <div className="flex justify-between items-center border-b border-pink-100 pb-2">
-                  <h4 className="font-display font-bold text-sm text-pink-900">✏️ Edit Complaint Details: {editingComplaint.id}</h4>
+              <form onSubmit={handleSaveComplaintEdit} className="bg-indigo-50/40 border border-indigo-200 p-5 rounded-2xl shadow-sm space-y-4">
+                <div className="flex justify-between items-center border-b border-indigo-100 pb-2">
+                  <h4 className="font-display font-bold text-sm text-indigo-900">✏️ Edit Complaint Details: {editingComplaint.id}</h4>
                   <button type="button" onClick={() => setEditingComplaint(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button></div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1859,14 +1859,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       type="text" required
                       value={editingComplaint.title}
                       onChange={(e) => setEditingComplaint({ ...editingComplaint, title: e.target.value })}
-                      className="w-full bg-white border border-pink-200 rounded-lg p-2.5 text-xs outline-none focus:border-pink-500"
+                      className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500"
                     /></div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Resolution Status</label>
                     <select
                       value={editingComplaint.status}
                       onChange={(e) => setEditingComplaint({ ...editingComplaint, status: e.target.value as any })}
-                      className="w-full bg-white border border-pink-200 rounded-lg p-2.5 text-xs outline-none focus:border-pink-500"
+                      className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500"
                     >
                       <option value="open">Open (Unresolved)</option>
                       <option value="in-progress">In Progress</option>
@@ -1879,7 +1879,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     required rows={3}
                     value={editingComplaint.description}
                     onChange={(e) => setEditingComplaint({ ...editingComplaint, description: e.target.value })}
-                    className="w-full bg-white border border-pink-200 rounded-lg p-2.5 text-xs outline-none focus:border-pink-500 resize-none"
+                    className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500 resize-none"
                   /></div>
 
                 <div>
@@ -1892,7 +1892,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <a
                         href={editingComplaint.mediaUrl}
                         download={editingComplaint.mediaName || 'attachment'}
-                        className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-1 px-2.5 rounded text-[10px] flex items-center space-x-1 cursor-pointer"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2.5 rounded text-[10px] flex items-center space-x-1 cursor-pointer"
                       >
                         <Download className="w-3 h-3" />
                         <span>Download</span>
@@ -1907,12 +1907,12 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     rows={3}
                     value={editingComplaint.processNotes || ''}
                     onChange={(e) => setEditingComplaint({ ...editingComplaint, processNotes: e.target.value })}
-                    className="w-full bg-white border border-pink-200 rounded-lg p-2.5 text-xs outline-none focus:border-pink-500 resize-none"
+                    className="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-xs outline-none focus:border-indigo-500 resize-none"
                     placeholder="Provide updates, actions taken, or resolution remarks..."
                   /></div>
 
                 <div className="flex justify-end gap-2 pt-2">
-                  <button type="submit" className="bg-pink-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">Save Complaint</button>
+                  <button type="submit" className="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer">Save Complaint</button>
                   <button type="button" onClick={() => setEditingComplaint(null)} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs cursor-pointer">Cancel</button></div>
               </form>
             )}
@@ -1927,7 +1927,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <div className="flex gap-1">
                         <button
                           onClick={() => setEditingComplaint(comp)}
-                          className="text-pink-600 hover:bg-pink-50 border border-pink-100 p-1 rounded-lg cursor-pointer"
+                          className="text-indigo-600 hover:bg-indigo-50 border border-indigo-100 p-1 rounded-lg cursor-pointer"
                           title="Edit"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1955,9 +1955,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           {comp.mediaUrl && !(comp.attachments && comp.attachments.some((a: any) => a.url === comp.mediaUrl)) && (
                             <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex items-center justify-between text-xs col-span-full shadow-sm">
                               <div className="flex items-center space-x-2 truncate">
-                                <FileText className="w-5 h-5 text-pink-500 shrink-0" />
+                                <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
                                 <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{comp.mediaName || 'Attachment'}</span></div>
-                              <a href={comp.mediaUrl} download={comp.mediaName || 'Attachment'} className="text-pink-600 hover:underline font-extrabold text-[10px]">Download</a></div>
+                              <a href={comp.mediaUrl} download={comp.mediaName || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                           )}
 
                           {/* Multi attachments */}
@@ -1970,14 +1970,14 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 <video src={att.url} controls className="max-h-[100px] w-full rounded border bg-black" />
                               ) : (
                                 <div className="flex items-center gap-1.5">
-                                  <FileText className="w-5 h-5 text-pink-500 shrink-0" />
+                                  <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
                                   <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                               )}
                               <div className="flex items-center justify-between text-[10px]">
                                 {!att.type?.startsWith('image/') && !att.type?.startsWith('video/') && (
                                   <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                                 )}
-                                <a href={att.url} download={att.name || 'Attachment'} className="text-pink-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                                <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
                           ))}</div></div>
                     )}
 
@@ -2015,7 +2015,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 <p className="text-xs text-slate-400">Upload reports, input expenses, and parse custom CSV tables directly into the ledger.</p></div>
               <button
                 onClick={() => setShowFinanceForm(!showFinanceForm)}
-                className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
               >
                 {showFinanceForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showFinanceForm ? 'Cancel Ledger Form' : 'Add Ledger Entry'}</span>
@@ -2108,7 +2108,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       }}
                       className={`border-2 border-dashed rounded-xl p-5 text-center transition-all duration-150 flex flex-col items-center justify-center cursor-pointer ${
                         isDraggingFin
-                          ? 'border-pink-600 bg-pink-50/50'
+                          ? 'border-indigo-600 bg-indigo-50/50'
                           : 'border-slate-200 bg-slate-50 hover:bg-slate-50/80 hover:border-slate-300'
                       }`}
                       onClick={() => document.getElementById('fin-file-input')?.click()}
@@ -2129,7 +2129,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       />
                       
                       <div className="space-y-1.5 py-1">
-                        <div className="mx-auto w-8 h-8 bg-pink-50 text-pink-600 border border-pink-100 rounded-full flex items-center justify-center">
+                        <div className="mx-auto w-8 h-8 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full flex items-center justify-center">
                           <Upload className="w-4 h-4" /></div>
                         <p className="text-xs font-bold text-slate-700">Drag & Drop files or click to select multiple</p>
                         <p className="text-[9px] text-slate-400">Supports PDF, CSV, Excel sheets, PNG, JPG (Max 15MB each)</p></div></div>
@@ -2145,7 +2145,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 {att.type?.startsWith('image/') ? (
                                   <img src={att.url} className="w-8 h-8 object-cover rounded border border-slate-100" />
                                 ) : (
-                                  <FileText className="w-6 h-6 text-pink-500 shrink-0" />
+                                  <FileText className="w-6 h-6 text-indigo-500 shrink-0" />
                                 )}
                                 <div className="text-left truncate">
                                   <p className="font-bold text-slate-700 truncate max-w-[150px]">{att.name}</p>
@@ -2249,7 +2249,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           report.reportType === 'welfare' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                           report.reportType === 'statement' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                           report.reportType === 'other' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                          'bg-pink-50 text-pink-700 border-pink-200'
+                          'bg-indigo-50 text-indigo-700 border-indigo-200'
                         }`}>
                           {report.reportType === 'welfare' ? 'Welfare Funds' :
                            report.reportType === 'statement' ? 'Audit Statement' :
@@ -2260,7 +2260,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleEditFinance(report)}
-                          className="text-pink-600 hover:bg-pink-50 border border-pink-100 p-1.5 rounded-lg transition cursor-pointer"
+                          className="text-indigo-600 hover:bg-indigo-50 border border-indigo-100 p-1.5 rounded-lg transition cursor-pointer"
                           title="Edit"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -2292,9 +2292,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         {report.pdfUrl && !(report.attachments && report.attachments.some((a: any) => a.url === report.pdfUrl)) && (
                           <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl flex items-center justify-between text-xs col-span-full shadow-sm">
                             <div className="flex items-center space-x-2 truncate">
-                              <FileText className="w-5 h-5 text-pink-500 shrink-0" />
+                              <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
                               <span className="font-bold text-slate-700 truncate max-w-[150px] text-[10px]">{report.fileName || 'document.pdf'}</span></div>
-                            <a href={report.pdfUrl} download={report.fileName || 'document.pdf'} className="text-pink-600 hover:underline font-extrabold text-[10px]">Download</a></div>
+                            <a href={report.pdfUrl} download={report.fileName || 'document.pdf'} className="text-indigo-600 hover:underline font-extrabold text-[10px]">Download</a></div>
                         )}
 
                         {/* Multi attachments list */}
@@ -2305,19 +2305,19 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                                 <img src={att.url} className="w-full object-cover max-h-[100px]" referrerPolicy="no-referrer" /></div>
                             ) : (
                               <div className="flex items-center gap-1.5">
-                                <FileText className="w-5 h-5 text-pink-500 shrink-0" />
+                                <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
                                 <p className="font-bold text-slate-700 truncate text-[10px] max-w-[120px]">{att.name}</p></div>
                             )}
                             <div className="flex items-center justify-between text-[10px]">
                               {!att.type?.startsWith('image/') && (
                                 <span className="text-[8px] text-slate-400 font-mono uppercase">{att.type?.split('/')[1] || 'FILE'}</span>
                               )}
-                              <a href={att.url} download={att.name || 'Attachment'} className="text-pink-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
+                              <a href={att.url} download={att.name || 'Attachment'} className="text-indigo-600 hover:underline font-extrabold text-[10px] ml-auto">Download</a></div></div>
                         ))}</div></div>
                   )}
 
                   <div className="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 font-mono">
-                    <span className="text-[10px] text-pink-500 font-bold uppercase tracking-wider">Month: {report.month} {report.year}</span>
+                    <span className="text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Month: {report.month} {report.year}</span>
                     <span>Uploaded: {new Date(report.createdAt).toLocaleDateString('en-IN')}</span></div></div>
               ))}
 
@@ -2345,7 +2345,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   setContactAltPhone('');
                   setShowContactForm(!showContactForm);
                 }}
-                className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
               >
                 {showContactForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showContactForm ? 'Cancel Form' : 'Add New Contact'}</span>
@@ -2418,7 +2418,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               {contacts.map((c) => (
                 <div key={c.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm text-left flex justify-between items-start gap-4">
                   <div className="space-y-2">
-                    <span className="text-[9px] font-black bg-pink-50 text-pink-700 border border-pink-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       {c.category}
                     </span>
                     <div>
@@ -2434,7 +2434,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleEditContact(c)}
-                      className="text-pink-600 hover:bg-pink-50 border border-pink-100 p-1.5 rounded-lg transition"
+                      className="text-indigo-600 hover:bg-indigo-50 border border-indigo-100 p-1.5 rounded-lg transition"
                       title="Edit"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -2456,7 +2456,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             {/* Header / Summary stats */}
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center space-x-3 text-left">
-                <div className="p-3 bg-pink-50 border border-pink-100 rounded-xl text-pink-600 shrink-0">
+                <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600 shrink-0">
                   <Sparkles className="w-6 h-6" /></div>
                 <div>
                   <h3 className="font-display font-black text-base text-slate-800">Amenities & Bookings Master Auditor</h3>
@@ -2465,7 +2465,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               <div className="flex gap-2">
                 <button
                   onClick={handleDownloadAmenitiesPDF}
-                  className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow transition cursor-pointer self-start md:self-auto shrink-0 animate-fadeIn"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow transition cursor-pointer self-start md:self-auto shrink-0 animate-fadeIn"
                 >
                   <Download className="w-4 h-4" />
                   <span>Export Amenities Logs (PDF)</span>
@@ -2486,7 +2486,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                 <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                   <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-pink-600" />
+                    <Calendar className="w-4 h-4 text-indigo-600" />
                     <span>Function Hall Requests ({amenityBookings.length})</span>
                   </h4></div>
 
@@ -2503,7 +2503,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                         <div key={booking.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-slate-50 transition text-left space-y-3">
                           <div className="flex justify-between items-start gap-4">
                             <div>
-                              <span className="bg-pink-100 text-pink-800 font-mono text-[9px] font-black px-2.5 py-0.5 rounded uppercase">
+                              <span className="bg-indigo-100 text-indigo-800 font-mono text-[9px] font-black px-2.5 py-0.5 rounded uppercase">
                                 Flat {booking.flatId}
                               </span>
                               <h5 className="font-bold text-xs text-slate-800 mt-1 uppercase">
@@ -2550,7 +2550,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 {/* 1. Active Check-ins */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                   <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
-                    <Clock className="text-pink-600 w-4 h-4" />
+                    <Clock className="text-indigo-600 w-4 h-4" />
                     <span>Active Sessions</span>
                   </h4>
 
@@ -2560,9 +2560,9 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   ) : (
                     <div className="space-y-3">
                       {gymTheatreLogs.filter(l => !l.checkOutTime).map((log) => (
-                        <div key={log.id} className="bg-pink-50/40 border border-pink-100 p-3.5 rounded-xl flex justify-between items-center text-xs gap-3">
+                        <div key={log.id} className="bg-indigo-50/40 border border-indigo-100 p-3.5 rounded-xl flex justify-between items-center text-xs gap-3">
                           <div className="text-left space-y-1">
-                            <p className="font-bold text-pink-900 uppercase">
+                            <p className="font-bold text-indigo-900 uppercase">
                               {log.amenity === 'Gym' ? '🏋️ Gym' : '🎬 Theatre'}
                             </p>
                             <p className="font-semibold text-slate-700">Flat: {log.flatId}</p>
@@ -2579,7 +2579,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 {/* 2. Log History */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                   <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
-                    <Dumbbell className="text-pink-600 w-4 h-4" />
+                    <Dumbbell className="text-indigo-600 w-4 h-4" />
                     <span>Log History</span>
                   </h4>
 
@@ -2617,7 +2617,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                   <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                     <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                      <Film className="text-pink-600 w-4 h-4" />
+                      <Film className="text-indigo-600 w-4 h-4" />
                       <span>Movie Postings ({moviesSchedule.length})</span>
                     </h4>
                     <div className="flex gap-3">
@@ -2629,7 +2629,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           }
                           await generateMoviePDF(moviesSchedule, "MOVIE THEATRE POSTINGS", "All Scheduled Community Screenings", true, owners);
                         }}
-                        className="text-[10px] text-pink-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                        className="text-[10px] text-indigo-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
                         <span>Export PDF</span>
@@ -2655,7 +2655,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                           link.click();
                           document.body.removeChild(link);
                         }}
-                        className="text-[10px] text-pink-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                        className="text-[10px] text-indigo-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
                         <span>Export CSV</span>
@@ -2674,7 +2674,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                             <p className="text-[10px] text-slate-500 font-medium">Day: {movie.day} • {movie.date}</p>
                             <p className="text-[10px] text-slate-500 font-mono">Time: {movie.timing} • Length: {movie.length}</p>
                             {movie.trailerUrl && (
-                              <a href={movie.trailerUrl} target="_blank" rel="noopener noreferrer" className="text-[9px] text-pink-500 underline font-semibold">
+                              <a href={movie.trailerUrl} target="_blank" rel="noopener noreferrer" className="text-[9px] text-indigo-500 underline font-semibold">
                                 Watch Trailer
                               </a>
                             )}</div>
@@ -2713,7 +2713,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
             {/* Form 1: Password Changer */}
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               <div>
-                <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-pink-600">
+                <div className="flex items-center space-x-2 border-b border-slate-100 pb-3 mb-4 text-indigo-600">
                   <Key className="w-5 h-5" />
                   <h3 className="font-display font-bold text-base text-slate-800">Admin Password Override</h3></div>
 
@@ -2766,7 +2766,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
 
                   <button
                     type="submit" disabled={passLoading}
-                    className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition cursor-pointer"
                   >
                     {passLoading ? 'Updating...' : 'Update Password Override'}
                   </button>
@@ -2802,7 +2802,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   </button>
                   <button
                     onClick={() => handleDownloadMasterVisitorLogs('all')}
-                    className="bg-pink-50 hover:bg-pink-100 text-pink-800 border border-pink-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
+                    className="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold py-3 px-4 rounded-xl text-xs transition cursor-pointer text-center"
                   >
                     🗂️ Download All-Time Logs
                   </button></div></div></div>
@@ -2903,7 +2903,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               <div className="space-y-4 text-left">
                 <div className="flex items-center space-x-2 border-b border-slate-100 pb-2 mb-2">
                   <h4 className="font-display font-bold text-xs uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-pink-600" />
+                    <User className="w-4 h-4 text-indigo-600" />
                     Local Directory & Handymen
                   </h4>
                 </div>
@@ -2912,7 +2912,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                     onClick={() => setLocalSubTab('local')}
                     className="bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group border-slate-200/60"
                   >
-                    <div className="w-14 h-14 rounded-none bg-pink-50 text-pink-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-14 h-14 rounded-none bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
                       <User className="w-7 h-7" />
                     </div>
                     <h4 className="font-display font-bold text-slate-800 text-sm tracking-tight leading-snug">
@@ -2956,7 +2956,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   setContactAltPhone('');
                   setShowContactForm(!showContactForm);
                 }}
-                className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition"
               >
                 {showContactForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 <span>{showContactForm ? 'Cancel Form' : 'Add New Contact'}</span>
@@ -3029,7 +3029,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
               {contacts.map((c) => (
                 <div key={c.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm text-left flex justify-between items-start gap-4">
                   <div className="space-y-2">
-                    <span className="text-[9px] font-black bg-pink-50 text-pink-700 border border-pink-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       {c.category}
                     </span>
                     <div>
@@ -3045,7 +3045,7 @@ export default function AdminDashboard({ owners, onRefreshOwners, onLogoutAdmin 
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleEditContact(c)}
-                      className="text-pink-600 hover:bg-pink-50 border border-pink-100 p-1.5 rounded-lg transition"
+                      className="text-indigo-600 hover:bg-indigo-50 border border-indigo-100 p-1.5 rounded-lg transition"
                       title="Edit"
                     >
                       <Edit3 className="w-3.5 h-3.5" />

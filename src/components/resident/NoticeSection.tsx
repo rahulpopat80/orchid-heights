@@ -34,7 +34,7 @@ export default function NoticeSection({
     <div className="space-y-6 text-left">
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center space-x-2.5 mb-4 border-b border-slate-100 pb-3">
-          <Megaphone className="w-5 h-5 text-pink-600" />
+          <Megaphone className="w-5 h-5 text-indigo-600" />
           <div>
             <h3 className="font-display font-bold text-base text-slate-800">Orchid Heights Society Announcements</h3>
             <p className="text-[10px] text-slate-400 mt-0.5">Important updates from society Secretary Rahul Popat</p>
@@ -55,7 +55,7 @@ export default function NoticeSection({
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
                   <div className="flex items-center space-x-2">
-                    <span className="p-1.5 bg-pink-50 border border-pink-100 text-pink-700 rounded-lg shrink-0">
+                    <span className="p-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg shrink-0">
                       🔔
                     </span>
                     <div>
@@ -68,7 +68,7 @@ export default function NoticeSection({
                     </div>
                   </div>
 
-                  <span className="text-[9px] font-mono font-bold bg-pink-100 text-pink-800 border border-pink-150 px-2.5 py-0.5 rounded-full uppercase self-start sm:self-center">
+                  <span className="text-[9px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-150 px-2.5 py-0.5 rounded-full uppercase self-start sm:self-center">
                     {notice.targetType === 'all' ? 'All Residents' : notice.targetType === 'wing' ? `Wing ${notice.targetWing} Only` : `Flat ${notice.targetWing}-${notice.targetFlat}`}
                   </span>
                 </div>

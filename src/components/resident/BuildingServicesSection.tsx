@@ -30,7 +30,7 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
       case 'Security':
         return <Shield className="w-4 h-4 text-emerald-600" />;
       case 'Manager':
-        return <Landmark className="w-4 h-4 text-pink-600" />;
+        return <Landmark className="w-4 h-4 text-indigo-600" />;
       case 'Gardener':
         return <User className="w-4 h-4 text-teal-600" />;
       default:
@@ -47,7 +47,7 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
       case 'Security':
         return 'bg-emerald-50 text-emerald-700 border-emerald-100';
       case 'Manager':
-        return 'bg-pink-50 text-pink-700 border-pink-100';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-100';
       case 'Gardener':
         return 'bg-teal-50 text-teal-700 border-teal-100';
       default:
@@ -66,8 +66,8 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
       <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
         {/* Header Title */}
         <div className="flex items-center space-x-2.5 border-b border-slate-100 pb-2.5">
-          <div className="w-9 h-9 rounded-full bg-pink-50 flex items-center justify-center">
-            <Wrench className="w-4.5 h-4.5 text-pink-600" />
+          <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center">
+            <Wrench className="w-4.5 h-4.5 text-indigo-600" />
           </div>
           <div>
             <h3 className="font-display font-bold text-sm text-slate-800">Building Services & Contacts</h3>
@@ -85,7 +85,7 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
             placeholder="Search by name, category, or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-pink-500 focus:bg-white rounded-xl pl-9 pr-4 py-2 text-xs font-semibold outline-none transition"
+            className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl pl-9 pr-4 py-2 text-xs font-semibold outline-none transition"
           />
         </div>
 
@@ -97,7 +97,7 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
               onClick={() => setActiveCategory(cat)}
               className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border transition shrink-0 select-none cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-pink-600 text-white border-pink-600 shadow-xs'
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
                   : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -150,7 +150,7 @@ export default function BuildingServicesSection({ contacts }: BuildingServicesSe
                   <a
                     href={`tel:${c.phone}`}
                     title="Call now"
-                    className="p-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg shadow-xs transition select-none flex items-center justify-center"
+                    className="p-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-xs transition select-none flex items-center justify-center"
                   >
                     <Phone className="w-3.5 h-3.5" />
                   </a>

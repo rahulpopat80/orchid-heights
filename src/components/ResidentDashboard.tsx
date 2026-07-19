@@ -1251,7 +1251,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   <h1 className="font-sans font-black text-white text-base leading-tight uppercase tracking-tight shadow-sm">
                     Orchid Heights
                   </h1>
-                  <p className="text-[9px] text-pink-200 font-bold uppercase tracking-widest font-sans">
+                  <p className="text-[9px] text-indigo-200 font-bold uppercase tracking-widest font-sans">
                     Owners Association • ઓર્કીડ સોસાયટી
                   </p>
                 </div>
@@ -1283,7 +1283,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                 {/* Premium Notification bell with badge */}
                 <button
                   onClick={() => setIsNotificationsOpen(true)}
-                  className="relative flex items-center justify-center p-3.5 bg-gradient-to-tr from-pink-600/90 to-purple-600/90 hover:from-pink-500 hover:to-purple-500 text-white rounded-2xl transition-all duration-300 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/30 backdrop-blur-xl group hover:scale-105 active:scale-95"
+                  className="relative flex items-center justify-center p-3.5 bg-gradient-to-tr from-indigo-600/90 to-purple-600/90 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl transition-all duration-300 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/30 backdrop-blur-xl group hover:scale-105 active:scale-95"
                   title="Open Notifications Panel"
                 >
                   <Bell className="w-5 h-5 group-hover:animate-bounce" />
@@ -1429,7 +1429,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/gate-visitors', 'visitors');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'visitors' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'visitors' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#7C3AED] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1448,7 +1448,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/complaints', 'complaints');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'complaints' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'complaints' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#EC4899] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1467,7 +1467,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/directory', 'directory');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'directory' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'directory' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1486,7 +1486,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/amenities', 'amenity');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'amenity' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'amenity' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#059669] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1505,7 +1505,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/services', 'services');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'services' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'services' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#DB2777] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1524,7 +1524,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/help-desk', 'helpdesk');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'helpdesk' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'helpdesk' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-sm mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1543,7 +1543,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   navigateToRoute('/notifications-center', 'notifications');
                 }}
                 className={`bg-white rounded-none p-6 border shadow-sm flex flex-col items-center justify-center min-h-[140px] text-center hover:shadow-md transition cursor-pointer relative group ${
-                  highlightBlock === 'notifications' ? 'ring-2 ring-pink-500 ring-offset-2 animate-pulse bg-pink-50/20 border-pink-300' : 'border-slate-200/60'
+                  highlightBlock === 'notifications' ? 'ring-2 ring-indigo-500 ring-offset-2 animate-pulse bg-indigo-50/20 border-indigo-300' : 'border-slate-200/60'
                 }`}
               >
                 <div className="w-14 h-14 rounded-none bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-sm relative mb-3 group-hover:scale-105 transition-transform duration-300">
@@ -1747,7 +1747,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                       setDismissedNotifIds(updated);
                       localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(updated));
                     }}
-                    className="text-[11px] font-bold text-pink-600 hover:text-pink-700 bg-pink-50 border border-pink-100 px-2.5 py-1 rounded-lg shrink-0"
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg shrink-0"
                   >
                     Clear All
                   </button>
@@ -1884,7 +1884,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     localStorage.setItem('orchid_deep_redirect', 'movies');
                                     setTimeout(() => window.dispatchEvent(new Event('orchid_amenities_redirect')), 100);
                                   }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
+                                  className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer animate-pulse"
                                 >
                                   Open Movies
                                 </button>
@@ -1897,7 +1897,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                                     setLastVisitedSubSection('complaints');
                                     setActiveSubSection('complaints');
                                   }}
-                                  className="text-[9px] font-black uppercase tracking-tight bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-100 px-2 py-1 rounded-lg cursor-pointer"
+                                  className="text-[9px] font-black uppercase tracking-tight bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 px-2 py-1 rounded-lg cursor-pointer"
                                 >
                                   Open Ticket
                                 </button>
@@ -2035,7 +2035,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
             window.history.pushState(null, '', '/home');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-            activeMainTab === 'community' ? 'text-pink-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+            activeMainTab === 'community' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <Home className="w-5.5 h-5.5" />
@@ -2049,7 +2049,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
             window.history.pushState(null, '', '/me');
           }}
           className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-            activeMainTab === 'personal' ? 'text-pink-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+            activeMainTab === 'personal' ? 'text-indigo-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <User className="w-5.5 h-5.5" />
@@ -2079,7 +2079,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
             {/* Header */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center space-x-2">
-                <Bell className="w-5 h-5 text-pink-600" />
+                <Bell className="w-5 h-5 text-indigo-600" />
                 <h3 className="font-sans font-black text-base text-slate-800 uppercase tracking-tight">Notification Center</h3>
               </div>
               <button
@@ -2166,7 +2166,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                       notif.type === 'financial' ? 'text-emerald-500 bg-emerald-50' :
                       notif.type === 'complaint' ? 'text-rose-500 bg-rose-50' :
                       notif.type === 'amenity_request' ? 'text-purple-500 bg-purple-50' :
-                      notif.type === 'movie_schedule' ? 'text-pink-500 bg-pink-50' :
+                      notif.type === 'movie_schedule' ? 'text-indigo-500 bg-indigo-50' :
                       'text-blue-500 bg-blue-50';
                     return (
                       <div key={notif.id} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-start space-x-3 text-left relative group">
@@ -2209,7 +2209,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                     const noticeDate = notice.createdAt || notice.timestamp || new Date().toISOString();
                     return (
                       <div key={notice.id} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-start space-x-3 text-left relative group">
-                        <Megaphone className="w-5 h-5 text-pink-500 shrink-0 mt-0.5" />
+                        <Megaphone className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
                         <div className="space-y-1 w-full pr-6">
                           <p className="text-xs font-black text-slate-800 uppercase tracking-wider">
                             📢 NOTICE: {noticeTitle}
@@ -2248,7 +2248,7 @@ export default function ResidentDashboard({ session, owners, onRefreshOwners }: 
                   localStorage.setItem('orchid_dismissed_notifs', JSON.stringify(allIds));
                   setIsNotificationsOpen(false);
                 }}
-                className="text-pink-600 hover:text-pink-700 font-sans font-extrabold text-xs uppercase tracking-wider transition cursor-pointer select-none"
+                className="text-indigo-600 hover:text-indigo-700 font-sans font-extrabold text-xs uppercase tracking-wider transition cursor-pointer select-none"
               >
                 Close Panel
               </button>

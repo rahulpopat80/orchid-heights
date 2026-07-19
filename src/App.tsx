@@ -375,7 +375,7 @@ export default function App() {
           loadingOwners && owners.length === 0 ? (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
               <div className="text-center space-y-4">
-                <div className="inline-block border-4 border-pink-600 border-t-transparent rounded-full w-10 h-10 animate-spin"></div>
+                <div className="inline-block border-4 border-indigo-600 border-t-transparent rounded-full w-10 h-10 animate-spin"></div>
                 <p className="text-sm font-semibold text-slate-600 font-display">Powering up Orchid Heights Gatekeeper...</p>
               </div>
             </div>

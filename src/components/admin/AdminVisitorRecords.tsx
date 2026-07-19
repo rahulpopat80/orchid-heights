@@ -109,12 +109,12 @@ export default function AdminVisitorRecords({ onBack, owners = [] }: AdminVisito
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 text-sm font-black text-pink-700 hover:text-pink-900 cursor-pointer transition select-none bg-pink-50 hover:bg-pink-100 border border-pink-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
+          className="flex items-center space-x-2 text-sm font-black text-indigo-700 hover:text-indigo-900 cursor-pointer transition select-none bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-5 py-2.5 rounded-full shadow-sm active:scale-95"
         >
           <span className="text-xl leading-none -mt-0.5">◀</span>
           <span className="uppercase tracking-widest text-[10px]">Back to Home</span>
         </button>
-        <div className="flex items-center space-x-1 text-pink-600">
+        <div className="flex items-center space-x-1 text-indigo-600">
           <ShieldCheck className="w-4 h-4" />
           <span className="text-[10px] font-bold uppercase tracking-widest font-mono">
             Security Logs
@@ -184,7 +184,7 @@ export default function AdminVisitorRecords({ onBack, owners = [] }: AdminVisito
           <button
             onClick={downloadPDF}
             disabled={loading}
-            className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer select-none disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center space-x-2 shadow-sm transition-all cursor-pointer select-none disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Search className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
             <span>Download PDF (With Photos)</span>
